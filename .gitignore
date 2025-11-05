@@ -1,0 +1,9 @@
+# Compiled executable
+/VerticalSlice/game.exe
+
+# VS Code user settings
+.vscode/
+!.vscode/tasks.json
+
+# Temporary directories
+ref/

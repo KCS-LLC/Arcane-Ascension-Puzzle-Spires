@@ -1,0 +1,33 @@
+
+# C++
+*.o
+*.lo
+*.la
+*.slo
+*.so
+*.a
+*.dll
+*.exe
+*.out
+*.app
+*.i
+*.ii
+*.s
+*.su
+
+# Build directories
+[Bb]uild/
+[Bb]uilds/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+build-*/
+
+# IDE-specific files
+.vscode/
+*.sln
+*.suo
+*.vcxproj*
+*.vs/
