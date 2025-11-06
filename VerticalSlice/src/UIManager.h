@@ -3,13 +3,24 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <optional>
 #include "Player.h"
 #include "Monster.h"
 #include "Constants.h"
 
+// A structure to represent a command sent from the UI to the Game
+enum class UIActionType { CastSpell };
+struct UIAction {
+    UIActionType type;
+    int spellIndex; 
+};
+
 class UIManager {
 public:
     UIManager();
+
+    // Takes an event and returns an action if a UI element was interacted with
+    std::optional<UIAction> handleEvent(const sf::Event& event);
 
     void setup(const sf::Font& font, const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin);
     void update(const Player& player, const Monster& monster);

@@ -64,12 +64,11 @@ void Game::processEvents() {
         if (auto* mbp = event->getIf<sf::Event::MouseButtonPressed>()) {
             if (mbp->button != sf::Mouse::Button::Left) continue;
             
-            // 1. Check for spell button clicks first.
-            bool buttonClicked = false;
-            const auto& spellButtons = uiManager.getSpellButtons();
-            for (int i = 0; i < spellButtons.size(); ++i) {
-                if (spellButtons[i].getGlobalBounds().contains(sf::Vector2f(mbp->position))) {
-                    int damage = player.castSpell(i);
+            // 1. Let the UIManager handle the event first.
+            auto uiAction = uiManager.handleEvent(*event);
+            if (uiAction.has_value()) {
+                if (uiAction->type == UIActionType::CastSpell) {
+                    int damage = player.castSpell(uiAction->spellIndex);
                     if (damage > 0) {
                         monster.takeDamage(damage);
                         std::cout << "Casted spell, dealing " << damage << " damage!\n";
@@ -80,13 +79,11 @@ void Game::processEvents() {
                     } else {
                         std::cout << "Not enough mana to cast spell!\n";
                     }
-                    buttonClicked = true;
-                    break;
                 }
+                continue; // UI handled the event, so we're done.
             }
-            if (buttonClicked) continue; // Don't process board clicks if a button was clicked
 
-            // 2. Check for board clicks for gem selection and swapping.
+            // 2. If the UI didn't handle it, check for board clicks.
             const int c = (mbp->position.x - boardOrigin.x) / TILE_SIZE;
             const int r = (mbp->position.y - boardOrigin.y) / TILE_SIZE;
             if (c < 0 || c >= BOARD_WIDTH || r < 0 || r >= BOARD_HEIGHT) continue;

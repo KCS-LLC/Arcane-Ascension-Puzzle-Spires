@@ -142,9 +142,77 @@ void UIManager::render(sf::RenderWindow& window, GameState currentState) {
 
     const std::vector<sf::RectangleShape>& UIManager::getSpellButtons() const {
 
+    
+
         return spellButtons;
 
+    
+
     }
+
+    
+
+    
+
+    
+
+    std::optional<UIAction> UIManager::handleEvent(const sf::Event& event) {
+
+    
+
+        if (auto* mbp = event.getIf<sf::Event::MouseButtonPressed>()) {
+
+    
+
+            if (mbp->button == sf::Mouse::Button::Left) {
+
+    
+
+                for (int i = 0; i < spellButtons.size(); ++i) {
+
+    
+
+                    if (spellButtons[i].getGlobalBounds().contains(sf::Vector2f(mbp->position))) {
+
+    
+
+                        // A spell button was clicked, return the corresponding action.
+
+    
+
+                        return UIAction{UIActionType::CastSpell, i};
+
+    
+
+                    }
+
+    
+
+                }
+
+    
+
+            }
+
+    
+
+        }
+
+    
+
+        // No UI element was interacted with, return no action.
+
+    
+
+        return std::nullopt;
+
+    
+
+    }
+
+    
+
+    
 
     
 
