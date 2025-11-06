@@ -22,6 +22,22 @@ g++ -g -DSFML_STATIC "src/main.cpp" "src/Game.cpp" "src/Board.cpp" -o "game.exe"
 
 ## How to Play
 
+
+
 *   **Swap Gems:** Click and drag a gem to swap it with an adjacent gem. Alternatively, click one gem and then click an adjacent gem.
+
 *   **Cast Spells:** When you have enough mana, click the spell buttons in the left-hand panel to cast them.
+
 *   **Objective:** Defeat the monster before it defeats you!
+
+
+
+## Developer Notes
+
+
+
+The codebase is currently in a stable, functional state. However, it is not yet optimized for future development. The `Game.cpp` file is overly large, and much of the game's data (spells, monster stats) is hardcoded directly into the source.
+
+
+
+A major architectural refactoring is planned to address these issues. The goal is to separate concerns into more focused classes (like a `UIManager` and `DataManager`) and to move all game data into external JSON files. For a detailed history of this effort and the revised plan, please see the `NEXT_STEPS.md` file.

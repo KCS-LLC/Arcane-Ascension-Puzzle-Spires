@@ -32,12 +32,14 @@ All game assets (fonts, sprites, etc.) must be located in a directory named `ass
 
 ---
 
-## 4. Build Command
-
-The following command is used to compile the project from the `VerticalSlice` directory. It includes all necessary flags for static linking.
+## Compiler Command
 
 ```bash
 g++ -g -DSFML_STATIC "src/main.cpp" "src/Game.cpp" "src/Board.cpp" -o "game.exe" -I "C:/Program Files (x86)/SFML/include" -L "C:/Program Files (x86)/SFML/lib" -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32 -lfreetype -lwinmm -lgdi32 -luser32 -lkernel32
 ```
+
+## Future Dependencies
+
+The next planned refactoring will introduce a dependency on the **nlohmann/json** library for parsing game data from JSON files. This is a header-only library, so it will not require any additional linking steps. The file `json.hpp` will need to be placed in the `src` directory.
 
 *Note: When adding new `.cpp` files to the `src` directory, they must be added to this command.*

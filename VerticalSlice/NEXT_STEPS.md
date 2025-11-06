@@ -2,71 +2,24 @@
 
 This document outlines the prioritized next steps for expanding the prototype from its current state into a more complete demonstration of the game's core mechanics.
 
-The current prototype successfully implements:
-- A basic SFML window and game loop.
-- A functional match-3 board with gem swapping and refilling.
-- Simple Player and Monster objects with HP.
-- A rudimentary turn system based on player actions.
-- A win/loss condition.
+---
 
-The following phases are designed to incrementally add layers of gameplay, bringing the prototype closer to the vision laid out in the design documents.
+## COMPLETED - Phase 1: Foundational UX & Visual Feedback
+
+This phase was focused on making the game state understandable and providing clear feedback for player actions.
+- **[DONE]** Display Core Game Stats (HP, Mana).
+- **[DONE]** Enhance Gem Variety (Multiple colors are implemented).
+- **[DONE]** Animate Gem Swaps.
+- **[DONE]** Animate Gem Destruction & Refill.
 
 ---
 
-## Phase 1: Foundational UX & Visual Feedback
+## COMPLETED - Phase 2: Complete the Core Combat Loop
 
-The highest priority is to make the game state understandable and to provide clear feedback for player actions. This phase addresses the immediate playability issues.
-
-1.  **Display Core Game Stats:**
-    *   **Goal:** Provide immediate context for the game state.
-    *   **Tasks:**
-        *   Render the Player's current and max HP on screen.
-        *   Render the Monster's current and max HP on screen.
-
-2.  **Enhance Gem Variety:**
-    *   **Goal:** Make the board easier to read and patterns easier to spot.
-    *   **Tasks:**
-        *   Add more gem types/colors to the `GemType` enum (e.g., Green, Yellow).
-        *   Update the board generation logic to include these new colors.
-
-3.  **Animate Gem Swaps:**
-    *   **Goal:** Make player moves feel impactful and clear.
-    *   **Tasks:**
-        *   Implement a simple animation where selected gems visibly slide into each other's places instead of instantly teleporting.
-
-4.  **Animate Gem Destruction & Refill:**
-    *   **Goal:** Make the match-and-refill cycle easy to follow.
-    *   **Tasks:**
-        *   Add a visual effect when gems are matched (e.g., a quick fade-out or shrink).
-        *   Animate new gems falling from the top of the board to fill empty spaces.
-
----
-
-## Phase 2: Complete the Core Combat Loop
-
-With a clearer UI, the next priority is to make the puzzle board fully interactive and consequential.
-
-1.  **Implement Match Consequences:**
-    *   **Goal:** Connect the `Board::processMatches` function to the `Player` and `Monster` objects.
-    *   **Tasks:**
-        *   When **Skull** gems are matched, the `Monster` should take damage based on the formula in `Formulas_and_Effects.md`.
-        *   When **Mana** gems (Fire, Water, etc.) are matched, the corresponding mana should be added to the `Player`'s mana pool.
-        *   The results of each match (damage dealt, mana gained) should be displayed on screen temporarily.
-
-2.  **Implement a Basic Spell System:**
-    *   **Goal:** Allow the player to spend their accumulated mana.
-    *   **Tasks:**
-        *   Create a simple "Fireball" spell for the player.
-        *   Assign a key (e.g., the '1' key) to cast the spell.
-        *   When the key is pressed, check if the player has enough Fire mana.
-        *   If they do, subtract the mana cost, deal damage to the monster, and display the damage on screen.
-
-3.  **Refine Monster Turn:**
-    *   **Goal:** Make the monster's turn more dynamic.
-    *   **Tasks:**
-        *   Give the monster a base attack damage value.
-        *   When the monster's turn is triggered, it should deal its base damage to the player.
-        *   This action should also have a "speed cost" that is added to the player's action counter, creating a more interactive turn flow.
+This phase was focused on making the puzzle board fully interactive and consequential.
+- **[DONE]** Implement Match Consequences (Skulls deal damage, gems grant mana).
+- **[DONE]** Implement a Basic Spell System (Player can cast 4 damage spells from UI buttons).
+- **[DONE]** Refine Monster Turn (Monster now operates on a speed-based system).
 
 ---
 
@@ -105,3 +58,42 @@ This phase begins to integrate the deeper progression systems.
     *   **Tasks:**
         *   Refactor the `Player` class to represent an "Elementalist" Attunement.
         *   Ensure its mana pools and starting spells align with the `attunement.md` document.
+
+---
+
+## Phase 5: Architectural Refactoring
+
+A recent attempt to refactor the codebase was made and subsequently reverted due to a series of cascading errors. This section documents the attempt and provides a clear, revised plan for the next attempt.
+
+### Summary of Failed Attempt (Nov 6, 2025)
+
+The goal was to improve the technical foundation by separating concerns and moving to a data-driven model. The plan involved creating `UIManager` and `DataManager` classes and moving data to JSON files. The attempt failed due to a series of critical, self-inflicted errors, primarily related to incorrect file modifications and a failure to correctly integrate the `nlohmann/json` library. After multiple failed compilations, the codebase was reverted to the last stable commit to ensure a clean state.
+
+### Revised Plan for Refactoring
+
+The goal remains the same, but the execution must be more methodical. The following steps should be taken one at a time, with a successful compilation after each step:
+
+1.  **Separate Implementations:**
+    *   Create `Player.cpp` and move all method implementations from `Player.h` into it.
+    *   Create `Monster.cpp` and move all method implementations from `Monster.h` into it.
+    *   **Compile and verify.**
+
+2.  **Create the `DataManager`:**
+    *   Add the full, correct `json.hpp` file to the `src` directory.
+    *   Create the `data` directory with `spells.json` and `monster.json`.
+    *   Create the `DataManager.h` and `DataManager.cpp` files.
+    *   Implement the loading logic for spells and monsters.
+    *   **Compile and verify.**
+
+3.  **Integrate the `DataManager`:**
+    *   Modify the `Player` and `Monster` classes to accept data in their constructors.
+    *   Modify the `Game` class to use the `DataManager` to load data and initialize the `Player` and `Monster`.
+    *   **Compile and verify.**
+
+4.  **Create the `UIManager`:**
+    *   Create the `UIManager.h` and `UIManager.cpp` files.
+    *   Carefully move all UI-related code from `Game.h` and `Game.cpp` into the `UIManager`.
+    *   Modify the `Game` class to own and delegate to the `UIManager`.
+    *   **Compile and verify.**
+
+This incremental approach will ensure that any errors are caught immediately and will prevent the kind of cascading failure that occurred previously.
