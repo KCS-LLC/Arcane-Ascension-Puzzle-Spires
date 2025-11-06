@@ -4,38 +4,20 @@
 
 class Monster {
 public:
-    // Constructor
-    Monster(int maxHp, int speed) : maxHp(maxHp), currentHp(maxHp), speed(speed), actionCounter(0) {}
+    Monster(int maxHp, int speed);
 
-    // Public Methods
-    void takeDamage(int damage) {
-        currentHp -= damage;
-        if (currentHp < 0) {
-            currentHp = 0;
-        }
-    }
+    void takeDamage(int damage);
+    bool isTurnReady(int playerActionCost);
 
-    // This function will be called by the game loop.
-    // It returns true if the monster is ready to take its turn.
-    bool isTurnReady(int playerActionCost) {
-        actionCounter += playerActionCost;
-        if (actionCounter >= speed) {
-            actionCounter -= speed; // Reset for the next turn
-            return true;
-        }
-        return false;
-    }
-
-    // Getters
-    int getCurrentHp() const { return currentHp; }
-    int getMaxHp() const { return maxHp; }
-    int getSpeed() const { return speed; }
-    int getActionCounter() const { return actionCounter; }
+    int getCurrentHp() const;
+    int getMaxHp() const;
+    int getSpeed() const;
+    int getActionCounter() const;
 
 private:
     int maxHp;
     int currentHp;
-    int speed; // The threshold for the monster to take an action
+    int speed;
     int actionCounter;
 };
 
