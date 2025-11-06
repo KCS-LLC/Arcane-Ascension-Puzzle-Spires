@@ -9,10 +9,21 @@
 enum class GemType {
     Empty,
     Skull,
+    // Primary Mana
+    Air,
     Fire,
-    Water,
     Earth,
-    Light
+    Water,
+    Umbral,
+    Light,
+    Life,
+    Death,
+    Mental,
+    Perception,
+    Transference,
+    Enhancement,
+    // Action Gems
+    Coin
 };
 
 struct Spell {

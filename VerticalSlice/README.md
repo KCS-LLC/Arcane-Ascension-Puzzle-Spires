@@ -1,43 +1,22 @@
-# Arcane Ascension - Vertical Slice
+# Vertical Slice - Arcane Ascension
 
-This project is a vertical slice of a match-3 combat RPG, "Arcane Ascension." It demonstrates the core gameplay loop, including the puzzle board, combat mechanics, spell casting, and a complete user interface.
+This directory contains the playable vertical slice for the game "Arcane Ascension".
 
-## Features
+## Current Status (Nov 6, 2025)
+The project has completed a major asset integration phase. All placeholder graphics for the puzzle board gems have been replaced with final, lore-based sprites. The rendering engine has been refactored to be resolution-independent, allowing for easy art asset updates in the future.
 
-*   **Match-3 Combat:** Match colored gems to gain mana and skull gems to deal direct damage.
-*   **Spell Casting:** Use the mana you've collected to cast powerful damage-dealing spells.
-*   **Speed-Based Turn System:** Player actions have a "speed cost." When the player's cumulative speed costs exceed the monster's Speed stat, the monster takes its turn.
-*   **Dynamic UI:** A three-panel UI displays player stats, the game board, and monster stats, including a real-time gauge for the monster's next turn.
-*   **Full Animation System:** All player actions, including gem swaps, destruction, and board refills, are fully animated.
-*   **Robust Board Logic:** The game board can detect when no more moves are possible and will automatically reshuffle itself.
+### Core Features Implemented:
+*   **Puzzle Board:** A fully functional 8x8 match-3 board.
+*   **Combat:** Players can match skull gems to deal direct damage to a monster.
+*   **Mana & Spells:** Matching colored gems grants mana, which can be used to cast spells with varying effects.
+*   **Animations:** The game includes animations for gem swaps, matches, and board refills.
+*   **Data-Driven Design:** Monster stats and spell definitions are loaded from external JSON files.
+*   **Modular Architecture:** The codebase is separated into managers for UI (`UIManager`), data (`DataManager`), and core game logic (`Game`), making it easier to maintain and expand.
 
-## How to Compile
+## How to Build and Run
+1.  **Environment:** Ensure you have a C++ compiler (like g++) and SFML 3.0+ installed and configured.
+2.  **Build:** Use the compile command specified in `BUILD_ENVIRONMENT.md`.
+3.  **Run:** Execute the generated `game.exe` from within the `VerticalSlice` directory.
 
-To compile this project, you will need a C++ compiler (like G++) and the SFML library. For detailed instructions on setting up the environment and the exact compiler command, please refer to the `BUILD_ENVIRONMENT.md` file.
-
-The general command is:
-```bash
-g++ -g -DSFML_STATIC "src/main.cpp" "src/Game.cpp" "src/Board.cpp" -o "game.exe" -I "path/to/sfml/include" -L "path/to/sfml/lib" -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32 -lfreetype -lwinmm -lgdi32 -luser32 -lkernel32
-```
-
-## How to Play
-
-
-
-*   **Swap Gems:** Click and drag a gem to swap it with an adjacent gem. Alternatively, click one gem and then click an adjacent gem.
-
-*   **Cast Spells:** When you have enough mana, click the spell buttons in the left-hand panel to cast them.
-
-*   **Objective:** Defeat the monster before it defeats you!
-
-
-
-## Developer Notes
-
-
-
-The codebase is currently in a stable, functional state. However, it is not yet optimized for future development. The `Game.cpp` file is overly large, and much of the game's data (spells, monster stats) is hardcoded directly into the source.
-
-
-
-A major architectural refactoring is planned to address these issues. The goal is to separate concerns into more focused classes (like a `UIManager` and `DataManager`) and to move all game data into external JSON files. For a detailed history of this effort and the revised plan, please see the `NEXT_STEPS.md` file.
+## Next Steps
+Please refer to `NEXT_STEPS.md` for the detailed development roadmap. The next major focus is on enhancing the player experience and visual polish.

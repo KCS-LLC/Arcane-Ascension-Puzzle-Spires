@@ -22,6 +22,7 @@ private:
     void processEvents();
     void update();
     void render();
+    void loadTextures();
     void handleSwap(sf::Vector2i tile1, sf::Vector2i tile2);
     void applyMatchConsequences(const std::map<GemType, int>& matchResults);
 
@@ -31,6 +32,7 @@ private:
     Monster monster;
     DataManager dataManager;
     UIManager uiManager;
+    std::map<GemType, sf::Texture> gemTextures;
 
     GameState currentState;
     sf::Clock animationClock;

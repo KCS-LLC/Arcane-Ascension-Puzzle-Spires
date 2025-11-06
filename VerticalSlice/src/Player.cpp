@@ -2,10 +2,18 @@
 
 Player::Player(int initialHp, const std::vector<Spell>& initialSpells) 
     : currentHp(initialHp), spells(initialSpells) {
+    mana[GemType::Air] = 0;
     mana[GemType::Fire] = 0;
-    mana[GemType::Water] = 0;
     mana[GemType::Earth] = 0;
+    mana[GemType::Water] = 0;
+    mana[GemType::Umbral] = 0;
     mana[GemType::Light] = 0;
+    mana[GemType::Life] = 0;
+    mana[GemType::Death] = 0;
+    mana[GemType::Mental] = 0;
+    mana[GemType::Perception] = 0;
+    mana[GemType::Transference] = 0;
+    mana[GemType::Enhancement] = 0;
 }
 
 int Player::getCurrentHp() const { return currentHp; }

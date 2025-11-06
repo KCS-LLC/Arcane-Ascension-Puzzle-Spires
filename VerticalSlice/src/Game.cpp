@@ -40,7 +40,26 @@ Game::Game()
     boardOrigin.x = (WINDOW_WIDTH - boardPixelWidth) / 2;
     boardOrigin.y = WINDOW_HEIGHT - boardPixelHeight - 20;
 
+    loadTextures();
     uiManager.setup(font, player, window.getSize(), boardOrigin);
+}
+
+void Game::loadTextures() {
+    if (!gemTextures[GemType::Fire].loadFromFile("assets/gem_fire.png")) std::cerr << "Failed to load fire gem texture\n";
+    if (!gemTextures[GemType::Water].loadFromFile("assets/gem_water.png")) std::cerr << "Failed to load water gem texture\n";
+    if (!gemTextures[GemType::Earth].loadFromFile("assets/gem_earth.png")) std::cerr << "Failed to load earth gem texture\n";
+    if (!gemTextures[GemType::Light].loadFromFile("assets/gem_light.png")) std::cerr << "Failed to load light gem texture\n";
+    if (!gemTextures[GemType::Skull].loadFromFile("assets/fist.png")) std::cerr << "Failed to load skull/fist texture\n";
+    // Load other textures as needed, even if not on the board yet
+    if (!gemTextures[GemType::Air].loadFromFile("assets/gem_air.png")) std::cerr << "Failed to load air gem texture\n";
+    if (!gemTextures[GemType::Umbral].loadFromFile("assets/gem_umbral.png")) std::cerr << "Failed to load umbral gem texture\n";
+    if (!gemTextures[GemType::Life].loadFromFile("assets/gem_life.png")) std::cerr << "Failed to load life gem texture\n";
+    if (!gemTextures[GemType::Death].loadFromFile("assets/gem_death.png")) std::cerr << "Failed to load death gem texture\n";
+    if (!gemTextures[GemType::Mental].loadFromFile("assets/gem_mental.png")) std::cerr << "Failed to load mental gem texture\n";
+    if (!gemTextures[GemType::Perception].loadFromFile("assets/gem_perception.png")) std::cerr << "Failed to load perception gem texture\n";
+    if (!gemTextures[GemType::Transference].loadFromFile("assets/gem_transference.png")) std::cerr << "Failed to load transference gem texture\n";
+    if (!gemTextures[GemType::Enhancement].loadFromFile("assets/gem_enhancement.png")) std::cerr << "Failed to load enhancement gem texture\n";
+    if (!gemTextures[GemType::Coin].loadFromFile("assets/gem_coin.png")) std::cerr << "Failed to load coin gem texture\n";
 }
 
 // Main game loop
@@ -229,14 +248,12 @@ void Game::update() {
 void Game::render() {
     window.clear(sf::Color(50, 50, 50));
 
-    // 1. Render static UI panels and frames (now handled by UIManager)
-    // window.draw(leftPanel);
-    // window.draw(rightPanel);
-    // window.draw(boardFrame);
+    // 1. Render UI via UIManager
+    uiManager.render(window, currentState);
 
     // 2. Render the game board and animations
     if (!isReshuffling) {
-        // Render static gems (gems not currently involved in an animation)
+        // Render static gems
         for (int r = 0; r < BOARD_HEIGHT; ++r) {
             for (int c = 0; c < BOARD_WIDTH; ++c) {
                 bool shouldDraw = true;
@@ -246,18 +263,15 @@ void Game::render() {
                     for (const auto& info : fallInfo) if (info.col == c && info.endRow == r) { shouldDraw = false; break; }
                 }
                 if (shouldDraw) {
-                    sf::RectangleShape tile({(float)TILE_SIZE - 2, (float)TILE_SIZE - 2});
-                    tile.setPosition({(float)boardOrigin.x + c * TILE_SIZE + 1, (float)boardOrigin.y + r * TILE_SIZE + 1});
                     Gem gem = board.getGem(r, c);
-                    switch (gem.type) {
-                        case GemType::Skull: tile.setFillColor(sf::Color::White); break;
-                        case GemType::Fire:  tile.setFillColor(sf::Color::Red); break;
-                        case GemType::Water: tile.setFillColor(sf::Color::Blue); break;
-                        case GemType::Earth: tile.setFillColor(sf::Color::Green); break;
-                        case GemType::Light: tile.setFillColor(sf::Color::Yellow); break;
-                        case GemType::Empty: default: shouldDraw = false; break;
+                    if (gem.type != GemType::Empty) {
+                        const sf::Texture& texture = gemTextures.at(gem.type);
+                        sf::Sprite sprite(texture);
+                        float scale = (float)TILE_SIZE / texture.getSize().x;
+                        sprite.setScale({scale, scale});
+                        sprite.setPosition({(float)boardOrigin.x + c * TILE_SIZE, (float)boardOrigin.y + r * TILE_SIZE});
+                        window.draw(sprite);
                     }
-                    if(shouldDraw) window.draw(tile);
                 }
             }
         }
@@ -266,51 +280,39 @@ void Game::render() {
     // Render swap animation
     if (isAnimatingSwap) {
         float p = std::min(1.f, animationClock.getElapsedTime().asSeconds() / 0.2f);
-        sf::Vector2f p1((float)animatingGems.first.x * TILE_SIZE + 1.f + boardOrigin.x, (float)animatingGems.first.y * TILE_SIZE + 1.f + boardOrigin.y);
-        sf::Vector2f p2((float)animatingGems.second.x * TILE_SIZE + 1.f + boardOrigin.x, (float)animatingGems.second.y * TILE_SIZE + 1.f + boardOrigin.y);
-        sf::RectangleShape t1({(float)TILE_SIZE - 2, (float)TILE_SIZE - 2});
-        t1.setPosition(p1 + (p2 - p1) * p);
+        sf::Vector2f p1((float)animatingGems.first.x * TILE_SIZE + boardOrigin.x, (float)animatingGems.first.y * TILE_SIZE + boardOrigin.y);
+        sf::Vector2f p2((float)animatingGems.second.x * TILE_SIZE + boardOrigin.x, (float)animatingGems.second.y * TILE_SIZE + boardOrigin.y);
+        
         Gem g1 = board.getGem(animatingGems.first.y, animatingGems.first.x);
-        switch (g1.type) {
-            case GemType::Skull: t1.setFillColor(sf::Color::White); break;
-            case GemType::Fire:  t1.setFillColor(sf::Color::Red); break;
-            case GemType::Water: t1.setFillColor(sf::Color::Blue); break;
-            case GemType::Earth: t1.setFillColor(sf::Color::Green); break;
-            case GemType::Light: t1.setFillColor(sf::Color::Yellow); break;
-            default: break;
-        }
-        window.draw(t1);
-        sf::RectangleShape t2({(float)TILE_SIZE - 2, (float)TILE_SIZE - 2});
-        t2.setPosition(p2 + (p1 - p2) * p);
+        const sf::Texture& tex1 = gemTextures.at(g1.type);
+        sf::Sprite s1(tex1);
+        float scale1 = (float)TILE_SIZE / tex1.getSize().x;
+        s1.setScale({scale1, scale1});
+        s1.setPosition(p1 + (p2 - p1) * p);
+        window.draw(s1);
+
         Gem g2 = board.getGem(animatingGems.second.y, animatingGems.second.x);
-        switch (g2.type) {
-            case GemType::Skull: t2.setFillColor(sf::Color::White); break;
-            case GemType::Fire:  t2.setFillColor(sf::Color::Red); break;
-            case GemType::Water: t2.setFillColor(sf::Color::Blue); break;
-            case GemType::Earth: t2.setFillColor(sf::Color::Green); break;
-            case GemType::Light: t2.setFillColor(sf::Color::Yellow); break;
-            default: break;
-        }
-        window.draw(t2);
+        const sf::Texture& tex2 = gemTextures.at(g2.type);
+        sf::Sprite s2(tex2);
+        float scale2 = (float)TILE_SIZE / tex2.getSize().x;
+        s2.setScale({scale2, scale2});
+        s2.setPosition(p2 + (p1 - p2) * p);
+        window.draw(s2);
     }
 
     // Render destruction animation
     if (isAnimatingDestruction) {
-        float scale = 1.f - std::min(1.f, animationClock.getElapsedTime().asSeconds() / 0.3f);
+        float animProgress = std::min(1.f, animationClock.getElapsedTime().asSeconds() / 0.3f);
+        float scale = 1.f - animProgress;
         for (const auto& pos : destroyingGems) {
-            sf::RectangleShape tile({(float)(TILE_SIZE - 2) * scale, (float)(TILE_SIZE - 2) * scale});
-            tile.setOrigin({(float)(TILE_SIZE - 2) / 2.f, (float)(TILE_SIZE - 2) / 2.f});
-            tile.setPosition({(float)boardOrigin.x + pos.second * TILE_SIZE + TILE_SIZE / 2.f, (float)boardOrigin.y + pos.first * TILE_SIZE + TILE_SIZE / 2.f});
             Gem gem = board.getGem(pos.first, pos.second);
-            switch (gem.type) {
-                case GemType::Skull: tile.setFillColor(sf::Color::White); break;
-                case GemType::Fire:  tile.setFillColor(sf::Color::Red); break;
-                case GemType::Water: tile.setFillColor(sf::Color::Blue); break;
-                case GemType::Earth: tile.setFillColor(sf::Color::Green); break;
-                case GemType::Light: tile.setFillColor(sf::Color::Yellow); break;
-                default: break;
-            }
-            window.draw(tile);
+            const sf::Texture& texture = gemTextures.at(gem.type);
+            sf::Sprite sprite(texture);
+            float base_scale = (float)TILE_SIZE / texture.getSize().x;
+            sprite.setOrigin({texture.getSize().x / 2.f, texture.getSize().y / 2.f});
+            sprite.setScale({base_scale * scale, base_scale * scale});
+            sprite.setPosition({(float)boardOrigin.x + pos.second * TILE_SIZE + TILE_SIZE / 2.f, (float)boardOrigin.y + pos.first * TILE_SIZE + TILE_SIZE / 2.f});
+            window.draw(sprite);
         }
     }
 
@@ -318,19 +320,14 @@ void Game::render() {
     if (isAnimatingRefill) {
         float p = std::min(1.f, animationClock.getElapsedTime().asSeconds() / 0.3f);
         for (const auto& info : fallInfo) {
-            sf::Vector2f start((float)boardOrigin.x + info.col * TILE_SIZE + 1.f, (float)boardOrigin.y + info.startRow * TILE_SIZE + 1.f);
-            sf::Vector2f end((float)boardOrigin.x + info.col * TILE_SIZE + 1.f, (float)boardOrigin.y + info.endRow * TILE_SIZE + 1.f);
-            sf::RectangleShape tile({(float)TILE_SIZE - 2, (float)TILE_SIZE - 2});
-            tile.setPosition(start + (end - start) * p);
-            switch (info.type) {
-                case GemType::Skull: tile.setFillColor(sf::Color::White); break;
-                case GemType::Fire:  tile.setFillColor(sf::Color::Red); break;
-                case GemType::Water: tile.setFillColor(sf::Color::Blue); break;
-                case GemType::Earth: tile.setFillColor(sf::Color::Green); break;
-                case GemType::Light: tile.setFillColor(sf::Color::Yellow); break;
-                default: break;
-            }
-            window.draw(tile);
+            sf::Vector2f start((float)boardOrigin.x + info.col * TILE_SIZE, (float)boardOrigin.y + info.startRow * TILE_SIZE);
+            sf::Vector2f end((float)boardOrigin.x + info.col * TILE_SIZE, (float)boardOrigin.y + info.endRow * TILE_SIZE);
+            const sf::Texture& texture = gemTextures.at(info.type);
+            sf::Sprite sprite(texture);
+            float scale = (float)TILE_SIZE / texture.getSize().x;
+            sprite.setScale({scale, scale});
+            sprite.setPosition(start + (end - start) * p);
+            window.draw(sprite);
         }
     }
 
@@ -343,9 +340,6 @@ void Game::render() {
         h.setOutlineThickness(2.f);
         window.draw(h);
     }
-
-    // 3. Render UI Text and Gauges (now handled by UIManager)
-    uiManager.render(window, currentState);
 
     window.display();
 }

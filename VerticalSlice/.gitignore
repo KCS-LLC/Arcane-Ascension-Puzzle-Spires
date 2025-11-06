@@ -1,33 +1,10 @@
-
-# C++
+# Build artifacts
+game.exe
 *.o
-*.lo
-*.la
-*.slo
-*.so
-*.a
-*.dll
-*.exe
-*.out
-*.app
-*.i
-*.ii
-*.s
-*.su
+*.obj
 
-# Build directories
-[Bb]uild/
-[Bb]uilds/
-[Dd]ebug/
-[Rr]elease/
-x64/
-x86/
-build/
-build-*/
-
-# IDE-specific files
+# VS Code specific
 .vscode/
-*.sln
-*.suo
-*.vcxproj*
-*.vs/
+
+# Asset Generator Tool
+VerticalSlice/tools/
