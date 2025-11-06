@@ -7,9 +7,8 @@
 #include <utility>
 #include <SFML/System/Vector2.hpp>
 #include "Player.h" // We need GemType
+#include "Constants.h"
 
-const int BOARD_WIDTH = 8;
-const int BOARD_HEIGHT = 8;
 struct Gem {
     GemType type;
     // In the full game, this would also store Aura rank, etc.

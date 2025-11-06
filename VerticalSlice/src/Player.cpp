@@ -1,16 +1,11 @@
 #include "Player.h"
 
-Player::Player(int initialHp) : currentHp(initialHp) {
+Player::Player(int initialHp, const std::vector<Spell>& initialSpells) 
+    : currentHp(initialHp), spells(initialSpells) {
     mana[GemType::Fire] = 0;
     mana[GemType::Water] = 0;
     mana[GemType::Earth] = 0;
     mana[GemType::Light] = 0;
-
-    // Add four basic spells
-    spells.push_back({"Fireball", GemType::Fire, 10, 25});
-    spells.push_back({"Ice Lance", GemType::Water, 10, 25});
-    spells.push_back({"Rock Throw", GemType::Earth, 10, 25});
-    spells.push_back({"Smite", GemType::Light, 10, 25});
 }
 
 int Player::getCurrentHp() const { return currentHp; }

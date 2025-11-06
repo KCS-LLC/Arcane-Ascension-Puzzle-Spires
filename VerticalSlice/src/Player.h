@@ -24,7 +24,7 @@ struct Spell {
 
 class Player {
 public:
-    Player(int initialHp);
+    Player(int initialHp, const std::vector<Spell>& initialSpells);
 
     int getCurrentHp() const;
     int getMana(GemType type) const;

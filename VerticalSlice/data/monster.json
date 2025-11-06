@@ -1,0 +1,6 @@
+{
+    "name": "Cave Goblin",
+    "hp": 250,
+    "speed": 100,
+    "attackDamage": 20
+}

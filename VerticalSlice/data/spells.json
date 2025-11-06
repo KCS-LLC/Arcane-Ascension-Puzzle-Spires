@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Fireball",
+        "costAmount": 10,
+        "costType": "Fire",
+        "damage": 25
+    },
+    {
+        "name": "Ice Lance",
+        "costAmount": 10,
+        "costType": "Water",
+        "damage": 25
+    },
+    {
+        "name": "Rock Throw",
+        "costAmount": 10,
+        "costType": "Earth",
+        "damage": 25
+    },
+    {
+        "name": "Holy Light",
+        "costAmount": 10,
+        "costType": "Light",
+        "damage": 25
+    }
+]

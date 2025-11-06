@@ -2,19 +2,15 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <SFML/Graphics.hpp>
-#include <optional>
+#include "Constants.h"
 #include "Board.h"
 #include "Player.h"
 #include "Monster.h"
+#include "DataManager.h"
+#include <SFML/Graphics.hpp>
+#include <optional>
+#include <vector>
 #include <map>
-
-// New Window Dimensions
-const int WINDOW_WIDTH = 1280;
-const int WINDOW_HEIGHT = 720;
-const int TILE_SIZE = 64; // Size of each gem sprite in pixels
-
-enum class GameState { Playing, Animating, GameOver };
 
 class Game {
 public:
@@ -33,34 +29,30 @@ private:
     Board board;
     Player player;
     Monster monster;
+    DataManager dataManager;
 
-    // Game State
     GameState currentState;
-    sf::Vector2i boardOrigin; // Top-left corner of the board in pixels
+    sf::Clock animationClock;
 
-    // Input
+    bool isAnimatingSwap;
+    bool isAnimatingDestruction;
+    bool isAnimatingRefill;
+    bool isReshuffling;
+    std::pair<sf::Vector2i, sf::Vector2i> animatingGems;
+    std::set<std::pair<int, int>> destroyingGems;
+    std::vector<Board::FallInfo> fallInfo;
+
     std::optional<sf::Vector2i> selectedTile;
     std::optional<sf::Vector2i> dragStartTile;
 
-    // Animation
-    sf::Clock animationClock;
-    std::pair<sf::Vector2i, sf::Vector2i> animatingGems;
-    bool isAnimatingSwap;
-    bool isAnimatingDestruction;
-    std::set<std::pair<int, int>> destroyingGems;
-    bool isAnimatingRefill;
-    std::vector<Board::FallInfo> fallInfo;
-    bool isReshuffling;
-
-    // UI Elements
     sf::Font font;
+    sf::Vector2f boardOrigin;
     sf::Text playerHpText;
     sf::Text monsterHpText;
     sf::Text manaText;
     sf::Text gameOverText;
     std::vector<sf::RectangleShape> spellButtons;
     std::vector<sf::Text> spellButtonTexts;
-
     sf::RectangleShape leftPanel;
     sf::RectangleShape rightPanel;
     sf::RectangleShape boardFrame;

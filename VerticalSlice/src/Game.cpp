@@ -10,8 +10,9 @@ const int SPELL_SPEED_COST = 70;
 // Game Constructor: Initializes the window, game objects, and UI layout.
 Game::Game()
     : window(sf::VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}), "Arcane Ascension - Prototype"),
-      player(100),
-      monster(250, 100), // HP, Speed
+      dataManager(),
+      player(100, {}), 
+      monster(0, 0),
       currentState(GameState::Playing),
       isAnimatingSwap(false),
       isAnimatingDestruction(false),
@@ -22,16 +23,25 @@ Game::Game()
       manaText(font),
       gameOverText(font)
 {
-    board.initialize();
     if (!font.openFromFile("assets/OpenSans-Regular.ttf")) {
         std::cerr << "Error loading font." << std::endl;
     }
 
-    // --- UI Layout Calculations ---
+    if (!dataManager.loadSpells("data/spells.json") || !dataManager.loadMonsterData("data/monster.json")) {
+        std::cerr << "Failed to load game data." << std::endl;
+        window.close();
+        return;
+    }
+
+    player = Player(100, dataManager.getAllSpells());
+    monster = Monster(dataManager.getMonsterHP(), dataManager.getMonsterSpeed());
+
+    board.initialize();
+    
     const int boardPixelWidth = BOARD_WIDTH * TILE_SIZE;
     const int boardPixelHeight = BOARD_HEIGHT * TILE_SIZE;
     boardOrigin.x = (WINDOW_WIDTH - boardPixelWidth) / 2;
-    boardOrigin.y = WINDOW_HEIGHT - boardPixelHeight - 20; // 20px padding from bottom
+    boardOrigin.y = WINDOW_HEIGHT - boardPixelHeight - 20;
 
     const float panelWidth = (WINDOW_WIDTH - boardPixelWidth) / 2.f - 40;
     leftPanel.setSize({panelWidth, (float)WINDOW_HEIGHT - 40});
@@ -95,8 +105,8 @@ void Game::processEvents() {
                         monster.takeDamage(damage);
                         std::cout << "Casted spell, dealing " << damage << " damage!\n";
                         if (monster.isTurnReady(SPELL_SPEED_COST)) {
-                            player.takeDamage(20);
-                            std::cout << "Monster's turn! Player takes 20 damage!\n";
+                            player.takeDamage(dataManager.getMonsterAttackDamage());
+                            std::cout << "Monster's turn! Player takes " << dataManager.getMonsterAttackDamage() << " damage!\n";
                         }
                     } else {
                         std::cout << "Not enough mana to cast spell!\n";
@@ -161,11 +171,6 @@ void Game::applyMatchConsequences(const std::map<GemType, int>& matchResults) {
             std::cout << "Matched " << count << " gems of type " << (int)gemType << ". Gained " << count << " mana!\n";
         }
     }
-    // Check if the monster gets a turn after the match.
-    if (monster.isTurnReady(MATCH_SPEED_COST)) {
-        player.takeDamage(20);
-        std::cout << "Monster's turn! Player takes 20 damage!\n";
-    }
 }
 
 // Main update function: handles game logic, animations, and state transitions.
@@ -189,6 +194,11 @@ void Game::update() {
                     std::map<GemType, int> results;
                     for (const auto& pos : matches) results[board.getGem(pos.first, pos.second).type]++;
                     applyMatchConsequences(results);
+                    // This was a direct player action, so check if the monster gets a turn.
+                    if (monster.isTurnReady(MATCH_SPEED_COST)) {
+                        player.takeDamage(dataManager.getMonsterAttackDamage());
+                        std::cout << "Monster's turn! Player takes " << dataManager.getMonsterAttackDamage() << " damage!\n";
+                    }
                     isAnimatingDestruction = true;
                     destroyingGems = matches;
                     animationClock.restart();
@@ -242,10 +252,13 @@ void Game::update() {
     if (currentState == GameState::Playing) {
         if (player.getCurrentHp() <= 0 || monster.getCurrentHp() <= 0) {
             currentState = GameState::GameOver;
-            gameOverText.setString(player.getCurrentHp() <= 0 ? "You have been defeated!" : "You are victorious!");
+            bool playerWon = player.getCurrentHp() > 0;
+            gameOverText.setString(playerWon ? "You are victorious!" : "You have been defeated!");
+            gameOverText.setFillColor(playerWon ? sf::Color::Green : sf::Color::Red);
             sf::FloatRect textRect = gameOverText.getLocalBounds();
             gameOverText.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
-            gameOverText.setPosition({(float)WINDOW_WIDTH / 2.0f, (float)WINDOW_HEIGHT / 2.0f});
+            // Position the text in the top-center of the screen, above the board.
+            gameOverText.setPosition({(float)WINDOW_WIDTH / 2.0f, 150.f});
         }
     }
 
@@ -423,7 +436,6 @@ void Game::setupText() {
 
     gameOverText.setFont(font);
     gameOverText.setCharacterSize(48);
-    gameOverText.setFillColor(sf::Color::Yellow);
 
     // Create Spell Buttons and their corresponding text labels
     const auto& spells = player.getSpells();
