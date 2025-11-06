@@ -17,7 +17,7 @@ public:
 
     // This function will be called by the game loop.
     // It returns true if the monster is ready to take its turn.
-    bool updateActionCounter(int playerActionCost) {
+    bool isTurnReady(int playerActionCost) {
         actionCounter += playerActionCost;
         if (actionCounter >= speed) {
             actionCounter -= speed; // Reset for the next turn
@@ -29,6 +29,8 @@ public:
     // Getters
     int getCurrentHp() const { return currentHp; }
     int getMaxHp() const { return maxHp; }
+    int getSpeed() const { return speed; }
+    int getActionCounter() const { return actionCounter; }
 
 private:
     int maxHp;

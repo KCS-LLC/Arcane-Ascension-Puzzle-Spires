@@ -4,49 +4,66 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
-// For the prototype, we'll define gem types here.
-// In a full game, this would be in its own file.
 enum class GemType {
     Skull,
     Fire,
     Water,
-    // Add other mana types as needed
+    Earth,
+    Light,
+    Empty
+};
+
+struct Spell {
+    std::string name;
+    GemType costType;
+    int costAmount;
+    int damage;
 };
 
 class Player {
 public:
-    // Constructor
-    Player(int maxHp) : maxHp(maxHp), currentHp(maxHp) {}
+    Player(int initialHp) : currentHp(initialHp) {
+        mana[GemType::Fire] = 0;
+        mana[GemType::Water] = 0;
+        mana[GemType::Earth] = 0;
+        mana[GemType::Light] = 0;
 
-    // Public Methods
-    void takeDamage(int damage) {
-        currentHp -= damage;
-        if (currentHp < 0) {
-            currentHp = 0;
-        }
+        // Add four basic spells
+        spells.push_back({"Fireball", GemType::Fire, 10, 25});
+        spells.push_back({"Ice Lance", GemType::Water, 10, 25});
+        spells.push_back({"Rock Throw", GemType::Earth, 10, 25});
+        spells.push_back({"Smite", GemType::Light, 10, 25});
     }
 
-    void addMana(GemType type, int amount) {
-        if (type != GemType::Skull) {
-            manaPools[type] += amount;
-        }
-    }
-
-    // Getters
     int getCurrentHp() const { return currentHp; }
-    int getMaxHp() const { return maxHp; }
-    int getMana(GemType type) const {
-        if (manaPools.count(type)) {
-            return manaPools.at(type);
+    int getMana(GemType type) const { return mana.at(type); }
+    const std::vector<Spell>& getSpells() const { return spells; }
+
+    void takeDamage(int amount) { currentHp -= amount; }
+    void addMana(GemType type, int amount) {
+        if (type != GemType::Skull && type != GemType::Empty) {
+            mana[type] += amount;
         }
-        return 0;
+    }
+
+    int castSpell(int spellIndex) {
+        if (spellIndex < 0 || spellIndex >= spells.size()) {
+            return 0; // Invalid index
+        }
+        const Spell& spell = spells[spellIndex];
+        if (mana[spell.costType] >= spell.costAmount) {
+            mana[spell.costType] -= spell.costAmount;
+            return spell.damage;
+        }
+        return 0; // Not enough mana
     }
 
 private:
-    int maxHp;
     int currentHp;
-    std::map<GemType, int> manaPools;
+    std::map<GemType, int> mana;
+    std::vector<Spell> spells;
 };
 
 #endif // PLAYER_H
