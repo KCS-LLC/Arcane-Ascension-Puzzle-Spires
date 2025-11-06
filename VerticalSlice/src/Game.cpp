@@ -13,15 +13,12 @@ Game::Game()
       dataManager(),
       player(100, {}), 
       monster(0, 0),
+      uiManager(),
       currentState(GameState::Playing),
       isAnimatingSwap(false),
       isAnimatingDestruction(false),
       isAnimatingRefill(false),
-      isReshuffling(false),
-      playerHpText(font),
-      monsterHpText(font),
-      manaText(font),
-      gameOverText(font)
+      isReshuffling(false)
 {
     if (!font.openFromFile("assets/OpenSans-Regular.ttf")) {
         std::cerr << "Error loading font." << std::endl;
@@ -43,36 +40,7 @@ Game::Game()
     boardOrigin.x = (WINDOW_WIDTH - boardPixelWidth) / 2;
     boardOrigin.y = WINDOW_HEIGHT - boardPixelHeight - 20;
 
-    const float panelWidth = (WINDOW_WIDTH - boardPixelWidth) / 2.f - 40;
-    leftPanel.setSize({panelWidth, (float)WINDOW_HEIGHT - 40});
-    leftPanel.setPosition({20, 20});
-    leftPanel.setFillColor(sf::Color(30, 30, 30, 200));
-    leftPanel.setOutlineColor(sf::Color(80, 80, 80));
-    leftPanel.setOutlineThickness(2.f);
-
-    rightPanel.setSize({panelWidth, (float)WINDOW_HEIGHT - 40});
-    rightPanel.setPosition({(float)WINDOW_WIDTH - panelWidth - 20, 20});
-    rightPanel.setFillColor(sf::Color(30, 30, 30, 200));
-    rightPanel.setOutlineColor(sf::Color(80, 80, 80));
-    rightPanel.setOutlineThickness(2.f);
-
-    boardFrame.setSize({(float)boardPixelWidth + 4, (float)boardPixelHeight + 4});
-    boardFrame.setPosition({(float)boardOrigin.x - 2, (float)boardOrigin.y - 2});
-    boardFrame.setFillColor(sf::Color::Transparent);
-    boardFrame.setOutlineColor(sf::Color(80, 80, 80));
-    boardFrame.setOutlineThickness(2.f);
-
-    monsterSpeedGaugeBackground.setSize({rightPanel.getSize().x - 40, 20});
-    monsterSpeedGaugeBackground.setPosition({rightPanel.getPosition().x + 20, rightPanel.getPosition().y + 80});
-    monsterSpeedGaugeBackground.setFillColor(sf::Color(50, 50, 50));
-    monsterSpeedGaugeBackground.setOutlineColor(sf::Color(80, 80, 80));
-    monsterSpeedGaugeBackground.setOutlineThickness(1.f);
-
-    monsterSpeedGaugeForeground.setSize({0, 20});
-    monsterSpeedGaugeForeground.setPosition({rightPanel.getPosition().x + 20, rightPanel.getPosition().y + 80});
-    monsterSpeedGaugeForeground.setFillColor(sf::Color::Cyan);
-
-    setupText();
+    uiManager.setup(font, player, window.getSize(), boardOrigin);
 }
 
 // Main game loop
@@ -98,6 +66,7 @@ void Game::processEvents() {
             
             // 1. Check for spell button clicks first.
             bool buttonClicked = false;
+            const auto& spellButtons = uiManager.getSpellButtons();
             for (int i = 0; i < spellButtons.size(); ++i) {
                 if (spellButtons[i].getGlobalBounds().contains(sf::Vector2f(mbp->position))) {
                     int damage = player.castSpell(i);
@@ -252,42 +221,21 @@ void Game::update() {
     if (currentState == GameState::Playing) {
         if (player.getCurrentHp() <= 0 || monster.getCurrentHp() <= 0) {
             currentState = GameState::GameOver;
-            bool playerWon = player.getCurrentHp() > 0;
-            gameOverText.setString(playerWon ? "You are victorious!" : "You have been defeated!");
-            gameOverText.setFillColor(playerWon ? sf::Color::Green : sf::Color::Red);
-            sf::FloatRect textRect = gameOverText.getLocalBounds();
-            gameOverText.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
-            // Position the text in the top-center of the screen, above the board.
-            gameOverText.setPosition({(float)WINDOW_WIDTH / 2.0f, 150.f});
         }
     }
 
     // --- UI Updates ---
-    playerHpText.setString("Player HP: " + std::to_string(player.getCurrentHp()));
-    monsterHpText.setString("Monster HP: " + std::to_string(monster.getCurrentHp()));
-    manaText.setString("Fire: " + std::to_string(player.getMana(GemType::Fire)) + "\nWater: " + std::to_string(player.getMana(GemType::Water)) + "\nEarth: " + std::to_string(player.getMana(GemType::Earth)) + "\nLight: " + std::to_string(player.getMana(GemType::Light)));
-    
-    const auto& spells = player.getSpells();
-    for(int i = 0; i < spells.size(); ++i) {
-        if (player.getMana(spells[i].costType) >= spells[i].costAmount) {
-            spellButtons[i].setFillColor(sf::Color(80, 80, 80));
-        } else {
-            spellButtons[i].setFillColor(sf::Color(40, 40, 40));
-        }
-    }
-
-    float speedPercent = (float)monster.getActionCounter() / monster.getSpeed();
-    monsterSpeedGaugeForeground.setSize({monsterSpeedGaugeBackground.getSize().x * speedPercent, monsterSpeedGaugeBackground.getSize().y});
+    uiManager.update(player, monster);
 }
 
 // Main render function: draws all game elements to the screen.
 void Game::render() {
     window.clear(sf::Color(50, 50, 50));
 
-    // 1. Render static UI panels and frames
-    window.draw(leftPanel);
-    window.draw(rightPanel);
-    window.draw(boardFrame);
+    // 1. Render static UI panels and frames (now handled by UIManager)
+    // window.draw(leftPanel);
+    // window.draw(rightPanel);
+    // window.draw(boardFrame);
 
     // 2. Render the game board and animations
     if (!isReshuffling) {
@@ -399,63 +347,11 @@ void Game::render() {
         window.draw(h);
     }
 
-    // 3. Render UI Text and Gauges
-    window.draw(playerHpText);
-    window.draw(monsterHpText);
-    window.draw(manaText);
-    for(const auto& button : spellButtons) window.draw(button);
-    for(const auto& text : spellButtonTexts) window.draw(text);
-    window.draw(monsterSpeedGaugeBackground);
-    window.draw(monsterSpeedGaugeForeground);
-
-    // 4. Render Game Over text if applicable
-    if (currentState == GameState::GameOver) {
-        window.draw(gameOverText);
-    }
+    // 3. Render UI Text and Gauges (now handled by UIManager)
+    uiManager.render(window, currentState);
 
     window.display();
 }
 
+
 // Initializes and positions all SFML Text objects.
-void Game::setupText() {
-    playerHpText.setFont(font);
-    playerHpText.setCharacterSize(24);
-    playerHpText.setFillColor(sf::Color::White);
-    playerHpText.setPosition({leftPanel.getPosition().x + 20, leftPanel.getPosition().y + 20});
-
-    monsterHpText.setFont(font);
-    monsterHpText.setCharacterSize(24);
-    monsterHpText.setFillColor(sf::Color::White);
-    monsterHpText.setPosition({rightPanel.getPosition().x + 20, rightPanel.getPosition().y + 20});
-
-    manaText.setFont(font);
-    manaText.setCharacterSize(22);
-    manaText.setFillColor(sf::Color::White);
-    manaText.setPosition({leftPanel.getPosition().x + 20, leftPanel.getPosition().y + 80});
-    manaText.setLineSpacing(1.2f);
-
-    gameOverText.setFont(font);
-    gameOverText.setCharacterSize(48);
-
-    // Create Spell Buttons and their corresponding text labels
-    const auto& spells = player.getSpells();
-    float buttonY = leftPanel.getPosition().y + 220;
-    for (const auto& spell : spells) {
-        sf::RectangleShape button;
-        button.setSize({leftPanel.getSize().x - 40, 40});
-        button.setPosition({leftPanel.getPosition().x + 20, buttonY});
-        button.setFillColor(sf::Color(80, 80, 80));
-        spellButtons.push_back(button);
-
-        sf::Text text(font);
-        text.setCharacterSize(18);
-        text.setFillColor(sf::Color::White);
-        text.setString(spell.name + " (" + std::to_string(spell.costAmount) + ")");
-        sf::FloatRect textRect = text.getLocalBounds();
-        text.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
-        text.setPosition({button.getPosition().x + button.getSize().x / 2.0f, button.getPosition().y + button.getSize().y / 2.0f});
-        spellButtonTexts.push_back(text);
-
-        buttonY += 50;
-    }
-}

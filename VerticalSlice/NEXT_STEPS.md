@@ -69,31 +69,14 @@ A recent attempt to refactor the codebase was made and subsequently reverted due
 
 The goal was to improve the technical foundation by separating concerns and moving to a data-driven model. The plan involved creating `UIManager` and `DataManager` classes and moving data to JSON files. The attempt failed due to a series of critical, self-inflicted errors, primarily related to incorrect file modifications and a failure to correctly integrate the `nlohmann/json` library. After multiple failed compilations, the codebase was reverted to the last stable commit to ensure a clean state.
 
-### Revised Plan for Refactoring
+### Architectural Refactoring Status
 
-The goal remains the same, but the execution must be more methodical. The following steps should be taken one at a time, with a successful compilation after each step:
+The major architectural refactoring is now largely complete. The codebase is in a much more modular and data-driven state.
 
-1.  **Separate Implementations:**
-    *   Create `Player.cpp` and move all method implementations from `Player.h` into it.
-    *   Create `Monster.cpp` and move all method implementations from `Monster.h` into it.
-    *   **Compile and verify.**
+*   **[DONE]** **1. Separate Implementations:** `Player` and `Monster` classes now have separate `.h` and `.cpp` files.
+*   **[DONE]** **2. Create the `DataManager`:** The `DataManager` class and `nlohmann/json` library have been successfully added and verified.
+*   **[DONE]** **3. Integrate the `DataManager`:** The `Game` class now loads all monster and spell data from external JSON files.
+*   **[DONE]** **4. Create the `UIManager`:** The `UIManager` class has been created and now handles all UI layout, update, and rendering logic, removing it from the `Game` class.
 
-2.  **Create the `DataManager`:**
-    *   Add the full, correct `json.hpp` file to the `src` directory.
-    *   Create the `data` directory with `spells.json` and `monster.json`.
-    *   Create the `DataManager.h` and `DataManager.cpp` files.
-    *   Implement the loading logic for spells and monsters.
-    *   **Compile and verify.**
-
-3.  **Integrate the `DataManager`:**
-    *   Modify the `Player` and `Monster` classes to accept data in their constructors.
-    *   Modify the `Game` class to use the `DataManager` to load data and initialize the `Player` and `Monster`.
-    *   **Compile and verify.**
-
-4.  **Create the `UIManager`:**
-    *   Create the `UIManager.h` and `UIManager.cpp` files.
-    *   Carefully move all UI-related code from `Game.h` and `Game.cpp` into the `UIManager`.
-    *   Modify the `Game` class to own and delegate to the `UIManager`.
-    *   **Compile and verify.**
-
-This incremental approach will ensure that any errors are caught immediately and will prevent the kind of cascading failure that occurred previously.
+### Next Architectural Step
+*   **Finalize UI Separation:** The input handling for UI elements (specifically spell button clicks) is still currently handled in `Game::processEvents()`. The next step is to move this logic into the `UIManager` to fully complete the separation of concerns. The `UIManager` should process events and return a command or action (e.g., "cast spell 1") for the `Game` class to execute.

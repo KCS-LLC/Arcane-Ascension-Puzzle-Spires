@@ -34,12 +34,15 @@ All game assets (fonts, sprites, etc.) must be located in a directory named `ass
 
 ## Compiler Command
 
+The command below includes all current source files.
+
 ```bash
-g++ -g -DSFML_STATIC "src/main.cpp" "src/Game.cpp" "src/Board.cpp" -o "game.exe" -I "C:/Program Files (x86)/SFML/include" -L "C:/Program Files (x86)/SFML/lib" -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32 -lfreetype -lwinmm -lgdi32 -luser32 -lkernel32
+g++ -g -DSFML_STATIC "src/main.cpp" "src/Game.cpp" "src/Board.cpp" "src/Player.cpp" "src/Monster.cpp" "src/DataManager.cpp" "src/UIManager.cpp" -o "game.exe" -I "C:/Program Files (x86)/SFML/include" -L "C:/Program Files (x86)/SFML/lib" -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32 -lfreetype -lwinmm -lgdi32 -luser32 -lkernel32
 ```
 
-## Future Dependencies
+## Dependencies
 
-The next planned refactoring will introduce a dependency on the **nlohmann/json** library for parsing game data from JSON files. This is a header-only library, so it will not require any additional linking steps. The file `json.hpp` will need to be placed in the `src` directory.
+*   **SFML 3.0.2:** The core graphics and windowing library.
+*   **nlohmann/json:** A header-only library for parsing JSON data. The file `json.hpp` is located in the `src` directory and is required for the `DataManager`.
 
 *Note: When adding new `.cpp` files to the `src` directory, they must be added to this command.*
