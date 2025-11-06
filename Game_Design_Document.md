@@ -146,3 +146,20 @@ This system introduces a long-term strategic and economic layer to the game, mak
     *   *Example:* An heir who mastered the Elementalist and Diviner attunements might become a powerful "Magical Forecaster," generating significant income. An heir who focused on defense and physical combat might become a "City Guard Captain," providing a smaller income but reducing the house's overall upkeep costs.
 
 *   **Strategic Depth:** This system encourages players to think about the long-term consequences of their heir's development, balancing short-term gains in the spire with the long-term economic prosperity of their family.
+
+## 11. Game Calendar and Time Progression
+
+To create a unified strategic layer and a tangible sense of urgency, the game will feature a global calendar. This system tracks the passage of time across all phases of gameplay, making time itself a critical resource to be managed.
+
+*   **Unified Time:** The calendar advances based on player actions, whether in the Manor or the Spire. This replaces abstract timers with a concrete timeline.
+    *   **Manor Actions:** Every significant action in the Manor (e.g., training, crafting, attending class) will cost a specific number of days.
+    *   **Spire Expeditions:** A run into the Spire is not instantaneous. It costs time to enter, and additional days will pass for every major floor cleared or Guardian defeated. A deep, successful run might take weeks of in-game time.
+
+*   **The Calendar Structure:** Each in-game year will consist of a procedurally generated calendar, unique to each new legacy. A suggested structure is: 10 months per year, 4 weeks per month, and 10 days per week.
+
+*   **Scheduled and Procedural Events:** The calendar will be populated with various events:
+    *   **Financial Obligations:** Tax deadlines and upkeep payments are now fixed dates on the calendar, allowing the player to plan for them.
+    *   **Holidays:** Each calendar will have procedurally generated holidays. These events can provide temporary global effects (e.g., bonuses to certain mana types, increased luck, unique merchant stock).
+    *   **Scheduled Story Events:** Major world events, such as tournaments, political summits, or celestial alignments, can be scheduled on the calendar, giving the player long-term goals to prepare for.
+
+*   **Strategic Impact:** This system forces meaningful strategic choices. A player must constantly weigh the time cost of their actions against upcoming deadlines and opportunities. Spending a month training an heir might make them powerful, but it could also mean missing a lucrative holiday bonus or failing to gather enough resources before taxes are due. This directly ties the micro-level puzzle gameplay to the macro-level generational strategy.

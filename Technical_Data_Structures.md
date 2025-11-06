@@ -153,3 +153,53 @@ Defines a single spell or ability.
   ]
 }
 ```
+
+---
+
+## 5. Calendar and Event Structures
+
+Defines the structures for the global calendar and the events that populate it.
+
+### Calendar Structure
+A top-level object that is procedurally generated for each new legacy.
+
+```json
+{
+  "legacy_id": "legacy_unique_id_abcd",
+  "current_year": 1,
+  "current_month": 1,
+  "current_day": 1,
+  "year_definition": {
+    "months_per_year": 10,
+    "weeks_per_month": 4,
+    "days_per_week": 10
+  },
+  "months": [
+    { "id": "month_01", "name": "Month of the Rising Sun" },
+    { "id": "month_02", "name": "Month of the Crystal Bloom" }
+    // ... up to 10
+  ],
+  "scheduled_events": [
+    {
+      "id": "event_id_sunstone_solstice",
+      "name": "The Sunstone Solstice",
+      "type": "Holiday", // Enum: Holiday, Deadline, Story
+      "date": { "year": 1, "month": 3, "day": 5 },
+      "duration_days": 1,
+      "effects": [
+        { "id": "effect_fire_mana_bonus", "description": "Fire gems are 10% more common in the spire." }
+      ]
+    },
+    {
+      "id": "event_id_tax_payment_q1",
+      "name": "Quarterly Tax Payment Due",
+      "type": "Deadline",
+      "date": { "year": 1, "month": 4, "day": 1 },
+      "duration_days": 1,
+      "effects": [
+        { "id": "effect_trigger_tax_payment", "amount": 5000 }
+      ]
+    }
+  ]
+}
+```

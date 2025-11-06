@@ -68,3 +68,33 @@ The overall tone of the game is **"Determined Academia under Duress."**
 *   **Core Feeling:** The gameplay is not about heroic, swashbuckling adventure. It is a methodical, intelligent, and often desperate struggle for survival and discovery. Every spire run is a research expedition that must be funded, every victory a data point, and every death a costly setback.
 *   **Aesthetic:** The world is one of magical science. The UI, item descriptions, and narrative should reflect this. Spells are "formulas," monsters are "subjects," and the spire is the ultimate "laboratory."
 *   **Pressure:** The external pressures of rival politics and the internal pressures of dwindling finances should create a constant sense of urgency that contrasts with the thoughtful, strategic nature of the puzzle combat.
+
+---
+
+## 5. World Calendar, Seasons, and Holidays
+
+The passage of time is a central theme, and the calendar should reflect the world's unique magical nature. The names of months and holidays should be evocative of the game's lore and provide thematic context for their potential in-game effects.
+
+### Brainstormed Month Names
+The 10 months of the year could be named after key magical or seasonal concepts.
+
+1.  **Month of the Thawing Sun:** Early spring.
+2.  **Month of the Crystal Bloom:** Late spring, a time of magical growth.
+3.  **Month of the High Sun:** Early summer.
+4.  **Month of the Raging Sun:** Mid-summer, a time of intense heat and powerful Fire mana.
+5.  **Month of the Fading Light:** Late summer.
+6.  **Month of the Crimson Leaf:** Early autumn, a time of harvest and change.
+7.  **Month of the Chilling Wind:** Mid-autumn.
+8.  **Month of the First Frost:** Late autumn.
+9.  **Month of the Deep Slumber:** Early winter, a time of quiet and darkness.
+10. **Month of the Silent Guardian:** Mid-winter, the darkest time of the year.
+
+### Brainstormed Holidays & Events
+These are procedurally generated for each legacy, but they draw from a pool of thematic concepts.
+
+*   **The Sunstone Solstice:** A mid-summer festival. *Effect: Fire and Light mana are more potent.*
+*   **Remembrance of the Broken Tower:** A solemn day commemorating a past disaster. *Effect: Increased chance of finding rare Heirlooms in the spire, but monsters are more dangerous.*
+*   **The Gilded Market:** A week-long merchant festival. *Effect: Special vendors appear in the Manor with unique and discounted items.*
+*   **Night of the Umbral Moon:** A rare celestial event. *Effect: Umbral and Mental mana are more potent; Perception is less effective.*
+*   **The Scholarly Conclave:** An annual academic gathering. *Effect: Provides a large bonus to Research Point generation for a short time.*
+*   **Day of the Smith:** A day celebrating craftsmanship. *Effect: Upgrading and enchanting items is cheaper.*
