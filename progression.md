@@ -50,3 +50,25 @@ Attunement Rank is the primary measure of an heir's magical development and the 
 *   **Sunstone:** The heir's control over their magic deepens, enhancing their existing spells and unlocking new, more powerful abilities.
 *   **Citrine:** A significant leap in power. This rank unlocks the Attunement's **tertiary mana type**, granting access to a whole new set of spells and strategies.
 *   **Emerald:** The pinnacle of an heir's in-run progression. Reaching this rank signifies mastery and unlocks an "ultimate" ability unique to their Attunement.
+
+---
+
+## 4. Heir Retirement and Careers
+
+The progression of an heir does not end with their last adventure in the spire. A successful and well-developed heir becomes a valuable asset to the family, contributing to its prosperity for the rest of their life. (See the main Game Design Document for the full Heir and Family Management System).
+
+### Triggering Retirement
+An heir can be retired from adventuring under a few conditions:
+*   **Voluntary Retirement:** After a set number of successful spire runs or reaching a specific milestone, the player may choose to retire the current heir.
+*   **Age:** Heirs will age over time, and eventually, they will be forced to retire from the dangers of the spire.
+
+### Choosing a Career
+Upon retirement, the player chooses a new career for the heir. The available careers are determined by the heir's final stats, skills, and, most importantly, their Attunement Ranks. A higher rank in an Attunement unlocks more prestigious and lucrative careers.
+
+*   **Career Effectiveness:** The income and special bonuses provided by a career are directly influenced by the heir's relevant skills.
+*   **Examples:**
+    *   An heir who reached **Sunstone Elementalist** could become a "Military Mage," providing a high income.
+    *   An heir who reached **Emerald Guardian** could become the "Master of the Guard," providing a moderate income but also a permanent reduction in the family's upkeep costs.
+    *   An heir with a mix of **Diviner** and **Shaper** might unlock a unique "Artisan Enchanter" career, generating a variable income but also having a chance to produce valuable items for the family vault.
+
+This system makes the in-run progression of an heir meaningful even after their adventuring days are over, creating a deep connection between individual runs and the long-term strategic management of the house.

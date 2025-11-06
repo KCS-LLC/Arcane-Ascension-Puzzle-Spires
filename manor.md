@@ -46,6 +46,18 @@ The economic health of the House is a critical mechanic that creates urgency and
     *   **Taking Loans:** Loans can be taken from various factions, but come with interest and potential long-term consequences if not repaid.
     *   **Critical Quests:** Special, high-risk/high-reward quests may appear, offering a chance to earn a large sum of Coins quickly, but often at a significant cost or danger to the heir.
 
+---
+
+## 4. Family Economy
+
+As the family grows, the simple model of spire-loot funding the house evolves into a more complex and engaging economic simulation. This system is directly tied to the **Heir and Family Management System** detailed in the main GDD.
+
+*   **Career Income:** The primary source of passive income for the house comes from the careers of its living members, especially retired heirs. This income is added to the House Treasury automatically at the start of each financial cycle.
+*   **Family Upkeep:** Each living member of the family has an upkeep cost, representing their living expenses. This cost is automatically deducted from the Treasury at the end of each financial cycle.
+*   **Net Income/Loss:** The total career income minus the total family upkeep results in a net income or loss for that cycle. This is then factored in with the standard "Financial Obligations" (taxes, etc.).
+    *   A prosperous family with many successful retired heirs might have a high net income, making it easier to afford Manor upgrades and fund well-equipped spire runs.
+    *   A family with many non-working members or those in low-income careers might face a net loss, increasing the pressure on the current heir to perform well in the spire.
+*   **Strategic Importance:** This system makes the retirement and career choice of an heir a critical long-term decision. A single, well-developed heir can become the economic backbone of the family for generations to come.
 
 ---
 

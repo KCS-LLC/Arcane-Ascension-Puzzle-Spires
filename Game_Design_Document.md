@@ -120,4 +120,29 @@ Enemies are drawn from the lore of Arcane Ascension, each with its own health, a
 ## 9. Art & Sound
 
 *   **Art Style:** A clean, anime-inspired art style that matches the book covers. Gem designs should be clear and distinct. Spell effects should be flashy and satisfying.
+
 *   **Sound:** Magical and orchestral soundtrack. Satisfying sound effects for gem matches, spell casts, and impacts.
+
+
+
+## 10. Heir and Family Management System
+
+
+
+This system introduces a long-term strategic and economic layer to the game, making the management of the house as important as the adventures in the spire.
+
+
+
+*   **Living Family Members:** The house is not just an abstract entity but is composed of living family members. The player will track all relatives, each of whom contributes to or drains the family's resources.
+
+*   **Careers and Income:** Each non-adventuring family member will have a job or career (e.g., merchant, politician, scholar). These careers will generate a steady stream of income for the house, which is crucial for paying upkeep and funding spire runs.
+
+*   **Upkeep Costs:** Every family member, including the active heir, will have an upkeep cost. This creates a constant financial pressure that must be managed through income from careers and loot from the spire.
+
+*   **Heir Retirement:** When an heir successfully completes their adventuring career (either by choice after a number of successful runs or by reaching a certain age), they retire.
+
+*   **Post-Adventure Careers:** Upon retirement, the player can choose a new career for the former heir. The available careers and their effectiveness will be determined by the skills and attunements the heir gained while adventuring.
+
+    *   *Example:* An heir who mastered the Elementalist and Diviner attunements might become a powerful "Magical Forecaster," generating significant income. An heir who focused on defense and physical combat might become a "City Guard Captain," providing a smaller income but reducing the house's overall upkeep costs.
+
+*   **Strategic Depth:** This system encourages players to think about the long-term consequences of their heir's development, balancing short-term gains in the spire with the long-term economic prosperity of their family.
