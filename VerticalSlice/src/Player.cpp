@@ -1,7 +1,7 @@
 #include "Player.h"
 
 Player::Player(int initialHp, const std::vector<Spell>& initialSpells) 
-    : currentHp(initialHp), spells(initialSpells) {
+    : maxHp(initialHp), currentHp(initialHp), spells(initialSpells) {
     mana[GemType::Air] = 0;
     mana[GemType::Fire] = 0;
     mana[GemType::Earth] = 0;
@@ -16,8 +16,10 @@ Player::Player(int initialHp, const std::vector<Spell>& initialSpells)
     mana[GemType::Enhancement] = 0;
 }
 
-int Player::getCurrentHp() const { return currentHp; }
 int Player::getMana(GemType type) const { return mana.at(type); }
+
+int Player::getCurrentHp() const { return currentHp; }
+
 const std::vector<Spell>& Player::getSpells() const { return spells; }
 
 void Player::takeDamage(int amount) { currentHp -= amount; }

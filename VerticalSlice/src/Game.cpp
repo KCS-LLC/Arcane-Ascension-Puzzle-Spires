@@ -13,7 +13,6 @@ Game::Game()
       dataManager(),
       player(100, {}), 
       monster(0, 0),
-      uiManager(),
       currentState(GameState::Playing),
       isAnimatingSwap(false),
       isAnimatingDestruction(false),
@@ -23,6 +22,7 @@ Game::Game()
     if (!font.openFromFile("assets/OpenSans-Regular.ttf")) {
         std::cerr << "Error loading font." << std::endl;
     }
+    uiManager = std::make_unique<UIManager>(font);
 
     if (!dataManager.loadSpells("data/spells.json") || !dataManager.loadMonsterData("data/monster.json")) {
         std::cerr << "Failed to load game data." << std::endl;
@@ -41,7 +41,7 @@ Game::Game()
     boardOrigin.y = WINDOW_HEIGHT - boardPixelHeight - 20;
 
     loadTextures();
-    uiManager.setup(font, player, window.getSize(), boardOrigin);
+    uiManager->setup(player, window.getSize(), boardOrigin);
 }
 
 void Game::loadTextures() {
@@ -84,7 +84,7 @@ void Game::processEvents() {
             if (mbp->button != sf::Mouse::Button::Left) continue;
             
             // 1. Let the UIManager handle the event first.
-            auto uiAction = uiManager.handleEvent(*event);
+            auto uiAction = uiManager->handleEvent(*event);
             if (uiAction.has_value()) {
                 if (uiAction->type == UIActionType::CastSpell) {
                     int damage = player.castSpell(uiAction->spellIndex);
@@ -241,7 +241,7 @@ void Game::update() {
     }
 
     // --- UI Updates ---
-    uiManager.update(player, monster);
+    uiManager->update(player, monster);
 }
 
 // Main render function: draws all game elements to the screen.
@@ -249,7 +249,7 @@ void Game::render() {
     window.clear(sf::Color(50, 50, 50));
 
     // 1. Render UI via UIManager
-    uiManager.render(window, currentState);
+    uiManager->render(window, currentState);
 
     // 2. Render the game board and animations
     if (!isReshuffling) {

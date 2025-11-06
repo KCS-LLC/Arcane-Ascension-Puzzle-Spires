@@ -1,9 +1,13 @@
-# Compiled executable
-/VerticalSlice/game.exe
-
-# VS Code user settings
+# IDE specific
 .vscode/
-!.vscode/tasks.json
 
-# Temporary directories
-ref/
+# Build artifacts
+/VerticalSlice/game.exe
+*.o
+*.obj
+
+# Asset Generator Tool
+/VerticalSlice/tools/
+
+# Generated Image Output (often temporary or experimental)
+/nanobanana-output/

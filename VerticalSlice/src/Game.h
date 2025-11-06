@@ -2,16 +2,17 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "Constants.h"
+#include <SFML/Graphics.hpp>
+#include <vector>
+#include <optional>
+#include <map>
+#include <memory>
 #include "Board.h"
 #include "Player.h"
 #include "Monster.h"
 #include "DataManager.h"
 #include "UIManager.h"
-#include <SFML/Graphics.hpp>
-#include <optional>
-#include <vector>
-#include <map>
+#include "Constants.h"
 
 class Game {
 public:
@@ -29,9 +30,12 @@ private:
     sf::RenderWindow window;
     Board board;
     Player player;
+#include <memory>
+
+// ... inside Game class private members ...
     Monster monster;
     DataManager dataManager;
-    UIManager uiManager;
+    std::unique_ptr<UIManager> uiManager;
     std::map<GemType, sf::Texture> gemTextures;
 
     GameState currentState;
