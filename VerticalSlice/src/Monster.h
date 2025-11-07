@@ -2,6 +2,8 @@
 #ifndef MONSTER_H
 #define MONSTER_H
 
+#include <string>
+
 class Monster {
 public:
     Monster(int maxHp, int speed);
@@ -13,6 +15,7 @@ public:
     int getMaxHp() const;
     int getSpeed() const;
     int getActionCounter() const;
+    std::string name;
 
 private:
     int maxHp;

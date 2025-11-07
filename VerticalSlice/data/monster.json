@@ -1,6 +1,6 @@
 {
-    "name": "Cave Goblin",
-    "hp": 250,
+    "name": "Goblin Grunt",
+    "hp": 150,
     "speed": 100,
-    "attackDamage": 20
+    "attackDamage": 10
 }

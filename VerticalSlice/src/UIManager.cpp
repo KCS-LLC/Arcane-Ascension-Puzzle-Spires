@@ -5,6 +5,7 @@ UIManager::UIManager(const sf::Font& fontRef)
     : font(fontRef),
       playerPanelTitle(font),
       monsterPanelTitle(font),
+      monsterNameText(font),
       manaTitle(font),
       gameOverText(font)
 {}
@@ -45,6 +46,12 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     monsterPanelTitle.setCharacterSize(28);
     monsterPanelTitle.setFillColor(sf::Color::White);
     monsterPanelTitle.setPosition({rightPanel.getPosition().x + 20, rightPanel.getPosition().y + 20});
+
+    monsterNameText.setFont(font);
+    monsterNameText.setString("TEMP NAME");
+    monsterNameText.setCharacterSize(20);
+    monsterNameText.setFillColor(sf::Color::White);
+    monsterNameText.setPosition({rightPanel.getPosition().x + 20, rightPanel.getPosition().y + 50});
     
     // --- Player HP Gauge ---
     playerHpBarBack.setSize({panelWidth - 40, 20});
@@ -56,18 +63,18 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
 
     // --- Monster HP Gauge ---
     monsterHpBarBack.setSize({panelWidth - 40, 20});
-    monsterHpBarBack.setPosition({rightPanel.getPosition().x + 20, rightPanel.getPosition().y + 70});
+    monsterHpBarBack.setPosition({rightPanel.getPosition().x + 20, rightPanel.getPosition().y + 80});
     monsterHpBarBack.setFillColor(sf::Color(50, 0, 0));
     monsterHpBarFront.setSize({panelWidth - 40, 20});
-    monsterHpBarFront.setPosition({rightPanel.getPosition().x + 20, rightPanel.getPosition().y + 70});
+    monsterHpBarFront.setPosition({rightPanel.getPosition().x + 20, rightPanel.getPosition().y + 80});
     monsterHpBarFront.setFillColor(sf::Color(200, 0, 0));
 
     // --- Monster Speed Gauge ---
     monsterSpeedGaugeBackground.setSize({panelWidth - 40, 10});
-    monsterSpeedGaugeBackground.setPosition({rightPanel.getPosition().x + 20, rightPanel.getPosition().y + 100});
+    monsterSpeedGaugeBackground.setPosition({rightPanel.getPosition().x + 20, rightPanel.getPosition().y + 110});
     monsterSpeedGaugeBackground.setFillColor(sf::Color(50, 50, 50));
     monsterSpeedGaugeForeground.setSize({0, 10});
-    monsterSpeedGaugeForeground.setPosition({rightPanel.getPosition().x + 20, rightPanel.getPosition().y + 100});
+    monsterSpeedGaugeForeground.setPosition({rightPanel.getPosition().x + 20, rightPanel.getPosition().y + 110});
     monsterSpeedGaugeForeground.setFillColor(sf::Color::Cyan);
 
     // --- Mana Gauges ---
@@ -134,9 +141,17 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     // --- Game Over Text ---
     gameOverText.setFont(font);
     gameOverText.setCharacterSize(48);
+
+    // --- Player Damage Overlay ---
+    playerDamageOverlay.setSize(leftPanel.getSize());
+    playerDamageOverlay.setPosition(leftPanel.getPosition());
+    playerDamageOverlay.setFillColor(sf::Color(255, 0, 0, 75));
 }
 
 void UIManager::update(const Player& player, const Monster& monster) {
+    // Update monster name
+    monsterNameText.setString(monster.name);
+
     // Update HP gauges
     float playerHpPercent = (float)player.getCurrentHp() / player.getMaxHp();
     playerHpBarFront.setSize({playerHpBarBack.getSize().x * playerHpPercent, playerHpBarBack.getSize().y});
@@ -186,7 +201,7 @@ void UIManager::update(const Player& player, const Monster& monster) {
     }
 }
 
-void UIManager::render(sf::RenderWindow& window, GameState currentState) {
+void UIManager::render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect) {
     window.draw(leftPanel);
     window.draw(rightPanel);
     window.draw(boardFrame);
@@ -194,6 +209,7 @@ void UIManager::render(sf::RenderWindow& window, GameState currentState) {
     // Draw Titles
     window.draw(playerPanelTitle);
     window.draw(monsterPanelTitle);
+    window.draw(monsterNameText);
 
     // Draw Gauges
     window.draw(playerHpBarBack);
@@ -212,6 +228,11 @@ void UIManager::render(sf::RenderWindow& window, GameState currentState) {
     for(const auto& button : spellButtons) window.draw(button);
     for(const auto& fill : spellButtonFills) window.draw(fill); // Draw the fill
     for(const auto& text : spellButtonTexts) window.draw(text);
+
+    // Draw Player Damage Effect
+    if (showPlayerDamageEffect) {
+        window.draw(playerDamageOverlay);
+    }
 
     if (currentState == GameState::GameOver) {
         window.draw(gameOverText);

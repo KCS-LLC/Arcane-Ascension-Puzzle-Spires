@@ -16,12 +16,14 @@ public:
     int getMonsterHP() const;
     int getMonsterSpeed() const;
     int getMonsterAttackDamage() const;
+    std::string getMonsterName() const;
 
 private:
     std::vector<Spell> spells;
     int monsterHP;
     int monsterSpeed;
     int monsterAttackDamage;
+    std::string monsterName;
 };
 
 #endif // DATAMANAGER_H

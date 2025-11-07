@@ -32,6 +32,7 @@ Game::Game()
 
     player = Player(100, dataManager.getAllSpells());
     monster = Monster(dataManager.getMonsterHP(), dataManager.getMonsterSpeed());
+    monster.name = dataManager.getMonsterName();
 
     board.initialize();
     
@@ -91,11 +92,12 @@ void Game::processEvents() {
                     if (damage > 0) {
                         monster.takeDamage(damage);
                         std::cout << "Casted spell, dealing " << damage << " damage!\n";
-                        if (monster.isTurnReady(SPELL_SPEED_COST)) {
-                            player.takeDamage(dataManager.getMonsterAttackDamage());
-                            std::cout << "Monster's turn! Player takes " << dataManager.getMonsterAttackDamage() << " damage!\n";
-                        }
-                    } else {
+                                            if (monster.isTurnReady(SPELL_SPEED_COST)) {
+                                                player.takeDamage(dataManager.getMonsterAttackDamage());
+                                                showPlayerDamageEffect = true;
+                                                playerDamageClock.restart();
+                                                std::cout << "Monster's turn! Player takes " << dataManager.getMonsterAttackDamage() << " damage!\n";
+                                            }                    } else {
                         std::cout << "Not enough mana to cast spell!\n";
                     }
                 }
@@ -182,6 +184,8 @@ void Game::update() {
                     // This was a direct player action, so check if the monster gets a turn.
                     if (monster.isTurnReady(MATCH_SPEED_COST)) {
                         player.takeDamage(dataManager.getMonsterAttackDamage());
+                        showPlayerDamageEffect = true;
+                        playerDamageClock.restart();
                         std::cout << "Monster's turn! Player takes " << dataManager.getMonsterAttackDamage() << " damage!\n";
                     }
                     isAnimatingDestruction = true;
@@ -240,6 +244,11 @@ void Game::update() {
         }
     }
 
+    // --- Damage Effect Logic ---
+    if (showPlayerDamageEffect && playerDamageClock.getElapsedTime().asMilliseconds() > 200) {
+        showPlayerDamageEffect = false;
+    }
+
     // --- UI Updates ---
     uiManager->update(player, monster);
 }
@@ -249,7 +258,7 @@ void Game::render() {
     window.clear(sf::Color(50, 50, 50));
 
     // 1. Render UI via UIManager
-    uiManager->render(window, currentState);
+    uiManager->render(window, currentState, showPlayerDamageEffect);
 
     // 2. Render the game board and animations
     if (!isReshuffling) {

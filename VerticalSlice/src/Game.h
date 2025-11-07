@@ -54,6 +54,9 @@ private:
 
     sf::Font font;
     sf::Vector2f boardOrigin;
+
+    sf::Clock playerDamageClock;
+    bool showPlayerDamageEffect = false;
 };
 
 #endif // GAME_H

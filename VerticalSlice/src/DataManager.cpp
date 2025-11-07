@@ -52,6 +52,7 @@ bool DataManager::loadMonsterData(const std::string& path) {
         monsterHP = data.at("hp").get<int>();
         monsterSpeed = data.at("speed").get<int>();
         monsterAttackDamage = data.at("attackDamage").get<int>();
+        monsterName = data.at("name").get<std::string>();
     } catch (json::parse_error& e) {
         std::cerr << "JSON parse error in monster file: " << e.what() << std::endl;
         return false;
@@ -73,4 +74,8 @@ int DataManager::getMonsterSpeed() const {
 
 int DataManager::getMonsterAttackDamage() const {
     return monsterAttackDamage;
+}
+
+std::string DataManager::getMonsterName() const {
+    return monsterName;
 }

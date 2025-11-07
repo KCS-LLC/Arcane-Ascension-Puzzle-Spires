@@ -24,7 +24,7 @@ public:
 
     void setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin);
     void update(const Player& player, const Monster& monster);
-    void render(sf::RenderWindow& window, GameState currentState);
+    void render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect);
 
     const std::vector<sf::RectangleShape>& getSpellButtons() const;
 
@@ -34,6 +34,7 @@ private:
     // Titles
     sf::Text playerPanelTitle;
     sf::Text monsterPanelTitle;
+    sf::Text monsterNameText;
     sf::Text manaTitle;
 
     // Gauges
@@ -53,6 +54,7 @@ private:
     sf::RectangleShape boardFrame;
     sf::RectangleShape monsterSpeedGaugeBackground;
     sf::RectangleShape monsterSpeedGaugeForeground;
+    sf::RectangleShape playerDamageOverlay;
 };
 
 #endif // UIMANAGER_H
