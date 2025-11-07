@@ -32,15 +32,23 @@ Each step will be followed by a compilation to verify correctness before proceed
 - **[DONE]** Integrate all sprites into the game's rendering logic.
 - **[DONE]** Refactor rendering logic to be resolution-independent, ensuring future assets of any size will display correctly.
 
-## Phase 3: Player Experience & Visual Polish
+## Phase 3: Player Experience & Visual Polish [COMPLETED]
 - **Objective:** Enhance the user's experience with better feedback, smoother interactions, and more engaging visual elements.
 - **Key Tasks:**
     - **[DONE]** **Stat "Fog of War":** Player stats (HP, Mana) and Monster stats (HP) are now represented as gauges, hiding the exact numerical values.
     - **[DONE]** **Spell Readiness Indicator:** Spell buttons now have a vertical fill effect to show mana progress and change color distinctly when ready.
-    - **[TODO]** **Monster Attack Indicator:** Add a clear visual effect when the monster performs an action (e.g., a screen flash, a simple animation, or a particle effect on the player's panel) to ensure the player is aware they have taken damage.
+    - **[DONE]** **Display Monster Name:** The specific name of the monster is now displayed in the combat UI.
+    - **[DONE]** **Monster Attack Indicator:** A clear visual effect (red flash) now occurs when the monster performs an action to ensure the player is aware they have taken damage.
     - **[TODO]** **UI Animations:** Add subtle animations and feedback to other UI elements, such as mana gains.
     - **[TODO]** **Visual Effects:** Implement particle effects or other animations for events like gem matches and taking damage.
 
+## Phase 4: Procedural Spire Generation
+- **Objective:** Build the core roguelike loop by creating a multi-room spire for the player to ascend.
+- **Key Tasks:**
+    - **[TODO]** **Create Floor/Room Structure:** Design and implement the basic C++ classes for `Room` (to hold encounters) and `Floor` (a collection of rooms).
+    - **[TODO]** **Implement Linear Floor Progression:** For the initial implementation, create a static, non-random sequence of rooms (e.g., Combat Room -> Combat Room -> Boss Room) to test the mechanics of moving between encounters.
+    - **[TODO]** **Integrate into Game Loop:** Modify the main `Game` class to manage the current floor and transition the player to the next room upon winning a combat encounter.
+
 ## Developer Notes
 - The rendering system is now robust. Any new sprites added to the `assets` folder and mapped in `Game::loadTextures` will be automatically scaled to fit the `TILE_SIZE`.
-- The next logical step would be to implement the **Monster Attack Indicator**. A simple, effective approach could be a quick red flash over the player's side panel when they take damage. This would require adding a new state or timer in the `Game` class to control the flash effect in the `render` loop.
+- The next logical step is to begin implementing the `Room` and `Floor` classes to support the core gameplay loop.
