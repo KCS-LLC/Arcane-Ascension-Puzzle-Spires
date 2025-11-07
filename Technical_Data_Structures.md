@@ -167,10 +167,10 @@ Defines the layout and contents of a single floor in the spire. This is the form
     {
       "id": 0,
       "name": "Entrance",
-      "type": "Entrance", // Enum: Entrance, Combat, Puzzle, Trap, Treasure, Special, Boss
+      "type": "Entrance",
       "connections": [
         {
-          "color": "Red", // Enum: Red, Blue, Yellow, etc.
+          "color": "Red",
           "destinationId": 1
         },
         {
@@ -186,7 +186,7 @@ Defines the layout and contents of a single floor in the spire. This is the form
       "monsterId": "monster_goblin_warrior",
       "connections": [
         {
-          "color": "White", // Color of the door leading back to the Entrance
+          "color": "White",
           "destinationId": 0
         },
         {
@@ -194,8 +194,20 @@ Defines the layout and contents of a single floor in the spire. This is the form
           "destinationId": 3
         }
       ]
+    },
+    {
+      "id": 2,
+      "name": "Flooded Gallery",
+      "type": "Puzzle",
+      "connections": [
+        {
+          "color": "White",
+          "destinationId": 0
+        }
+      ]
     }
-    // ... more rooms
+    // ... more rooms of types:
+    // Trap, Treasure, Special, Boss, AgilityChallenge, EnduranceChallenge, MagicChallenge
   ]
 }
 ```

@@ -28,7 +28,16 @@ The player's goal is to manage their house's legacy by sending heirs into the sp
 2.  **The Judgement:** Complete the Judgement to determine the heir's starting loadout. The judgment will be a modified match 3 puzzle initially to set mana types and attunement. This will be followed by a modified first floor spire run. This will set initial treasure and items.
 3.  **Manor Phase:** Prepare for the run. Buy/sell equipment, manage the vault, and attend training. This phase can take as long as the player wants, but each action will take in-game time, that will deplete the house, treasury, and resources.
 4.  **Enter Spire:** The player starts a new "run" by entering the spire. Each floor is a procedurally generated network of rooms.
-5.  **Exploration & Encounters:** The player navigates from room to room. Each room has a unique name and a set of doors leading to other rooms. Doors are color-coded based on the type of room they lead to (e.g., Red for Combat, Blue for Puzzle). Once a room's encounter is completed (e.g., a monster is defeated), it is marked as "cleared" and will not trigger again on that run. Doors leading to previously visited rooms are labeled with the room's name, allowing for strategic navigation.
+5.  **Exploration & Encounters:** The player navigates from room to room. Each room has a unique name and a set of doors leading to other rooms. Doors are color-coded based on the type of room they lead to. Once a room's encounter is completed, it is marked as "cleared" and will not trigger again on that run. Doors leading to previously visited rooms are labeled with the room's name, allowing for strategic navigation. The door color themes are:
+    *   **Red:** Combat
+    *   **Orange:** Agility Challenge
+    *   **Yellow:** Trap
+    *   **Green:** Endurance Challenge
+    *   **Blue:** Puzzle
+    *   **Indigo:** Magic Challenge
+    *   **Violet:** Special Event
+    *   **White:** Sanctuary / Boss
+    *   **Metallic (Copper, Silver, Gold):** Treasure
 6.  **Exiting the Spire:** At regular intervals (e.g., after defeating a boss), the player has the option to safely exit the spire with all the loot they have gathered. This resets the spire for the next run. Later in the progression, the player will be able to acquire items that will allow for early exit from the tower. They will be single-use and expensive.
 7.  **Defeat & Legacy:** If an heir dies in the spire, all wealth and items they were carrying are lost forever. The player then returns to the Manor to select the next heir, continuing the cycle, if the house has heirs and can afford the process. The game will be a loss if the house suffers financial ruin, or runs out of heirs.
 ## 4. Time and Urgency

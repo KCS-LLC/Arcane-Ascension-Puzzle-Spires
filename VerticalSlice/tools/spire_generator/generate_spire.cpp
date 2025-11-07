@@ -13,7 +13,7 @@
 using json = nlohmann::json;
 
 // --- Data Structures ---
-enum class RoomType { Entrance, Combat, Treasure, Boss, Sanctuary, Special, Puzzle, Trap, Unknown };
+enum class RoomType { Entrance, Combat, Treasure, Boss, Sanctuary, Special, Puzzle, Trap, AgilityChallenge, EnduranceChallenge, MagicChallenge, Unknown };
 enum class DoorColor { Red, Orange, Yellow, Green, Blue, Indigo, Violet, Copper, Silver, Gold, White, Unknown };
 
 struct Teleporter {
@@ -75,6 +75,9 @@ std::string roomTypeToString(RoomType type) {
         case RoomType::Special: return "Special";
         case RoomType::Puzzle: return "Puzzle";
         case RoomType::Trap: return "Trap";
+        case RoomType::AgilityChallenge: return "AgilityChallenge";
+        case RoomType::EnduranceChallenge: return "EnduranceChallenge";
+        case RoomType::MagicChallenge: return "MagicChallenge";
         default: return "Unknown";
     }
 }
@@ -113,14 +116,16 @@ DoorColor determineTreasureTier(int floorNumber) {
 DoorColor colorFromRoomType(RoomType type, int floorNumber) {
     switch (type) {
         case RoomType::Combat: return DoorColor::Red;
+        case RoomType::AgilityChallenge: return DoorColor::Orange;
         case RoomType::Trap: return DoorColor::Yellow;
+        case RoomType::EnduranceChallenge: return DoorColor::Green;
         case RoomType::Puzzle: return DoorColor::Blue;
-        case RoomType::Treasure:
-        case RoomType::Special:
-            return determineTreasureTier(floorNumber);
+        case RoomType::MagicChallenge: return DoorColor::Indigo;
+        case RoomType::Special: return DoorColor::Violet;
+        case RoomType::Treasure: return determineTreasureTier(floorNumber);
         case RoomType::Sanctuary:
         case RoomType::Boss:
-        case RoomType::Entrance: // Entrance doors are white from the other side
+        case RoomType::Entrance:
             return DoorColor::White;
         default: return DoorColor::Red;
     }
@@ -143,7 +148,6 @@ int main(int argc, char* argv[]) {
         floor.rooms.back().id = i;
     }
 
-    // --- Phase 1: Node Creation & Type Assignment ---
     floor.rooms[0].type = RoomType::Entrance;
     floor.rooms[0].name = "Entrance";
     floor.startRoomId = floor.rooms[0].id;
@@ -163,11 +167,10 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    // Fill the rest with a mix of challenge rooms
+    std::vector<RoomType> challengePool = {RoomType::Combat, RoomType::Puzzle, RoomType::Trap, RoomType::AgilityChallenge, RoomType::EnduranceChallenge, RoomType::MagicChallenge};
     while (currentRoomIdx < roomCount) {
-        int randType = getRandomInt(1, 3);
-        if (randType == 1) floor.rooms[currentRoomIdx].type = RoomType::Combat;
-        else if (randType == 2) floor.rooms[currentRoomIdx].type = RoomType::Puzzle;
-        else floor.rooms[currentRoomIdx].type = RoomType::Trap;
+        floor.rooms[currentRoomIdx].type = challengePool[getRandomInt(0, challengePool.size() - 1)];
         currentRoomIdx++;
     }
 
@@ -193,7 +196,6 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    // --- Phase 2 & 3: Build Progression Graph ---
     std::vector<int> connectedIndices = {entranceIdx};
     std::vector<int> unconnectedIndices;
     for(int i = 0; i < floor.rooms.size(); ++i) if(i != entranceIdx) unconnectedIndices.push_back(i);
@@ -232,7 +234,6 @@ int main(int argc, char* argv[]) {
         unconnectedIndices.erase(unconnectedIndices.begin());
     }
 
-    // --- Phase 4: Add Loops ---
     int extraConnections = getRandomInt(roomCount / 2, roomCount);
     for(int k = 0; k < extraConnections; ++k) {
         int idx1 = getRandomInt(0, roomCount - 1);
@@ -263,37 +264,36 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // --- Phase 5: ENTRANCE ROOM FIX ---
-    std::vector<RoomType> desiredTypes = {RoomType::Combat, RoomType::Puzzle, RoomType::Trap};
-    while (floor.rooms[entranceIdx].connections.size() < 3) {
-        bool connectedSomething = false;
-        for (RoomType targetType : desiredTypes) {
-            DoorColor targetColor = colorFromRoomType(targetType, floorNumber);
-            
-            bool alreadyHasColor = false;
-            for(const auto& conn : floor.rooms[entranceIdx].connections) {
-                if (colorFromRoomType(floor.rooms[id_to_idx.at(conn.destinationRoomId)].type, floorNumber) == targetColor) alreadyHasColor = true;
-            }
-            if (alreadyHasColor) continue;
-
-            for (int i = 0; i < floor.rooms.size(); ++i) {
-                if (i == entranceIdx || floor.rooms[i].type != targetType) continue;
-
-                bool alreadyConnected = false;
-                for(const auto& conn : floor.rooms[entranceIdx].connections) if(conn.destinationRoomId == floor.rooms[i].id) alreadyConnected = true;
-                if(alreadyConnected) continue;
-
-                floor.rooms[entranceIdx].connections.push_back({DoorColor::Unknown, floor.rooms[i].id});
-                floor.rooms[i].connections.push_back({DoorColor::Unknown, floor.rooms[entranceIdx].id});
-                connectedSomething = true;
-                break; 
-            }
+    std::vector<RoomType> desiredTypes = {RoomType::Combat, RoomType::Puzzle, RoomType::Trap, RoomType::AgilityChallenge, RoomType::EnduranceChallenge, RoomType::MagicChallenge};
+    std::shuffle(desiredTypes.begin(), desiredTypes.end(), rng);
+    while (floor.rooms[entranceIdx].connections.size() < 3 && !desiredTypes.empty()) {
+        RoomType targetType = desiredTypes.back();
+        desiredTypes.pop_back();
+        
+        DoorColor targetColor = colorFromRoomType(targetType, floorNumber);
+        
+        bool alreadyHasColor = false;
+        for(const auto& conn : floor.rooms[entranceIdx].connections) {
+            if (colorFromRoomType(floor.rooms[id_to_idx.at(conn.destinationRoomId)].type, floorNumber) == targetColor) alreadyHasColor = true;
         }
-        if (!connectedSomething) break; // Avoid infinite loop if no valid connections can be made
+        if (alreadyHasColor) continue;
+
+        int bestCandidate = -1;
+        for (int i = 0; i < floor.rooms.size(); ++i) {
+            if (i == entranceIdx || floor.rooms[i].type != targetType) continue;
+            bool alreadyConnected = false;
+            for(const auto& conn : floor.rooms[entranceIdx].connections) if(conn.destinationRoomId == floor.rooms[i].id) alreadyConnected = true;
+            if(alreadyConnected) continue;
+            bestCandidate = i;
+            break; 
+        }
+        
+        if (bestCandidate != -1) {
+            floor.rooms[entranceIdx].connections.push_back({DoorColor::Unknown, floor.rooms[bestCandidate].id});
+            floor.rooms[bestCandidate].connections.push_back({DoorColor::Unknown, floor.rooms[entranceIdx].id});
+        }
     }
 
-
-    // --- Phase 6: Finalize JSON ---
     json floorJson;
     floorJson["floorNumber"] = floor.floorNumber;
     floorJson["startRoomId"] = floor.startRoomId;

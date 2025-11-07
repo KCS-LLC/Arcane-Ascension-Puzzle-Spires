@@ -16,6 +16,9 @@ enum class RoomType {
     Special,
     Puzzle,
     Trap,
+    AgilityChallenge,
+    EnduranceChallenge,
+    MagicChallenge,
     Unknown
 };
 
@@ -52,6 +55,9 @@ inline RoomType stringToRoomType(const std::string& s) {
     if (s == "Special")   return RoomType::Special;
     if (s == "Puzzle")    return RoomType::Puzzle;
     if (s == "Trap")      return RoomType::Trap;
+    if (s == "AgilityChallenge") return RoomType::AgilityChallenge;
+    if (s == "EnduranceChallenge") return RoomType::EnduranceChallenge;
+    if (s == "MagicChallenge") return RoomType::MagicChallenge;
     return RoomType::Unknown;
 }
 

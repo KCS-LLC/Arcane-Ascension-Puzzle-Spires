@@ -9,6 +9,19 @@ const int BOARD_HEIGHT = 8;
 const int TILE_SIZE = 64;
 
 // Enum for the main game states
-enum class GameState { Playing, Animating, GameOver, Exploration, Treasure, Special, Puzzle, Trap, Sanctuary };
+enum class GameState {
+    Playing,
+    Animating,
+    GameOver,
+    Exploration,
+    Treasure,
+    Special,
+    Puzzle,
+    Trap,
+    Sanctuary,
+    AgilityChallenge,
+    EnduranceChallenge,
+    MagicChallenge
+};
 
 #endif // CONSTANTS_H

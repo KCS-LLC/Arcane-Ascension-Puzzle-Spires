@@ -46,7 +46,7 @@ When not in combat, the player sees the Exploration screen. This view is designe
 *   **Content:**
     *   **Room Name:** The unique, procedurally generated name of the current room is displayed prominently at the top of the screen (e.g., "Forgotten Chamber").
     *   **Door Buttons:** The exits to other rooms are displayed as a series of buttons in the center of the screen. The layout wraps dynamically to handle any number of doors.
-        *   **Unexplored Rooms:** Doors leading to new rooms are colored according to the destination's type (e.g., Red for Combat) and labeled with the color (e.g., "Red Door").
+        *   **Unexplored Rooms:** Doors leading to new rooms are colored according to the destination's type and labeled with the color (e.g., "Red Door"). The color themes are: Red (Combat), Orange (Agility), Yellow (Trap), Green (Endurance), Blue (Puzzle), Indigo (Magic), Violet (Special), White (Sanctuary/Boss), and Metallics (Treasure).
         *   **Explored Rooms:** Doors leading to rooms the player has already visited are labeled with the destination room's name (e.g., "Whispering Hall"). This allows the player to navigate without having to memorize the floor layout.
 
 ### 2.6. User Flow

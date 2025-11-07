@@ -1,44 +1,9 @@
 #include "UIManager.h"
 #include "SpireData.h"
 #include "DataManager.h"
+#include "StringUtils.h"
 #include <string>
 #include <algorithm>
-
-// Helper function to map DoorColor enum to sf::Color
-sf::Color doorColorToSfColor(DoorColor color) {
-    switch (color) {
-        case DoorColor::Red:    return sf::Color::Red;
-        case DoorColor::Orange: return sf::Color(255, 165, 0);
-        case DoorColor::Yellow: return sf::Color::Yellow;
-        case DoorColor::Green:  return sf::Color::Green;
-        case DoorColor::Blue:   return sf::Color::Blue;
-        case DoorColor::Indigo: return sf::Color(75, 0, 130);
-        case DoorColor::Violet: return sf::Color(238, 130, 238);
-        case DoorColor::Copper: return sf::Color(184, 115, 51);
-        case DoorColor::Silver: return sf::Color(192, 192, 192);
-        case DoorColor::Gold:   return sf::Color(255, 215, 0);
-        case DoorColor::White:  return sf::Color::White;
-        default:                return sf::Color::Black;
-    }
-}
-
-std::string doorColorToString(DoorColor color) {
-    switch (color) {
-        case DoorColor::Red:    return "Red";
-        case DoorColor::Orange: return "Orange";
-        case DoorColor::Yellow: return "Yellow";
-        case DoorColor::Green:  return "Green";
-        case DoorColor::Blue:   return "Blue";
-        case DoorColor::Indigo: return "Indigo";
-        case DoorColor::Violet: return "Violet";
-        case DoorColor::Copper: return "Copper";
-        case DoorColor::Silver: return "Silver";
-        case DoorColor::Gold:   return "Gold";
-        case DoorColor::White:  return "White";
-        default:                return "Unknown";
-    }
-}
-
 UIManager::UIManager(const sf::Font& fontRef)
     : font(fontRef),
       playerPanelTitle(font),
@@ -51,7 +16,10 @@ UIManager::UIManager(const sf::Font& fontRef)
       specialTitle(font),
       puzzleTitle(font),
       trapTitle(font),
-      sanctuaryTitle(font)
+      sanctuaryTitle(font),
+      agilityTitle(font),
+      enduranceTitle(font),
+      magicTitle(font)
 {}
 
 void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin) {
@@ -212,6 +180,9 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     setupPlaceholderTitle(puzzleTitle, "Puzzle Room\n(Click to continue)");
     setupPlaceholderTitle(trapTitle, "Trap Room\n(Click to continue)");
     setupPlaceholderTitle(sanctuaryTitle, "Sanctuary\n(Click to continue)");
+    setupPlaceholderTitle(agilityTitle, "Agility Challenge\n(Click to continue)");
+    setupPlaceholderTitle(enduranceTitle, "Endurance Challenge\n(Click to continue)");
+    setupPlaceholderTitle(magicTitle, "Magic Challenge\n(Click to continue)");
 }
 
 void UIManager::update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager) {
@@ -376,6 +347,9 @@ void UIManager::render(sf::RenderWindow& window, GameState currentState, bool sh
         case GameState::Puzzle: window.draw(puzzleTitle); break;
         case GameState::Trap: window.draw(trapTitle); break;
         case GameState::Sanctuary: window.draw(sanctuaryTitle); break;
+        case GameState::AgilityChallenge: window.draw(agilityTitle); break;
+        case GameState::EnduranceChallenge: window.draw(enduranceTitle); break;
+        case GameState::MagicChallenge: window.draw(magicTitle); break;
     }
 }
 

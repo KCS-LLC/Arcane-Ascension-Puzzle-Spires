@@ -6,7 +6,7 @@ This directory contains the playable vertical slice for the game "Arcane Ascensi
 The project is in a stable, compiling state. The core gameplay loop, combining procedural dungeon exploration with match-3 combat, is now implemented.
 
 ### Core Features Implemented:
-*   **Procedural Spire Generation:** The game creates a unique, multi-room floor layout for each run, governed by a set of robust rules. This includes a variety of room types (Combat, Puzzle, Trap, etc.) and guarantees unique, thematic door connections for each room.
+*   **Procedural Spire Generation:** The game creates a unique, multi-room floor layout for each run, governed by a set of robust rules. This includes an expanded variety of room types (Combat, Puzzle, Trap, Agility, Endurance, Magic, etc.) and guarantees unique, thematic door connections for each room.
 *   **Exploration Gameplay:** Players navigate between uniquely named rooms using a dedicated exploration screen. The system tracks visited and cleared rooms, preventing events from re-triggering and updating door labels to show the names of explored destinations.
 *   **Puzzle Board:** A fully functional 8x8 match-3 board.
 *   **Combat:** Players can match skull gems to deal direct damage to a monster.
@@ -22,4 +22,4 @@ The project is in a stable, compiling state. The core gameplay loop, combining p
 3.  **Run:** Execute the generated `game.exe` from within the `VerticalSlice` directory.
 
 ## Next Steps
-The foundational exploration and combat loop is complete. The next major focus will be on fleshing out the non-combat room encounters (Treasure, Puzzle, Trap) and implementing a greater variety of monsters.
+The foundational exploration and combat loop is complete. The next major focus will be on fleshing out the non-combat room encounters (Treasure, Puzzle, Trap, and the new Challenge rooms) and implementing a greater variety of monsters.

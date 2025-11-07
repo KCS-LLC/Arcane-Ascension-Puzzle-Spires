@@ -1,23 +1,9 @@
 #include "Game.h"
+#include "SpireData.h"
+#include "StringUtils.h"
 #include <iostream>
 #include <algorithm>
 #include <string>
-
-// Duplicated from SpireData.h for now to avoid circular dependencies
-// A better solution would be a shared utility header.
-std::string roomTypeToString(RoomType type) {
-    switch (type) {
-        case RoomType::Entrance:  return "Entrance";
-        case RoomType::Combat:    return "Combat";
-        case RoomType::Treasure:  return "Treasure";
-        case RoomType::Boss:      return "Boss";
-        case RoomType::Sanctuary: return "Sanctuary";
-        case RoomType::Special:   return "Special";
-        case RoomType::Puzzle:    return "Puzzle";
-        case RoomType::Trap:      return "Trap";
-        default:                  return "Unknown";
-    }
-}
 
 // Constants for the turn-based speed system
 const int MATCH_SPEED_COST = 30;
@@ -107,7 +93,8 @@ void Game::processEvents() {
             // Handle click-through for placeholder screens
             if (currentState == GameState::Treasure || currentState == GameState::Special ||
                 currentState == GameState::Puzzle || currentState == GameState::Trap ||
-                currentState == GameState::Sanctuary)
+                currentState == GameState::Sanctuary || currentState == GameState::AgilityChallenge ||
+                currentState == GameState::EnduranceChallenge || currentState == GameState::MagicChallenge)
             {
                 currentState = GameState::Exploration;
                 continue;
@@ -443,9 +430,10 @@ void Game::moveToRoom(int destinationRoomId) {
             case RoomType::Trap:
                 currentState = GameState::Trap;
                 break;
-            case RoomType::Sanctuary:
-                currentState = GameState::Sanctuary;
-                break;
+            case RoomType::Sanctuary: currentState = GameState::Sanctuary; break;
+            case RoomType::AgilityChallenge: currentState = GameState::AgilityChallenge; break;
+            case RoomType::EnduranceChallenge: currentState = GameState::EnduranceChallenge; break;
+            case RoomType::MagicChallenge: currentState = GameState::MagicChallenge; break;
             default:
                 // For any other room type, just go back to exploration for now
                 currentState = GameState::Exploration;

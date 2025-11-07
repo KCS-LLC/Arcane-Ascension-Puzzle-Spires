@@ -69,6 +69,9 @@ private:
     sf::Text puzzleTitle;
     sf::Text trapTitle;
     sf::Text sanctuaryTitle;
+    sf::Text agilityTitle;
+    sf::Text enduranceTitle;
+    sf::Text magicTitle;
 
     // Room Exits
     std::vector<sf::RectangleShape> doorButtons;
