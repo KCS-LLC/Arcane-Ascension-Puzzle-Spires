@@ -19,9 +19,7 @@ enum class RoomType {
     Unknown
 };
 
-enum class DoorColor {
-    Red, Orange, Yellow, Green, Blue, Gold, White, Unknown
-};
+enum class DoorColor { Red, Orange, Yellow, Green, Blue, Indigo, Violet, Copper, Silver, Gold, White, Unknown };
 
 struct Teleporter {
     DoorColor color;
@@ -30,6 +28,7 @@ struct Teleporter {
 
 struct Room {
     int id;
+    std::string name;
     RoomType type;
     std::string monsterId;
     std::vector<Teleporter> connections;
@@ -62,6 +61,10 @@ inline DoorColor stringToDoorColor(const std::string& s) {
     if (s == "Yellow") return DoorColor::Yellow;
     if (s == "Green")  return DoorColor::Green;
     if (s == "Blue")   return DoorColor::Blue;
+    if (s == "Indigo") return DoorColor::Indigo;
+    if (s == "Violet") return DoorColor::Violet;
+    if (s == "Copper") return DoorColor::Copper;
+    if (s == "Silver") return DoorColor::Silver;
     if (s == "Gold")   return DoorColor::Gold;
     if (s == "White")  return DoorColor::White;
     return DoorColor::Unknown;
@@ -75,6 +78,7 @@ inline void from_json(const nlohmann::json& j, Teleporter& t) {
 
 inline void from_json(const nlohmann::json& j, Room& r) {
     j.at("id").get_to(r.id);
+    j.at("name").get_to(r.name);
     r.type = stringToRoomType(j.at("type").get<std::string>());
     if (j.contains("monsterId")) {
         j.at("monsterId").get_to(r.monsterId);

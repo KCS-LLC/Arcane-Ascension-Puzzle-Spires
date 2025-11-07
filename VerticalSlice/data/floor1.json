@@ -4,633 +4,309 @@
         {
             "connections": [
                 {
-                    "color": "White",
-                    "destinationId": 1
+                    "color": "Blue",
+                    "destinationId": 2
                 },
                 {
-                    "color": "Gold",
+                    "color": "Red",
                     "destinationId": 4
                 },
                 {
-                    "color": "White",
-                    "destinationId": 16
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 21
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 3
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 9
+                    "color": "Yellow",
+                    "destinationId": 11
                 }
             ],
             "id": 0,
+            "name": "Entrance",
             "type": "Entrance"
         },
         {
             "connections": [
                 {
-                    "color": "Gold",
-                    "destinationId": 2
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 13
-                },
-                {
-                    "color": "Red",
+                    "color": "White",
                     "destinationId": 0
                 },
                 {
-                    "color": "White",
-                    "destinationId": 14
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 3
-                },
-                {
-                    "color": "White",
-                    "destinationId": 15
-                },
-                {
-                    "color": "White",
-                    "destinationId": 19
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 21
-                }
-            ],
-            "id": 1,
-            "monsterId": "monster_1",
-            "type": "Boss"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Gold",
-                    "destinationId": 3
-                },
-                {
-                    "color": "White",
-                    "destinationId": 6
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 12
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 18
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 7
-                },
-                {
-                    "color": "White",
-                    "destinationId": 1
-                },
-                {
-                    "color": "White",
-                    "destinationId": 22
-                }
-            ],
-            "id": 2,
-            "type": "Treasure"
-        },
-        {
-            "connections": [
-                {
-                    "color": "White",
-                    "destinationId": 1
-                },
-                {
-                    "color": "White",
-                    "destinationId": 5
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 8
-                },
-                {
-                    "color": "White",
-                    "destinationId": 14
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 0
-                },
-                {
-                    "color": "Gold",
+                    "color": "Blue",
                     "destinationId": 2
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 12
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 23
-                }
-            ],
-            "id": 3,
-            "type": "Special"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 8
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 0
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 23
-                }
-            ],
-            "id": 4,
-            "type": "Special"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Gold",
-                    "destinationId": 7
-                },
-                {
-                    "color": "White",
-                    "destinationId": 20
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 17
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 3
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 23
-                }
-            ],
-            "id": 5,
-            "monsterId": "monster_5",
-            "type": "Boss"
-        },
-        {
-            "connections": [
-                {
-                    "color": "White",
-                    "destinationId": 10
-                },
-                {
-                    "color": "White",
-                    "destinationId": 15
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 2
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 8
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 23
-                }
-            ],
-            "id": 6,
-            "monsterId": "monster_6",
-            "type": "Boss"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 17
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 2
-                },
-                {
-                    "color": "White",
-                    "destinationId": 5
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 8
-                }
-            ],
-            "id": 7,
-            "type": "Treasure"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 9
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 11
-                },
-                {
-                    "color": "White",
-                    "destinationId": 19
-                },
-                {
-                    "color": "White",
-                    "destinationId": 6
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 7
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 3
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 4
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 17
-                }
-            ],
-            "id": 8,
-            "monsterId": "monster_8",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 21
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 0
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 8
-                }
-            ],
-            "id": 9,
-            "monsterId": "monster_9",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Gold",
-                    "destinationId": 11
-                },
-                {
-                    "color": "White",
-                    "destinationId": 6
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 13
-                },
-                {
-                    "color": "White",
-                    "destinationId": 16
-                }
-            ],
-            "id": 10,
-            "monsterId": "monster_10",
-            "type": "Boss"
-        },
-        {
-            "connections": [
-                {
-                    "color": "White",
-                    "destinationId": 15
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 8
-                },
-                {
-                    "color": "White",
-                    "destinationId": 10
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 21
-                },
-                {
-                    "color": "White",
-                    "destinationId": 22
                 }
             ],
             "id": 11,
-            "type": "Treasure"
+            "name": "Flooded Library",
+            "type": "Trap"
         },
         {
             "connections": [
                 {
-                    "color": "Gold",
-                    "destinationId": 13
+                    "color": "White",
+                    "destinationId": 0
                 },
                 {
-                    "color": "Gold",
-                    "destinationId": 3
+                    "color": "Red",
+                    "destinationId": 4
                 },
                 {
-                    "color": "Gold",
+                    "color": "Yellow",
+                    "destinationId": 5
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 11
+                }
+            ],
+            "id": 2,
+            "name": "Flooded Garden",
+            "type": "Puzzle"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Blue",
                     "destinationId": 2
                 },
                 {
-                    "color": "White",
-                    "destinationId": 20
+                    "color": "Red",
+                    "destinationId": 4
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 16
                 }
             ],
-            "id": 12,
-            "monsterId": "monster_12",
-            "type": "Combat"
+            "id": 5,
+            "name": "Flooded Armory",
+            "type": "Trap"
         },
         {
             "connections": [
                 {
                     "color": "White",
+                    "destinationId": 1
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 5
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 8
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 9
+                },
+                {
+                    "color": "Blue",
                     "destinationId": 10
                 },
                 {
-                    "color": "White",
-                    "destinationId": 1
-                },
-                {
                     "color": "Red",
-                    "destinationId": 12
+                    "destinationId": 15
                 }
             ],
-            "id": 13,
-            "type": "Treasure"
+            "id": 16,
+            "name": "Whispering Garden",
+            "type": "Trap"
         },
         {
             "connections": [
                 {
-                    "color": "Red",
-                    "destinationId": 21
+                    "color": "Yellow",
+                    "destinationId": 7
                 },
                 {
-                    "color": "White",
-                    "destinationId": 1
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 3
-                }
-            ],
-            "id": 14,
-            "monsterId": "monster_14",
-            "type": "Boss"
-        },
-        {
-            "connections": [
-                {
-                    "color": "White",
-                    "destinationId": 22
-                },
-                {
-                    "color": "White",
-                    "destinationId": 6
-                },
-                {
-                    "color": "White",
-                    "destinationId": 1
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 11
+                    "color": "Yellow",
+                    "destinationId": 16
                 },
                 {
                     "color": "Red",
-                    "destinationId": 21
+                    "destinationId": 17
                 }
             ],
             "id": 15,
             "monsterId": "monster_15",
-            "type": "Boss"
-        },
-        {
-            "connections": [
-                {
-                    "color": "White",
-                    "destinationId": 10
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 21
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 0
-                }
-            ],
-            "id": 16,
-            "monsterId": "monster_16",
-            "type": "Boss"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 8
-                },
-                {
-                    "color": "White",
-                    "destinationId": 5
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 7
-                },
-                {
-                    "color": "White",
-                    "destinationId": 20
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 21
-                }
-            ],
-            "id": 17,
-            "monsterId": "monster_17",
+            "name": "Hallowed Library",
             "type": "Combat"
         },
         {
             "connections": [
                 {
-                    "color": "Red",
-                    "destinationId": 23
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 2
-                },
-                {
-                    "color": "White",
-                    "destinationId": 19
-                }
-            ],
-            "id": 18,
-            "type": "Treasure"
-        },
-        {
-            "connections": [
-                {
-                    "color": "White",
-                    "destinationId": 1
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 18
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 8
-                }
-            ],
-            "id": 19,
-            "monsterId": "monster_19",
-            "type": "Boss"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 17
-                },
-                {
-                    "color": "Red",
+                    "color": "Yellow",
                     "destinationId": 12
                 },
                 {
-                    "color": "Red",
-                    "destinationId": 23
-                },
-                {
-                    "color": "White",
-                    "destinationId": 5
-                }
-            ],
-            "id": 20,
-            "monsterId": "monster_20",
-            "type": "Boss"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Gold",
-                    "destinationId": 11
-                },
-                {
-                    "color": "White",
-                    "destinationId": 1
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 17
-                },
-                {
-                    "color": "White",
-                    "destinationId": 15
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 0
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 9
-                },
-                {
-                    "color": "White",
-                    "destinationId": 14
-                },
-                {
-                    "color": "White",
+                    "color": "Yellow",
                     "destinationId": 16
                 },
                 {
                     "color": "Red",
-                    "destinationId": 23
+                    "destinationId": 17
                 }
             ],
-            "id": 21,
-            "monsterId": "monster_21",
+            "id": 10,
+            "name": "Burning Gallery",
+            "type": "Puzzle"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Yellow",
+                    "destinationId": 16
+                }
+            ],
+            "id": 9,
+            "name": "Sunken Hall",
+            "type": "Trap"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Yellow",
+                    "destinationId": 7
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 10
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 13
+                }
+            ],
+            "id": 12,
+            "name": "Forgotten Chamber",
+            "type": "Trap"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 3
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 12
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 15
+                }
+            ],
+            "id": 7,
+            "name": "Burning Garden",
+            "type": "Trap"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Blue",
+                    "destinationId": 10
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 15
+                }
+            ],
+            "id": 17,
+            "monsterId": "monster_17",
+            "name": "Shattered Observatory",
             "type": "Combat"
         },
         {
             "connections": [
                 {
-                    "color": "Gold",
-                    "destinationId": 11
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 2
-                },
-                {
-                    "color": "White",
-                    "destinationId": 15
+                    "color": "Yellow",
+                    "destinationId": 16
                 }
             ],
-            "id": 22,
-            "monsterId": "monster_22",
+            "id": 1,
+            "monsterId": "monster_1",
+            "name": "Guardian's Antechamber",
             "type": "Boss"
         },
         {
             "connections": [
                 {
-                    "color": "Gold",
-                    "destinationId": 4
+                    "color": "Yellow",
+                    "destinationId": 7
+                }
+            ],
+            "id": 3,
+            "monsterId": "monster_3",
+            "name": "Frozen Hall",
+            "type": "Combat"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Yellow",
+                    "destinationId": 12
                 },
                 {
-                    "color": "Gold",
-                    "destinationId": 3
-                },
+                    "color": "Yellow",
+                    "destinationId": 14
+                }
+            ],
+            "id": 13,
+            "monsterId": "monster_13",
+            "name": "Burning Nexus",
+            "type": "Combat"
+        },
+        {
+            "connections": [
                 {
-                    "color": "White",
+                    "color": "Yellow",
                     "destinationId": 6
                 },
                 {
-                    "color": "White",
-                    "destinationId": 5
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 21
-                },
-                {
-                    "color": "Gold",
-                    "destinationId": 18
-                },
-                {
-                    "color": "White",
-                    "destinationId": 20
+                    "color": "Yellow",
+                    "destinationId": 16
                 }
             ],
-            "id": 23,
-            "monsterId": "monster_23",
+            "id": 8,
+            "name": "Cursed Chamber",
+            "type": "Puzzle"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 13
+                }
+            ],
+            "id": 14,
+            "name": "Sunken Gallery",
+            "type": "Trap"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Blue",
+                    "destinationId": 8
+                }
+            ],
+            "id": 6,
+            "name": "Shattered Chamber",
+            "type": "Trap"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 0
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 2
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 5
+                }
+            ],
+            "id": 4,
+            "monsterId": "monster_4",
+            "name": "Forgotten Nexus",
             "type": "Combat"
         }
     ],

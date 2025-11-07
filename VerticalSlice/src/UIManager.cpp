@@ -1,5 +1,43 @@
 #include "UIManager.h"
+#include "SpireData.h"
+#include "DataManager.h"
 #include <string>
+#include <algorithm>
+
+// Helper function to map DoorColor enum to sf::Color
+sf::Color doorColorToSfColor(DoorColor color) {
+    switch (color) {
+        case DoorColor::Red:    return sf::Color::Red;
+        case DoorColor::Orange: return sf::Color(255, 165, 0);
+        case DoorColor::Yellow: return sf::Color::Yellow;
+        case DoorColor::Green:  return sf::Color::Green;
+        case DoorColor::Blue:   return sf::Color::Blue;
+        case DoorColor::Indigo: return sf::Color(75, 0, 130);
+        case DoorColor::Violet: return sf::Color(238, 130, 238);
+        case DoorColor::Copper: return sf::Color(184, 115, 51);
+        case DoorColor::Silver: return sf::Color(192, 192, 192);
+        case DoorColor::Gold:   return sf::Color(255, 215, 0);
+        case DoorColor::White:  return sf::Color::White;
+        default:                return sf::Color::Black;
+    }
+}
+
+std::string doorColorToString(DoorColor color) {
+    switch (color) {
+        case DoorColor::Red:    return "Red";
+        case DoorColor::Orange: return "Orange";
+        case DoorColor::Yellow: return "Yellow";
+        case DoorColor::Green:  return "Green";
+        case DoorColor::Blue:   return "Blue";
+        case DoorColor::Indigo: return "Indigo";
+        case DoorColor::Violet: return "Violet";
+        case DoorColor::Copper: return "Copper";
+        case DoorColor::Silver: return "Silver";
+        case DoorColor::Gold:   return "Gold";
+        case DoorColor::White:  return "White";
+        default:                return "Unknown";
+    }
+}
 
 UIManager::UIManager(const sf::Font& fontRef)
     : font(fontRef),
@@ -7,7 +45,13 @@ UIManager::UIManager(const sf::Font& fontRef)
       monsterPanelTitle(font),
       monsterNameText(font),
       manaTitle(font),
-      gameOverText(font)
+      gameOverText(font),
+      explorationTitle(font),
+      treasureTitle(font),
+      specialTitle(font),
+      puzzleTitle(font),
+      trapTitle(font),
+      sanctuaryTitle(font)
 {}
 
 void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin) {
@@ -146,9 +190,31 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     playerDamageOverlay.setSize(leftPanel.getSize());
     playerDamageOverlay.setPosition(leftPanel.getPosition());
     playerDamageOverlay.setFillColor(sf::Color(255, 0, 0, 75));
+
+    // --- Exploration Title ---
+    explorationTitle.setFont(font);
+    explorationTitle.setCharacterSize(36);
+    explorationTitle.setFillColor(sf::Color::White);
+    
+    // --- Placeholder Screen Titles ---
+    auto setupPlaceholderTitle = [&](sf::Text& text, const std::string& str) {
+        text.setFont(font);
+        text.setCharacterSize(36);
+        text.setFillColor(sf::Color::White);
+        text.setString(str);
+        sf::FloatRect textRect = text.getLocalBounds();
+        text.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
+        text.setPosition({(float)windowSize.x / 2.0f, (float)windowSize.y / 2.0f});
+    };
+
+    setupPlaceholderTitle(treasureTitle, "Treasure Room\n(Click to continue)");
+    setupPlaceholderTitle(specialTitle, "Special Room\n(Click to continue)");
+    setupPlaceholderTitle(puzzleTitle, "Puzzle Room\n(Click to continue)");
+    setupPlaceholderTitle(trapTitle, "Trap Room\n(Click to continue)");
+    setupPlaceholderTitle(sanctuaryTitle, "Sanctuary\n(Click to continue)");
 }
 
-void UIManager::update(const Player& player, const Monster& monster) {
+void UIManager::update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager) {
     // Update monster name
     monsterNameText.setString(monster.name);
 
@@ -178,11 +244,11 @@ void UIManager::update(const Player& player, const Monster& monster) {
         spellButtonFills[i].setPosition({spellButtons[i].getPosition().x, spellButtons[i].getPosition().y + 40 - fillHeight});
 
         if (manaProgress >= 1.f) {
-            spellButtons[i].setFillColor(sf::Color(40, 100, 40)); // A noticeable green background
-            spellButtonFills[i].setFillColor(sf::Color(100, 250, 100, 200)); // Bright green fill
+            spellButtons[i].setFillColor(sf::Color(40, 100, 40));
+            spellButtonFills[i].setFillColor(sf::Color(100, 250, 100, 200));
         } else {
-            spellButtons[i].setFillColor(sf::Color(40, 40, 40)); // Not ready color
-            spellButtonFills[i].setFillColor(sf::Color(0, 100, 200, 150)); // Progress blue fill
+            spellButtons[i].setFillColor(sf::Color(40, 40, 40));
+            spellButtonFills[i].setFillColor(sf::Color(0, 100, 200, 150));
         }
     }
 
@@ -190,11 +256,79 @@ void UIManager::update(const Player& player, const Monster& monster) {
     float speedPercent = (float)monster.getActionCounter() / monster.getSpeed();
     monsterSpeedGaugeForeground.setSize({monsterSpeedGaugeBackground.getSize().x * speedPercent, monsterSpeedGaugeBackground.getSize().y});
 
+    // --- Update Door Buttons (only in exploration mode) ---
+    doorButtons.clear();
+    doorButtonTexts.clear();
+    if (currentState == GameState::Exploration && currentRoom) {
+        explorationTitle.setString(currentRoom->name);
+        sf::FloatRect textRect = explorationTitle.getLocalBounds();
+        explorationTitle.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
+        explorationTitle.setPosition({(float)WINDOW_WIDTH / 2.0f, 100.f});
+
+        const float buttonWidth = 150.f;
+        const float buttonHeight = 50.f;
+        const float buttonSpacing = 20.f;
+        const float screenPadding = 100.f;
+        int numDoors = currentRoom->connections.size();
+        
+        int buttonsPerLine = (WINDOW_WIDTH - screenPadding * 2) / (buttonWidth + buttonSpacing);
+        int numRows = (numDoors + buttonsPerLine - 1) / buttonsPerLine;
+
+        float totalLayoutHeight = (numRows * buttonHeight) + ((numRows - 1) * buttonSpacing);
+        float startY = (WINDOW_HEIGHT - totalLayoutHeight) / 2.0f;
+
+        float currentY = startY;
+        int doorIndex = 0;
+
+        for (int row = 0; row < numRows; ++row) {
+            int doorsInThisRow = std::min(buttonsPerLine, numDoors - doorIndex);
+            float totalLineWidth = (doorsInThisRow * buttonWidth) + ((doorsInThisRow - 1) * buttonSpacing);
+            float startX = (WINDOW_WIDTH - totalLineWidth) / 2.0f;
+            float currentX = startX;
+
+            for (int i = 0; i < doorsInThisRow; ++i) {
+                const auto& teleporter = currentRoom->connections[doorIndex];
+                
+                sf::RectangleShape button;
+                button.setSize({buttonWidth, buttonHeight});
+                button.setPosition({currentX, currentY});
+                button.setFillColor(doorColorToSfColor(teleporter.color));
+                doorButtons.push_back(button);
+
+                sf::Text text(font);
+                text.setCharacterSize(18);
+                text.setFillColor(sf::Color::White);
+                text.setOutlineColor(sf::Color::Black);
+                text.setOutlineThickness(1.f);
+
+                // **THE FIX**: Check if the destination room has been visited
+                if (visitedRoomIds.count(teleporter.destinationRoomId)) {
+                    const Room* destRoom = dataManager.getRoomById(teleporter.destinationRoomId);
+                    if (destRoom) {
+                        text.setString(destRoom->name);
+                    } else {
+                        text.setString("Error"); // Should not happen
+                    }
+                } else {
+                    text.setString(doorColorToString(teleporter.color) + " Door");
+                }
+                
+                sf::FloatRect textRect = text.getLocalBounds();
+                text.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
+                text.setPosition({button.getPosition().x + button.getSize().x / 2.0f, button.getPosition().y + button.getSize().y / 2.0f});
+                doorButtonTexts.push_back(text);
+
+                currentX += buttonWidth + buttonSpacing;
+                doorIndex++;
+            }
+            currentY += buttonHeight + buttonSpacing;
+        }
+    }
+
     // Update Game Over text
-    if (player.getCurrentHp() <= 0 || monster.getCurrentHp() <= 0) {
-        bool playerWon = player.getCurrentHp() > 0;
-        gameOverText.setString(playerWon ? "You are victorious!" : "You have been defeated!");
-        gameOverText.setFillColor(playerWon ? sf::Color::Green : sf::Color::Red);
+    if (player.getCurrentHp() <= 0) {
+        gameOverText.setString("You have been defeated!");
+        gameOverText.setFillColor(sf::Color::Red);
         sf::FloatRect textRect = gameOverText.getLocalBounds();
         gameOverText.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
         gameOverText.setPosition({(float)WINDOW_WIDTH / 2.0f, 150.f});
@@ -202,119 +336,75 @@ void UIManager::update(const Player& player, const Monster& monster) {
 }
 
 void UIManager::render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect) {
-    window.draw(leftPanel);
-    window.draw(rightPanel);
-    window.draw(boardFrame);
+    switch (currentState) {
+        case GameState::Playing:
+        case GameState::Animating:
+        case GameState::GameOver:
+            window.draw(leftPanel);
+            window.draw(rightPanel);
+            window.draw(boardFrame);
+            window.draw(monsterPanelTitle);
+            window.draw(monsterNameText);
+            window.draw(monsterHpBarBack);
+            window.draw(monsterHpBarFront);
+            window.draw(monsterSpeedGaugeBackground);
+            window.draw(monsterSpeedGaugeForeground);
+            window.draw(playerPanelTitle);
+            window.draw(playerHpBarBack);
+            window.draw(playerHpBarFront);
+            window.draw(manaTitle);
+            for (auto const& [type, bar] : manaBarBacks) window.draw(bar);
+            for (auto const& [type, bar] : manaBarFronts) window.draw(bar);
+            for(const auto& button : spellButtons) window.draw(button);
+            for(const auto& fill : spellButtonFills) window.draw(fill);
+            for(const auto& text : spellButtonTexts) window.draw(text);
+            if (showPlayerDamageEffect) window.draw(playerDamageOverlay);
+            if (currentState == GameState::GameOver) window.draw(gameOverText);
+            break;
 
-    // Draw Titles
-    window.draw(playerPanelTitle);
-    window.draw(monsterPanelTitle);
-    window.draw(monsterNameText);
-
-    // Draw Gauges
-    window.draw(playerHpBarBack);
-    window.draw(playerHpBarFront);
-    window.draw(monsterHpBarBack);
-    window.draw(monsterHpBarFront);
-    window.draw(monsterSpeedGaugeBackground);
-    window.draw(monsterSpeedGaugeForeground);
-
-    // Draw Mana UI
-    window.draw(manaTitle);
-    for (auto const& [type, bar] : manaBarBacks) window.draw(bar);
-    for (auto const& [type, bar] : manaBarFronts) window.draw(bar);
-
-    // Draw Spell Buttons
-    for(const auto& button : spellButtons) window.draw(button);
-    for(const auto& fill : spellButtonFills) window.draw(fill); // Draw the fill
-    for(const auto& text : spellButtonTexts) window.draw(text);
-
-    // Draw Player Damage Effect
-    if (showPlayerDamageEffect) {
-        window.draw(playerDamageOverlay);
-    }
-
-    if (currentState == GameState::GameOver) {
-        window.draw(gameOverText);
+        case GameState::Exploration:
+            window.draw(explorationTitle);
+            for(const auto& button : doorButtons) window.draw(button);
+            for(const auto& text : doorButtonTexts) window.draw(text);
+            // Simplified player status at the bottom
+            window.draw(playerHpBarBack);
+            window.draw(playerHpBarFront);
+            break;
+        
+        case GameState::Treasure: window.draw(treasureTitle); break;
+        case GameState::Special: window.draw(specialTitle); break;
+        case GameState::Puzzle: window.draw(puzzleTitle); break;
+        case GameState::Trap: window.draw(trapTitle); break;
+        case GameState::Sanctuary: window.draw(sanctuaryTitle); break;
     }
 }
 
-    
+bool UIManager::handleEvent(const sf::Event& event, GameState currentState, const Room* currentRoom, UIAction& outAction) {
+    if (auto* mbp = event.getIf<sf::Event::MouseButtonPressed>()) {
+        if (mbp->button == sf::Mouse::Button::Left) {
+            sf::Vector2f mousePos(mbp->position);
 
-    const std::vector<sf::RectangleShape>& UIManager::getSpellButtons() const {
-
-    
-
-        return spellButtons;
-
-    
-
-    }
-
-    
-
-    
-
-    
-
-    std::optional<UIAction> UIManager::handleEvent(const sf::Event& event) {
-
-    
-
-        if (auto* mbp = event.getIf<sf::Event::MouseButtonPressed>()) {
-
-    
-
-            if (mbp->button == sf::Mouse::Button::Left) {
-
-    
-
-                for (int i = 0; i < spellButtons.size(); ++i) {
-
-    
-
-                    if (spellButtons[i].getGlobalBounds().contains(sf::Vector2f(mbp->position))) {
-
-    
-
-                        // A spell button was clicked, return the corresponding action.
-
-    
-
-                        return UIAction{UIActionType::CastSpell, i};
-
-    
-
+            if (currentState == GameState::Playing) {
+                if (leftPanel.getGlobalBounds().contains(mousePos) || rightPanel.getGlobalBounds().contains(mousePos)) {
+                    for (size_t i = 0; i < spellButtons.size(); ++i) {
+                        if (spellButtons[i].getGlobalBounds().contains(mousePos)) {
+                            outAction = {UIActionType::CastSpell, (int)i, -1};
+                            return true;
+                        }
                     }
-
-    
-
+                    return true;
                 }
-
-    
-
             }
-
-    
-
+            
+            if (currentState == GameState::Exploration && currentRoom) {
+                for (size_t i = 0; i < doorButtons.size(); ++i) {
+                    if (doorButtons[i].getGlobalBounds().contains(mousePos)) {
+                        outAction = {UIActionType::ChangeRoom, -1, currentRoom->connections[i].destinationRoomId};
+                        return true;
+                    }
+                }
+            }
         }
-
-    
-
-        // No UI element was interacted with, return no action.
-
-    
-
-        return std::nullopt;
-
-    
-
     }
-
-    
-
-    
-
-    
-
-    
+    return false;
+}

@@ -27,8 +27,8 @@ The player's goal is to manage their house's legacy by sending heirs into the sp
 1.  **Heir Selection:** Choose an heir for the next generation.
 2.  **The Judgement:** Complete the Judgement to determine the heir's starting loadout. The judgment will be a modified match 3 puzzle initially to set mana types and attunement. This will be followed by a modified first floor spire run. This will set initial treasure and items.
 3.  **Manor Phase:** Prepare for the run. Buy/sell equipment, manage the vault, and attend training. This phase can take as long as the player wants, but each action will take in-game time, that will deplete the house, treasury, and resources.
-4.  **Enter Spire:** The player starts a new "run" by entering the spire.
-5.  **Puzzle Combat & Encounters:** The core match-3 gameplay remains the same. The player moves through rooms, battles monsters, and gathers rewards.
+4.  **Enter Spire:** The player starts a new "run" by entering the spire. Each floor is a procedurally generated network of rooms.
+5.  **Exploration & Encounters:** The player navigates from room to room. Each room has a unique name and a set of doors leading to other rooms. Doors are color-coded based on the type of room they lead to (e.g., Red for Combat, Blue for Puzzle). Once a room's encounter is completed (e.g., a monster is defeated), it is marked as "cleared" and will not trigger again on that run. Doors leading to previously visited rooms are labeled with the room's name, allowing for strategic navigation.
 6.  **Exiting the Spire:** At regular intervals (e.g., after defeating a boss), the player has the option to safely exit the spire with all the loot they have gathered. This resets the spire for the next run. Later in the progression, the player will be able to acquire items that will allow for early exit from the tower. They will be single-use and expensive.
 7.  **Defeat & Legacy:** If an heir dies in the spire, all wealth and items they were carrying are lost forever. The player then returns to the Manor to select the next heir, continuing the cycle, if the house has heirs and can afford the process. The game will be a loss if the house suffers financial ruin, or runs out of heirs.
 ## 4. Time and Urgency
@@ -100,7 +100,7 @@ The player's "class" is their Attunement.
 
 ## 8. Enemies
 
-Enemies are drawn from the lore of Arcane Ascension, each with its own health, abilities, and mana affinities. The spire contains a wide variety of threats.
+Enemies are drawn from the lore of Arcane Ascension, each with its own health, abilities, and mana affinities. The spire contains a wide variety of threats. Each combat room on a floor will feature a unique monster encounter, loaded from the floor's data.
 
 *   **Common Monsters:** These form the bulk of the encounters in the spire. Examples include:
     *   Golems
@@ -159,7 +159,7 @@ To create a unified strategic layer and a tangible sense of urgency, the game wi
 
 *   **Scheduled and Procedural Events:** The calendar will be populated with various events:
     *   **Financial Obligations:** Tax deadlines and upkeep payments are now fixed dates on the calendar, allowing the player to plan for them.
-    *   **Holidays:** Each calendar will have procedurally generated holidays. These events can provide temporary global effects (e.g., bonuses to certain mana types, increased luck, unique merchant stock).
+    *   **Holidays:** Each calendar will have a procedurally generated holidays. These events can provide temporary global effects (e.g., bonuses to certain mana types, increased luck, unique merchant stock).
     *   **Scheduled Story Events:** Major world events, such as tournaments, political summits, or celestial alignments, can be scheduled on the calendar, giving the player long-term goals to prepare for.
 
 *   **Strategic Impact:** This system forces meaningful strategic choices. A player must constantly weigh the time cost of their actions against upcoming deadlines and opportunities. Spending a month training an heir might make them powerful, but it could also mean missing a lucrative holiday bonus or failing to gather enough resources before taxes are due. This directly ties the micro-level puzzle gameplay to the macro-level generational strategy.

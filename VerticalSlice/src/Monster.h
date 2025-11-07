@@ -16,6 +16,7 @@ public:
     int getSpeed() const;
     int getActionCounter() const;
     std::string name;
+    void reset();
 
 private:
     int maxHp;

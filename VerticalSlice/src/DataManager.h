@@ -20,6 +20,7 @@ public:
     int getMonsterAttackDamage() const;
     std::string getMonsterName() const;
     const Floor& getFloor() const;
+    const Room* getRoomById(int roomId) const;
 
 private:
     std::vector<Spell> spells;

@@ -4,26 +4,32 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <optional>
+#include <set>
 #include "Player.h"
 #include "Monster.h"
 #include "Constants.h"
 
+struct Room; // Forward declaration
+class DataManager; // Forward declaration
+
 // A structure to represent a command sent from the UI to the Game
-enum class UIActionType { CastSpell };
+enum class UIActionType { CastSpell, ChangeRoom };
 struct UIAction {
     UIActionType type;
-    int spellIndex; 
+    int spellIndex = -1; // Used for CastSpell
+    int destinationRoomId = -1; // Used for ChangeRoom
 };
 
 class UIManager {
 public:
     UIManager(const sf::Font& font);
 
-    // Takes an event and returns an action if a UI element was interacted with
-    std::optional<UIAction> handleEvent(const sf::Event& event);
+    // Returns true if the event was handled (consumed) by the UI, false otherwise.
+    // If a specific action is needed (like a button click), it's returned via the outAction parameter.
+    bool handleEvent(const sf::Event& event, GameState currentState, const Room* currentRoom, UIAction& outAction);
 
     void setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin);
-    void update(const Player& player, const Monster& monster);
+    void update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager);
     void render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect);
 
     const std::vector<sf::RectangleShape>& getSpellButtons() const;
@@ -55,6 +61,18 @@ private:
     sf::RectangleShape monsterSpeedGaugeBackground;
     sf::RectangleShape monsterSpeedGaugeForeground;
     sf::RectangleShape playerDamageOverlay;
+
+    // Exploration Screen
+    sf::Text explorationTitle;
+    sf::Text treasureTitle;
+    sf::Text specialTitle;
+    sf::Text puzzleTitle;
+    sf::Text trapTitle;
+    sf::Text sanctuaryTitle;
+
+    // Room Exits
+    std::vector<sf::RectangleShape> doorButtons;
+    std::vector<sf::Text> doorButtonTexts;
 };
 
 #endif // UIMANAGER_H

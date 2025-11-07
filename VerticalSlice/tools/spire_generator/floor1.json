@@ -4,34 +4,35 @@
         {
             "connections": [
                 {
-                    "color": "Red",
-                    "destinationId": 19
+                    "color": "Yellow",
+                    "destinationId": 5
                 },
                 {
-                    "color": "Red",
-                    "destinationId": 22
-                },
-                {
-                    "color": "Red",
+                    "color": "Blue",
                     "destinationId": 17
                 },
                 {
+                    "color": "Yellow",
+                    "destinationId": 10
+                },
+                {
                     "color": "Red",
-                    "destinationId": 23
+                    "destinationId": 18
+                },
+                {
+                    "color": "White",
+                    "destinationId": 1
                 }
             ],
             "id": 0,
+            "name": "Entrance",
             "type": "Entrance"
         },
         {
             "connections": [
                 {
-                    "color": "Red",
-                    "destinationId": 21
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 15
+                    "color": "Yellow",
+                    "destinationId": 4
                 },
                 {
                     "color": "Red",
@@ -39,16 +40,20 @@
                 },
                 {
                     "color": "Red",
-                    "destinationId": 0
+                    "destinationId": 13
                 },
                 {
-                    "color": "Red",
-                    "destinationId": 17
+                    "color": "Blue",
+                    "destinationId": 3
+                },
+                {
+                    "color": "White",
+                    "destinationId": 1
                 }
             ],
-            "id": 19,
-            "monsterId": "monster_19",
-            "type": "Combat"
+            "id": 5,
+            "name": "Gilded Armory",
+            "type": "Trap"
         },
         {
             "connections": [
@@ -57,82 +62,52 @@
                     "destinationId": 8
                 },
                 {
-                    "color": "Red",
-                    "destinationId": 10
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 7
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 6
-                },
-                {
-                    "color": "Red",
+                    "color": "Yellow",
                     "destinationId": 5
                 },
                 {
-                    "color": "Red",
-                    "destinationId": 19
+                    "color": "Blue",
+                    "destinationId": 3
                 },
                 {
                     "color": "Red",
-                    "destinationId": 2
-                }
-            ],
-            "id": 21,
-            "monsterId": "monster_21",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 20
+                    "destinationId": 13
                 },
                 {
-                    "color": "Red",
-                    "destinationId": 2
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 16
-                }
-            ],
-            "id": 1,
-            "monsterId": "monster_1",
-            "type": "Boss"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 16
-                },
-                {
-                    "color": "Red",
+                    "color": "Blue",
                     "destinationId": 11
+                }
+            ],
+            "id": 4,
+            "name": "Forgotten Library",
+            "type": "Trap"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 15
                 },
                 {
                     "color": "Red",
-                    "destinationId": 22
+                    "destinationId": 12
                 },
                 {
-                    "color": "Red",
-                    "destinationId": 21
+                    "color": "Yellow",
+                    "destinationId": 16
                 },
                 {
-                    "color": "Red",
-                    "destinationId": 10
+                    "color": "Yellow",
+                    "destinationId": 4
                 },
                 {
-                    "color": "Red",
-                    "destinationId": 18
+                    "color": "White",
+                    "destinationId": 1
                 }
             ],
             "id": 8,
             "monsterId": "monster_8",
+            "name": "Flooded Crypt",
             "type": "Combat"
         },
         {
@@ -142,361 +117,56 @@
                     "destinationId": 1
                 },
                 {
-                    "color": "Red",
-                    "destinationId": 5
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 20
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 8
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 12
+                    "color": "Blue",
+                    "destinationId": 11
                 },
                 {
                     "color": "Red",
                     "destinationId": 13
                 },
                 {
-                    "color": "Red",
-                    "destinationId": 18
-                }
-            ],
-            "id": 16,
-            "monsterId": "monster_16",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 4
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 22
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 19
-                },
-                {
-                    "color": "Red",
+                    "color": "Yellow",
                     "destinationId": 9
                 },
                 {
                     "color": "Red",
-                    "destinationId": 17
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 2
+                    "destinationId": 8
                 }
             ],
             "id": 15,
             "monsterId": "monster_15",
+            "name": "Flooded Armory",
             "type": "Combat"
         },
         {
             "connections": [
                 {
-                    "color": "Red",
-                    "destinationId": 12
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 13
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 20
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 8
-                }
-            ],
-            "id": 11,
-            "monsterId": "monster_11",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 3
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 23
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 21
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 8
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 22
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 7
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 17
-                },
-                {
-                    "color": "Red",
+                    "color": "Yellow",
                     "destinationId": 2
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 18
-                }
-            ],
-            "id": 10,
-            "monsterId": "monster_10",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 7
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 16
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 20
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 21
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 17
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 23
-                }
-            ],
-            "id": 5,
-            "monsterId": "monster_5",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 9
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 5
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 10
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 21
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 3
-                }
-            ],
-            "id": 7,
-            "monsterId": "monster_7",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 13
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 0
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 8
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 15
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 10
-                }
-            ],
-            "id": 22,
-            "monsterId": "monster_22",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 15
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 3
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 7
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 17
-                }
-            ],
-            "id": 9,
-            "monsterId": "monster_9",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 23
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 2
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 18
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 16
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 11
-                }
-            ],
-            "id": 12,
-            "monsterId": "monster_12",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 17
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 21
-                }
-            ],
-            "id": 6,
-            "monsterId": "monster_6",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 19
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 9
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 15
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 10
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 5
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 0
                 },
                 {
                     "color": "Red",
                     "destinationId": 6
-                }
-            ],
-            "id": 17,
-            "monsterId": "monster_17",
-            "type": "Combat"
-        },
-        {
-            "connections": [
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 3
+                },
                 {
                     "color": "Red",
                     "destinationId": 0
                 },
                 {
-                    "color": "Red",
-                    "destinationId": 5
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 10
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 12
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 20
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 4
+                    "color": "Blue",
+                    "destinationId": 11
                 }
             ],
-            "id": 23,
-            "monsterId": "monster_23",
-            "type": "Combat"
+            "id": 17,
+            "name": "Frozen Observatory",
+            "type": "Puzzle"
         },
         {
             "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 14
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 21
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 10
-                },
                 {
                     "color": "Red",
                     "destinationId": 15
@@ -506,131 +176,21 @@
                     "destinationId": 1
                 },
                 {
-                    "color": "Red",
-                    "destinationId": 12
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 20
-                }
-            ],
-            "id": 2,
-            "monsterId": "monster_2",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
+                    "color": "Blue",
                     "destinationId": 3
                 },
                 {
-                    "color": "White",
-                    "destinationId": 1
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 23
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 2
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 16
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 11
-                },
-                {
-                    "color": "Red",
+                    "color": "Yellow",
                     "destinationId": 5
                 },
                 {
-                    "color": "Red",
-                    "destinationId": 18
-                }
-            ],
-            "id": 20,
-            "monsterId": "monster_20",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 23
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 15
-                }
-            ],
-            "id": 4,
-            "monsterId": "monster_4",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 18
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 19
-                },
-                {
-                    "color": "Red",
+                    "color": "Yellow",
                     "destinationId": 2
                 }
             ],
             "id": 14,
             "monsterId": "monster_14",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 16
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 11
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 22
-                }
-            ],
-            "id": 13,
-            "monsterId": "monster_13",
-            "type": "Combat"
-        },
-        {
-            "connections": [
-                {
-                    "color": "Red",
-                    "destinationId": 7
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 10
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 9
-                },
-                {
-                    "color": "Red",
-                    "destinationId": 20
-                }
-            ],
-            "id": 3,
-            "monsterId": "monster_3",
+            "name": "Flooded Library",
             "type": "Combat"
         },
         {
@@ -640,29 +200,319 @@
                     "destinationId": 14
                 },
                 {
+                    "color": "Yellow",
+                    "destinationId": 5
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 7
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 17
+                },
+                {
+                    "color": "White",
+                    "destinationId": 1
+                }
+            ],
+            "id": 2,
+            "name": "Whispering Garden",
+            "type": "Trap"
+        },
+        {
+            "connections": [
+                {
                     "color": "Red",
                     "destinationId": 8
                 },
                 {
-                    "color": "Red",
-                    "destinationId": 16
+                    "color": "Yellow",
+                    "destinationId": 2
                 },
                 {
                     "color": "Red",
-                    "destinationId": 10
+                    "destinationId": 0
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 5
                 },
                 {
                     "color": "Red",
-                    "destinationId": 20
+                    "destinationId": 15
+                }
+            ],
+            "id": 1,
+            "monsterId": "monster_1",
+            "name": "Guardian's Antechamber",
+            "type": "Boss"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Blue",
+                    "destinationId": 7
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 2
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 0
+                },
+                {
+                    "color": "White",
+                    "destinationId": 1
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 8
+                }
+            ],
+            "id": 12,
+            "monsterId": "monster_12",
+            "name": "Whispering Chamber",
+            "type": "Combat"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 18
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 11
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 9
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 2
                 },
                 {
                     "color": "Red",
                     "destinationId": 12
                 }
             ],
+            "id": 7,
+            "name": "Burning Armory",
+            "type": "Puzzle"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 13
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 16
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 11
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 0
+                }
+            ],
+            "id": 10,
+            "name": "Forgotten Observatory",
+            "type": "Trap"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Yellow",
+                    "destinationId": 2
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 8
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 3
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 17
+                }
+            ],
+            "id": 6,
+            "monsterId": "monster_6",
+            "name": "Cursed Garden",
+            "type": "Combat"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Yellow",
+                    "destinationId": 4
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 15
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 3
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 5
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 10
+                }
+            ],
+            "id": 13,
+            "monsterId": "monster_13",
+            "name": "Cursed Gallery",
+            "type": "Combat"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Yellow",
+                    "destinationId": 4
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 8
+                },
+                {
+                    "color": "White",
+                    "destinationId": 1
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 17
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 15
+                }
+            ],
+            "id": 11,
+            "name": "Whispering Gallery",
+            "type": "Puzzle"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Yellow",
+                    "destinationId": 9
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 7
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 8
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 5
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 4
+                }
+            ],
+            "id": 3,
+            "name": "Flooded Garden",
+            "type": "Puzzle"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Yellow",
+                    "destinationId": 4
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 8
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 3
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 15
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 7
+                }
+            ],
+            "id": 9,
+            "name": "Forgotten Garden",
+            "type": "Trap"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 1
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 5
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 13
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 17
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 0
+                }
+            ],
             "id": 18,
             "monsterId": "monster_18",
+            "name": "Cursed Library",
             "type": "Combat"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 13
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 4
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 7
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 8
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 10
+                }
+            ],
+            "id": 16,
+            "name": "Frozen Crypt",
+            "type": "Trap"
         }
     ],
     "startRoomId": 0

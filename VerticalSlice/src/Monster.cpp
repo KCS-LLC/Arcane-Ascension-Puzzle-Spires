@@ -10,13 +10,18 @@ void Monster::takeDamage(int damage) {
     }
 }
 
-bool Monster::isTurnReady(int playerActionCost) {
-    actionCounter += playerActionCost;
+bool Monster::isTurnReady(int speedCost) {
+    actionCounter += speedCost;
     if (actionCounter >= speed) {
-        actionCounter -= speed; // Reset for the next turn
+        actionCounter -= speed;
         return true;
     }
     return false;
+}
+
+void Monster::reset() {
+    currentHp = maxHp;
+    actionCounter = 0;
 }
 
 int Monster::getCurrentHp() const { 

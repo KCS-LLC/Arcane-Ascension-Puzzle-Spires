@@ -14,7 +14,7 @@ enum class RoomType {
 };
 
 enum class DoorColor {
-    Red, Orange, Yellow, Green, Blue, Copper, Silver, Gold, White, Unknown
+    Red, Orange, Yellow, Green, Blue, Indigo, Violet, Copper, Silver, Gold, White, Unknown
 };
 
 struct Teleporter {
@@ -24,6 +24,7 @@ struct Teleporter {
 
 struct Room {
     int id;
+    std::string name;
     RoomType type;
     std::string monsterId;
     std::vector<Teleporter> connections;
@@ -69,6 +70,8 @@ DoorColor stringToDoorColor(const std::string& s) {
     if (s == "Yellow") return DoorColor::Yellow;
     if (s == "Green") return DoorColor::Green;
     if (s == "Blue") return DoorColor::Blue;
+    if (s == "Indigo") return DoorColor::Indigo;
+    if (s == "Violet") return DoorColor::Violet;
     if (s == "Copper") return DoorColor::Copper;
     if (s == "Silver") return DoorColor::Silver;
     if (s == "Gold") return DoorColor::Gold;
@@ -83,6 +86,8 @@ std::string doorColorToString(DoorColor color) {
         case DoorColor::Yellow: return "Yellow";
         case DoorColor::Green: return "Green";
         case DoorColor::Blue: return "Blue";
+        case DoorColor::Indigo: return "Indigo";
+        case DoorColor::Violet: return "Violet";
         case DoorColor::Copper: return "Copper";
         case DoorColor::Silver: return "Silver";
         case DoorColor::Gold: return "Gold";
@@ -98,6 +103,7 @@ void from_json(const json& j, Teleporter& t) {
 
 void from_json(const json& j, Room& r) {
     j.at("id").get_to(r.id);
+    j.at("name").get_to(r.name);
     r.type = stringToRoomType(j.at("type").get<std::string>());
     if (j.contains("monsterId")) {
         j.at("monsterId").get_to(r.monsterId);
@@ -120,12 +126,12 @@ void printFloorSummary(const Floor& floor) {
     std::cout << "--------------------" << std::endl;
 
     for (const auto& room : floor.rooms) {
-        std::cout << "Room " << room.id << " (" << roomTypeToString(room.type) << "):" << std::endl;
+        std::cout << "Room " << room.id << " (" << room.name << " - " << roomTypeToString(room.type) << "):" << std::endl;
         if (room.connections.empty()) {
             std::cout << "  -> [End of a branch]" << std::endl;
         } else {
             for (const auto& teleporter : room.connections) {
-                std::cout << "  -> " << doorColorToString(teleporter.color) 
+                std::cout << "  -> " << doorColorToString(teleporter.color)
                           << " door to Room " << teleporter.destinationRoomId << std::endl;
             }
         }

@@ -103,3 +103,12 @@ bool DataManager::loadFloor(const std::string& path) {
 const Floor& DataManager::getFloor() const {
     return currentFloor;
 }
+
+const Room* DataManager::getRoomById(int roomId) const {
+    for (const auto& room : currentFloor.rooms) {
+        if (room.id == roomId) {
+            return &room;
+        }
+    }
+    return nullptr;
+}

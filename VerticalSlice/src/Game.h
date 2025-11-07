@@ -27,6 +27,7 @@ private:
     void loadTextures();
     void handleSwap(sf::Vector2i tile1, sf::Vector2i tile2);
     void applyMatchConsequences(const std::map<GemType, int>& matchResults);
+    void moveToRoom(int destinationRoomId);
 
     sf::RenderWindow window;
     Board board;
@@ -37,8 +38,15 @@ private:
     std::map<GemType, sf::Texture> gemTextures;
 
     Floor currentFloor;
-    const Room* currentRoom;
+#include <set>
 
+// ... existing class Game ...
+    const Room* currentRoom;
+    std::vector<int> roomHistory;
+    std::set<int> visitedRoomIds;
+    std::set<int> clearedRoomIds;
+
+    // Game State
     GameState currentState;
     sf::Clock animationClock;
 
