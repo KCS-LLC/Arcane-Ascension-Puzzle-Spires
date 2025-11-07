@@ -1,0 +1,588 @@
+{
+    "floorNumber": 30,
+    "rooms": [
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 1
+                },
+                {
+                    "color": "White",
+                    "destinationId": 15
+                },
+                {
+                    "color": "White",
+                    "destinationId": 22
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 14
+                },
+                {
+                    "color": "White",
+                    "destinationId": 10
+                }
+            ],
+            "id": 0,
+            "type": "Entrance"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 22
+                },
+                {
+                    "color": "White",
+                    "destinationId": 19
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 16
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 0
+                },
+                {
+                    "color": "White",
+                    "destinationId": 15
+                }
+            ],
+            "id": 1,
+            "monsterId": "monster_1",
+            "type": "Boss"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 4
+                },
+                {
+                    "color": "Copper",
+                    "destinationId": 18
+                },
+                {
+                    "color": "Silver",
+                    "destinationId": 8
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 16
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 17
+                },
+                {
+                    "color": "White",
+                    "destinationId": 10
+                }
+            ],
+            "id": 22,
+            "monsterId": "monster_22",
+            "type": "Combat"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 3
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 16
+                },
+                {
+                    "color": "White",
+                    "destinationId": 19
+                },
+                {
+                    "color": "Gold",
+                    "destinationId": 12
+                },
+                {
+                    "color": "White",
+                    "destinationId": 10
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 9
+                }
+            ],
+            "id": 12,
+            "monsterId": "monster_12",
+            "type": "Combat"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 2
+                },
+                {
+                    "color": "White",
+                    "destinationId": 22
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 14
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 3
+                }
+            ],
+            "id": 8,
+            "monsterId": "monster_8",
+            "type": "Combat"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Copper",
+                    "destinationId": 11
+                },
+                {
+                    "color": "White",
+                    "destinationId": 5
+                },
+                {
+                    "color": "Copper",
+                    "destinationId": 13
+                },
+                {
+                    "color": "White",
+                    "destinationId": 21
+                }
+            ],
+            "id": 13,
+            "monsterId": "monster_13",
+            "type": "Boss"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Gold",
+                    "destinationId": 12
+                },
+                {
+                    "color": "White",
+                    "destinationId": 1
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 17
+                },
+                {
+                    "color": "Silver",
+                    "destinationId": 20
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 14
+                }
+            ],
+            "id": 15,
+            "monsterId": "monster_15",
+            "type": "Boss"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 22
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 14
+                }
+            ],
+            "id": 18,
+            "monsterId": "monster_18",
+            "type": "Combat"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 1
+                },
+                {
+                    "color": "Copper",
+                    "destinationId": 13
+                },
+                {
+                    "color": "Gold",
+                    "destinationId": 18
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 2
+                },
+                {
+                    "color": "White",
+                    "destinationId": 10
+                },
+                {
+                    "color": "White",
+                    "destinationId": 21
+                },
+                {
+                    "color": "White",
+                    "destinationId": 19
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 7
+                }
+            ],
+            "id": 16,
+            "type": "Treasure"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 6
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 17
+                },
+                {
+                    "color": "Silver",
+                    "destinationId": 11
+                }
+            ],
+            "id": 20,
+            "monsterId": "monster_20",
+            "type": "Combat"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 5
+                },
+                {
+                    "color": "Copper",
+                    "destinationId": 8
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 0
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 16
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 4
+                }
+            ],
+            "id": 21,
+            "monsterId": "monster_21",
+            "type": "Boss"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Silver",
+                    "destinationId": 13
+                }
+            ],
+            "id": 2,
+            "type": "Treasure"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Copper",
+                    "destinationId": 8
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 17
+                },
+                {
+                    "color": "White",
+                    "destinationId": 15
+                },
+                {
+                    "color": "Copper",
+                    "destinationId": 11
+                }
+            ],
+            "id": 19,
+            "type": "Treasure"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 16
+                },
+                {
+                    "color": "Silver",
+                    "destinationId": 20
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 14
+                },
+                {
+                    "color": "White",
+                    "destinationId": 10
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 2
+                }
+            ],
+            "id": 4,
+            "type": "Special"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 6
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 7
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 0
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 4
+                }
+            ],
+            "id": 14,
+            "monsterId": "monster_14",
+            "type": "Combat"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 9
+                },
+                {
+                    "color": "White",
+                    "destinationId": 15
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 16
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 2
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 0
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 17
+                },
+                {
+                    "color": "White",
+                    "destinationId": 6
+                }
+            ],
+            "id": 17,
+            "monsterId": "monster_17",
+            "type": "Boss"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 16
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 3
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 17
+                },
+                {
+                    "color": "Copper",
+                    "destinationId": 20
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 2
+                },
+                {
+                    "color": "White",
+                    "destinationId": 1
+                },
+                {
+                    "color": "Copper",
+                    "destinationId": 12
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 4
+                },
+                {
+                    "color": "White",
+                    "destinationId": 10
+                }
+            ],
+            "id": 10,
+            "monsterId": "monster_10",
+            "type": "Combat"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 22
+                },
+                {
+                    "color": "White",
+                    "destinationId": 15
+                },
+                {
+                    "color": "White",
+                    "destinationId": 19
+                },
+                {
+                    "color": "White",
+                    "destinationId": 10
+                }
+            ],
+            "id": 6,
+            "monsterId": "monster_6",
+            "type": "Combat"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 21
+                },
+                {
+                    "color": "White",
+                    "destinationId": 22
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 16
+                }
+            ],
+            "id": 5,
+            "type": "Treasure"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 3
+                },
+                {
+                    "color": "White",
+                    "destinationId": 15
+                },
+                {
+                    "color": "White",
+                    "destinationId": 1
+                },
+                {
+                    "color": "Copper",
+                    "destinationId": 12
+                }
+            ],
+            "id": 9,
+            "monsterId": "monster_9",
+            "type": "Boss"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 21
+                },
+                {
+                    "color": "White",
+                    "destinationId": 19
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 4
+                },
+                {
+                    "color": "White",
+                    "destinationId": 10
+                }
+            ],
+            "id": 3,
+            "type": "Special"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Copper",
+                    "destinationId": 8
+                },
+                {
+                    "color": "White",
+                    "destinationId": 5
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 3
+                }
+            ],
+            "id": 7,
+            "monsterId": "monster_7",
+            "type": "Boss"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Copper",
+                    "destinationId": 12
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 9
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 0
+                },
+                {
+                    "color": "White",
+                    "destinationId": 1
+                },
+                {
+                    "color": "Silver",
+                    "destinationId": 18
+                },
+                {
+                    "color": "White",
+                    "destinationId": 6
+                }
+            ],
+            "id": 11,
+            "monsterId": "monster_11",
+            "type": "Boss"
+        }
+    ],
+    "startRoomId": 0
+}

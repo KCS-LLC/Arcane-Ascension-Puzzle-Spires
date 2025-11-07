@@ -13,6 +13,7 @@
 #include "DataManager.h"
 #include "UIManager.h"
 #include "Constants.h"
+#include "SpireData.h"
 
 class Game {
 public:
@@ -30,13 +31,13 @@ private:
     sf::RenderWindow window;
     Board board;
     Player player;
-#include <memory>
-
-// ... inside Game class private members ...
     Monster monster;
     DataManager dataManager;
     std::unique_ptr<UIManager> uiManager;
     std::map<GemType, sf::Texture> gemTextures;
+
+    Floor currentFloor;
+    const Room* currentRoom;
 
     GameState currentState;
     sf::Clock animationClock;

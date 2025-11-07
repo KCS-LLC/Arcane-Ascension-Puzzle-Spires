@@ -24,11 +24,16 @@ Game::Game()
     }
     uiManager = std::make_unique<UIManager>(font);
 
-    if (!dataManager.loadSpells("data/spells.json") || !dataManager.loadMonsterData("data/monster.json")) {
+    if (!dataManager.loadSpells("data/spells.json") || 
+        !dataManager.loadMonsterData("data/monster.json") ||
+        !dataManager.loadFloor("data/floor1.json")) {
         std::cerr << "Failed to load game data." << std::endl;
         window.close();
         return;
     }
+
+    currentFloor = dataManager.getFloor();
+    currentRoom = &currentFloor.rooms[currentFloor.startRoomId];
 
     player = Player(100, dataManager.getAllSpells());
     monster = Monster(dataManager.getMonsterHP(), dataManager.getMonsterSpeed());

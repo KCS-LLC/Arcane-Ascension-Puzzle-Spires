@@ -7,7 +7,6 @@
 *.obj
 
 # Asset Generator Tool
-/VerticalSlice/tools/
 
 # Generated Image Output (often temporary or experimental)
 /nanobanana-output/

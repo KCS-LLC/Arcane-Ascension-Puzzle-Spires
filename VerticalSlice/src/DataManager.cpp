@@ -79,3 +79,27 @@ int DataManager::getMonsterAttackDamage() const {
 std::string DataManager::getMonsterName() const {
     return monsterName;
 }
+
+bool DataManager::loadFloor(const std::string& path) {
+    std::ifstream f(path);
+    if (!f.is_open()) {
+        std::cerr << "Could not open floor file: " << path << std::endl;
+        return false;
+    }
+
+    try {
+        json data = json::parse(f);
+        currentFloor = data.get<Floor>();
+    } catch (json::parse_error& e) {
+        std::cerr << "JSON parse error in floor file: " << e.what() << std::endl;
+        return false;
+    } catch (json::exception& e) {
+        std::cerr << "JSON data error in floor file: " << e.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
+const Floor& DataManager::getFloor() const {
+    return currentFloor;
+}

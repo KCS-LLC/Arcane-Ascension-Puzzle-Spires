@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "Player.h" // For Spell struct
+#include "SpireData.h"
 
 class DataManager {
 public:
@@ -11,12 +12,14 @@ public:
 
     bool loadSpells(const std::string& path);
     bool loadMonsterData(const std::string& path);
+    bool loadFloor(const std::string& path);
 
     const std::vector<Spell>& getAllSpells() const;
     int getMonsterHP() const;
     int getMonsterSpeed() const;
     int getMonsterAttackDamage() const;
     std::string getMonsterName() const;
+    const Floor& getFloor() const;
 
 private:
     std::vector<Spell> spells;
@@ -24,6 +27,7 @@ private:
     int monsterSpeed;
     int monsterAttackDamage;
     std::string monsterName;
+    Floor currentFloor;
 };
 
 #endif // DATAMANAGER_H
