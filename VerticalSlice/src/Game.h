@@ -1,4 +1,3 @@
-
 #ifndef GAME_H
 #define GAME_H
 
@@ -7,6 +6,7 @@
 #include <optional>
 #include <map>
 #include <memory>
+#include <set>
 #include "Board.h"
 #include "Player.h"
 #include "Monster.h"
@@ -28,6 +28,7 @@ private:
     void handleSwap(sf::Vector2i tile1, sf::Vector2i tile2);
     void applyMatchConsequences(const std::map<GemType, int>& matchResults);
     void moveToRoom(int destinationRoomId);
+    void startNewCombat();
 
     sf::RenderWindow window;
     Board board;
@@ -38,9 +39,6 @@ private:
     std::map<GemType, sf::Texture> gemTextures;
 
     Floor currentFloor;
-#include <set>
-
-// ... existing class Game ...
     const Room* currentRoom;
     std::vector<int> roomHistory;
     std::set<int> visitedRoomIds;

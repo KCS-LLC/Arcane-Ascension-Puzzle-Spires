@@ -15,7 +15,7 @@ Game::Game()
       dataManager(),
       player(100, {}), 
       monster(0, 0),
-      currentState(GameState::Exploration),
+      currentState(GameState::Judgement),
       isAnimatingSwap(false),
       isAnimatingDestruction(false),
       isAnimatingRefill(false),
@@ -26,7 +26,8 @@ Game::Game()
     }
     uiManager = std::make_unique<UIManager>(font);
 
-    if (!dataManager.loadSpells("data/spells.json") || 
+    if (!dataManager.loadAttunements("data/attunements.json") ||
+        !dataManager.loadSpells("data/spells.json") || 
         !dataManager.loadMonsterData("data/monster.json") ||
         !dataManager.loadFloor("data/floor1.json")) {
         std::cerr << "Failed to load game data." << std::endl;
@@ -38,11 +39,9 @@ Game::Game()
     currentRoom = dataManager.getRoomById(currentFloor.startRoomId);
     visitedRoomIds.insert(currentRoom->id);
 
-    player = Player(100, dataManager.getAllSpells());
+    // Player is initialized empty, will be set by Judgement screen
     monster = Monster(dataManager.getMonsterHP(), dataManager.getMonsterSpeed());
     monster.name = dataManager.getMonsterName();
-
-    board.initialize();
     
     const int boardPixelWidth = BOARD_WIDTH * TILE_SIZE;
     const int boardPixelHeight = BOARD_HEIGHT * TILE_SIZE;
@@ -50,7 +49,7 @@ Game::Game()
     boardOrigin.y = WINDOW_HEIGHT - boardPixelHeight - 20;
 
     loadTextures();
-    uiManager->setup(player, window.getSize(), boardOrigin);
+    uiManager->setup(player, window.getSize(), boardOrigin, dataManager.getAttunements());
 }
 
 void Game::loadTextures() {
@@ -104,7 +103,7 @@ void Game::processEvents() {
             
             // 1. Let the UIManager handle the event first.
             UIAction uiAction;
-            if (uiManager->handleEvent(*event, currentState, currentRoom, uiAction)) {
+            if (uiManager->handleEvent(*event, currentState, currentRoom, dataManager.getAttunements(), uiAction)) {
                 // UI has consumed the event. Check if it was a specific action.
                 if (uiAction.type == UIActionType::CastSpell) {
                     int damage = player.castSpell(uiAction.spellIndex);
@@ -122,6 +121,15 @@ void Game::processEvents() {
                     }
                 } else if (uiAction.type == UIActionType::ChangeRoom) {
                     moveToRoom(uiAction.destinationRoomId);
+                } else if (uiAction.type == UIActionType::SelectAttunement) {
+                    const auto& attunements = dataManager.getAttunements();
+                    auto it = std::find_if(attunements.begin(), attunements.end(), [&](const Attunement& a) {
+                        return a.id == uiAction.attunementId;
+                    });
+                    if (it != attunements.end()) {
+                        player.setAttunement(*it, dataManager);
+                        startNewCombat();
+                    }
                 }
                 // If it was just a click on a panel, we do nothing.
                 continue; // In any case, the UI handled it, so we're done with this event.
@@ -161,6 +169,12 @@ void Game::processEvents() {
             }
         }
     }
+}
+
+void Game::startNewCombat() {
+    monster.reset();
+    board.initialize();
+    currentState = GameState::Playing;
 }
 
 // Initiates a swap animation if the move is valid.

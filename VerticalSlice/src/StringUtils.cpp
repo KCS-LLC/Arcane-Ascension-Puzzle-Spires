@@ -50,3 +50,36 @@ sf::Color doorColorToSfColor(DoorColor color) {
         default:                return sf::Color::Black;
     }
 }
+
+GemType stringToGemType(const std::string& s) {
+    if (s == "fire") return GemType::Fire;
+    if (s == "water") return GemType::Water;
+    if (s == "earth") return GemType::Earth;
+    if (s == "air") return GemType::Air;
+    if (s == "light") return GemType::Light;
+    if (s == "umbral") return GemType::Umbral;
+    if (s == "enhancement") return GemType::Enhancement;
+    if (s == "perception") return GemType::Perception;
+    if (s == "transference") return GemType::Transference;
+    if (s == "life") return GemType::Life;
+    if (s == "death") return GemType::Death;
+    if (s == "mental") return GemType::Mental;
+    if (s == "raw") return GemType::Raw;
+    if (s == "sword") return GemType::Sword;
+    if (s == "coin") return GemType::Coin;
+    return GemType::Skull; // Default
+}
+
+EffectType stringToEffectType(const std::string& s) {
+    if (s == "damage") return EffectType::Damage;
+    if (s == "heal") return EffectType::Heal;
+    if (s == "stun") return EffectType::Stun;
+    if (s == "shield") return EffectType::Shield;
+    return EffectType::Damage; // Default
+}
+
+TargetType stringToTargetType(const std::string& s) {
+    if (s == "player") return TargetType::Player;
+    if (s == "monster") return TargetType::Monster;
+    return TargetType::Monster; // Default
+}

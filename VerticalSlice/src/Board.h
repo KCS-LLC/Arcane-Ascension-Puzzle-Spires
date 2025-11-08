@@ -18,7 +18,7 @@ class Board {
 public:
     Board();
 
-    void initialize(); // Fills the board with random gems
+    void initialize(const Player& player); // Fills the board with random gems
 
     // Core gameplay methods
     bool canSwap(int r1, int c1, int r2, int c2);
@@ -34,7 +34,7 @@ public:
         int endRow;
         GemType type;
     };
-    std::vector<FallInfo> applyGravityAndRefill();
+    std::vector<FallInfo> applyGravityAndRefill(const Player& player);
     std::vector<std::pair<sf::Vector2i, sf::Vector2i>> findAllValidSwaps();
 
     // Getters
@@ -43,8 +43,9 @@ public:
 private:
     std::vector<std::vector<Gem>> grid;
 
-    void fillBoard();
+    void fillBoard(const Player& player);
     bool hasMatches();
+    GemType getRandomGemType(const Player& player);
 };
 
 #endif // BOARD_H

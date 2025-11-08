@@ -1,0 +1,16 @@
+[
+  {
+    "id": "elementalist",
+    "name": "Elementalist",
+    "description": "Focuses on raw elemental power.",
+    "starting_spells": [1, 2],
+    "mana_types": ["fire", "water", "earth", "air"]
+  },
+  {
+    "id": "guardian",
+    "name": "Guardian",
+    "description": "Focuses on defense and protection.",
+    "starting_spells": [3, 4],
+    "mana_types": ["light", "life", "enhancement", "earth"]
+  }
+]

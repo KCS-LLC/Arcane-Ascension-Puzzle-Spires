@@ -10,6 +10,7 @@ const int TILE_SIZE = 64;
 
 // Enum for the main game states
 enum class GameState {
+    Judgement,
     Playing,
     Animating,
     GameOver,

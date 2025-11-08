@@ -1,29 +1,38 @@
-#ifndef STRUCTS_H
-#define STRUCTS_H
+#pragma once
 
-#include "Constants.h"
 #include <string>
 #include <vector>
 #include <map>
+#include "GemType.h"
+
+enum class EffectType { Damage, Heal, Stun, Shield };
+enum class TargetType { Player, Monster };
+
+struct Effect {
+    EffectType type;
+    int amount;
+    TargetType target;
+};
 
 struct Spell {
+    int id;
     std::string name;
-    std::string description;
-    int value;
-    std::map<GemType, int> cost;
+    GemType costType;
+    int costAmount;
+    std::vector<Effect> effects;
 };
 
 struct Attunement {
     std::string id;
     std::string name;
-    std::vector<GemType> primary_mana_types;
+    std::string description;
+    std::vector<int> starting_spell_ids;
+    std::vector<GemType> mana_types;
 };
 
-struct MonsterAbility {
+struct MonsterData {
     std::string name;
-    int damage;
-
-    MonsterAbility(std::string name = "", int damage = 0) : name(name), damage(damage) {}
+    int hp;
+    int speed;
+    int attack;
 };
-
-#endif // STRUCTS_H

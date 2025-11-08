@@ -8,27 +8,26 @@
 #include "Player.h"
 #include "Monster.h"
 #include "Constants.h"
+#include "Structs.h"
 
 struct Room; // Forward declaration
 class DataManager; // Forward declaration
 
 // A structure to represent a command sent from the UI to the Game
-enum class UIActionType { CastSpell, ChangeRoom };
+enum class UIActionType { CastSpell, ChangeRoom, SelectAttunement };
 struct UIAction {
     UIActionType type;
-    int spellIndex = -1; // Used for CastSpell
-    int destinationRoomId = -1; // Used for ChangeRoom
+    int spellIndex = -1;
+    int destinationRoomId = -1;
+    std::string attunementId;
 };
 
 class UIManager {
 public:
     UIManager(const sf::Font& font);
 
-    // Returns true if the event was handled (consumed) by the UI, false otherwise.
-    // If a specific action is needed (like a button click), it's returned via the outAction parameter.
-    bool handleEvent(const sf::Event& event, GameState currentState, const Room* currentRoom, UIAction& outAction);
-
-    void setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin);
+    bool handleEvent(const sf::Event& event, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction);
+    void setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin, const std::vector<Attunement>& attunements);
     void update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager);
     void render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect);
 
@@ -36,6 +35,11 @@ public:
 
 private:
     sf::Font font;
+
+    // Judgement Screen
+    sf::Text judgementTitle;
+    std::vector<sf::RectangleShape> attunementButtons;
+    std::vector<sf::Text> attunementButtonTexts;
 
     // Titles
     sf::Text playerPanelTitle;

@@ -4,8 +4,10 @@
 #include "StringUtils.h"
 #include <string>
 #include <algorithm>
+
 UIManager::UIManager(const sf::Font& fontRef)
     : font(fontRef),
+      judgementTitle(font),
       playerPanelTitle(font),
       monsterPanelTitle(font),
       monsterNameText(font),
@@ -22,7 +24,35 @@ UIManager::UIManager(const sf::Font& fontRef)
       magicTitle(font)
 {}
 
-void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin) {
+void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin, const std::vector<Attunement>& attunements) {
+
+    // --- Judgement Screen ---
+    judgementTitle.setString("Choose your Attunement");
+    judgementTitle.setCharacterSize(36);
+    judgementTitle.setFillColor(sf::Color::White);
+    sf::FloatRect textRect = judgementTitle.getLocalBounds();
+    judgementTitle.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
+    judgementTitle.setPosition({(float)windowSize.x / 2.0f, 100.f});
+
+    float buttonY = 200.f;
+    for (const auto& attunement : attunements) {
+        sf::RectangleShape button;
+        button.setSize({300, 50});
+        button.setPosition({(float)windowSize.x / 2.0f - 150, buttonY});
+        button.setFillColor(sf::Color(80, 80, 80));
+        attunementButtons.push_back(button);
+
+        sf::Text text(font);
+        text.setString(attunement.name);
+        text.setCharacterSize(24);
+        text.setFillColor(sf::Color::White);
+        textRect = text.getLocalBounds();
+        text.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
+        text.setPosition({button.getPosition().x + button.getSize().x / 2.0f, button.getPosition().y + button.getSize().y / 2.0f});
+        attunementButtonTexts.push_back(text);
+
+        buttonY += 70;
+    }
 
     // --- UI Layout Calculations ---
     const int boardPixelWidth = BOARD_WIDTH * TILE_SIZE;
@@ -122,34 +152,6 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
         manaBarY += 25;
     }
 
-    // --- Spell Buttons ---
-    const auto& spells = player.getSpells();
-    float buttonY = manaBarY + 20; // Position buttons below mana bars
-    for (const auto& spell : spells) {
-        sf::RectangleShape button;
-        button.setSize({panelWidth - 40, 40});
-        button.setPosition({leftPanel.getPosition().x + 20, buttonY});
-        button.setFillColor(sf::Color(80, 80, 80));
-        spellButtons.push_back(button);
-
-        sf::RectangleShape fill;
-        fill.setSize({panelWidth - 40, 0}); // Start with 0 height
-        fill.setPosition({leftPanel.getPosition().x + 20, buttonY + 40}); // Position at the bottom
-        fill.setFillColor(sf::Color(0, 100, 200, 150)); // A semi-transparent blue
-        spellButtonFills.push_back(fill);
-
-        sf::Text text(font);
-        text.setCharacterSize(18);
-        text.setFillColor(sf::Color::White);
-        text.setString(spell.name); // Remove cost from text
-        sf::FloatRect textRect = text.getLocalBounds();
-        text.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
-        text.setPosition({button.getPosition().x + button.getSize().x / 2.0f, button.getPosition().y + button.getSize().y / 2.0f});
-        spellButtonTexts.push_back(text);
-
-        buttonY += 50;
-    }
-
     // --- Game Over Text ---
     gameOverText.setFont(font);
     gameOverText.setCharacterSize(48);
@@ -186,6 +188,11 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
 }
 
 void UIManager::update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager) {
+    if (currentState == GameState::Judgement) {
+        // No dynamic updates needed on the Judgement screen yet
+        return;
+    }
+    
     // Update monster name
     monsterNameText.setString(monster.name);
 
@@ -202,8 +209,38 @@ void UIManager::update(const Player& player, const Monster& monster, GameState c
         manaBarFronts[type].setSize({back.getSize().x * manaPercent, back.getSize().y});
     }
 
-    // Update spell button colors and fills
+    // --- Spell Buttons ---
+    // Clear old buttons and create new ones based on player's current spells
+    spellButtons.clear();
+    spellButtonFills.clear();
+    spellButtonTexts.clear();
+    float buttonY = leftPanel.getPosition().y + 160 + (manaBarBacks.size() * 25) + 20;
     const auto& spells = player.getSpells();
+    for (const auto& spell : spells) {
+        sf::RectangleShape button;
+        button.setSize({leftPanel.getSize().x - 40, 40});
+        button.setPosition({leftPanel.getPosition().x + 20, buttonY});
+        spellButtons.push_back(button);
+
+        sf::RectangleShape fill;
+        fill.setSize({leftPanel.getSize().x - 40, 0}); // Start with 0 height
+        fill.setPosition({leftPanel.getPosition().x + 20, buttonY + 40}); // Position at the bottom
+        spellButtonFills.push_back(fill);
+
+        sf::Text text(font);
+        text.setCharacterSize(18);
+        text.setFillColor(sf::Color::White);
+        text.setString(spell.name);
+        sf::FloatRect textRect = text.getLocalBounds();
+        text.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
+        text.setPosition({button.getPosition().x + button.getSize().x / 2.0f, button.getPosition().y + button.getSize().y / 2.0f});
+        spellButtonTexts.push_back(text);
+
+        buttonY += 50;
+    }
+
+
+    // Update spell button colors and fills
     for(size_t i = 0; i < spells.size(); ++i) {
         float manaProgress = 0.f;
         if (spells[i].costAmount > 0) {
@@ -308,6 +345,11 @@ void UIManager::update(const Player& player, const Monster& monster, GameState c
 
 void UIManager::render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect) {
     switch (currentState) {
+        case GameState::Judgement:
+            window.draw(judgementTitle);
+            for(const auto& button : attunementButtons) window.draw(button);
+            for(const auto& text : attunementButtonTexts) window.draw(text);
+            break;
         case GameState::Playing:
         case GameState::Animating:
         case GameState::GameOver:
@@ -353,10 +395,19 @@ void UIManager::render(sf::RenderWindow& window, GameState currentState, bool sh
     }
 }
 
-bool UIManager::handleEvent(const sf::Event& event, GameState currentState, const Room* currentRoom, UIAction& outAction) {
+bool UIManager::handleEvent(const sf::Event& event, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction) {
     if (auto* mbp = event.getIf<sf::Event::MouseButtonPressed>()) {
         if (mbp->button == sf::Mouse::Button::Left) {
             sf::Vector2f mousePos(mbp->position);
+
+            if (currentState == GameState::Judgement) {
+                for (size_t i = 0; i < attunementButtons.size(); ++i) {
+                    if (attunementButtons[i].getGlobalBounds().contains(mousePos)) {
+                        outAction = {UIActionType::SelectAttunement, -1, -1, attunements[i].id};
+                        return true;
+                    }
+                }
+            }
 
             if (currentState == GameState::Playing) {
                 if (leftPanel.getGlobalBounds().contains(mousePos) || rightPanel.getGlobalBounds().contains(mousePos)) {

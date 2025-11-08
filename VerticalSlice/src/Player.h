@@ -1,41 +1,20 @@
-
 #ifndef PLAYER_H
 #define PLAYER_H
 
 #include <map>
 #include <string>
 #include <vector>
+#include "Structs.h"
+#include "GemType.h"
 
-enum class GemType {
-    Empty,
-    Skull,
-    // Primary Mana
-    Air,
-    Fire,
-    Earth,
-    Water,
-    Umbral,
-    Light,
-    Life,
-    Death,
-    Mental,
-    Perception,
-    Transference,
-    Enhancement,
-    // Action Gems
-    Coin
-};
-
-struct Spell {
-    std::string name;
-    GemType costType;
-    int costAmount;
-    int damage;
-};
+// Forward declarations
+class DataManager;
 
 class Player {
 public:
     Player(int initialHp, const std::vector<Spell>& initialSpells);
+
+    void setAttunement(const Attunement& attunement, const DataManager& dataManager);
 
     int getCurrentHp() const;
     int getMaxHp() const { return maxHp; }

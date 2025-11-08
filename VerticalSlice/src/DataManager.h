@@ -3,18 +3,21 @@
 
 #include <vector>
 #include <string>
-#include "Player.h" // For Spell struct
+#include "Structs.h" // Contains Spell, Attunement, etc.
 #include "SpireData.h"
 
 class DataManager {
 public:
     DataManager();
 
+    bool loadAttunements(const std::string& path);
     bool loadSpells(const std::string& path);
     bool loadMonsterData(const std::string& path);
     bool loadFloor(const std::string& path);
 
+    const std::vector<Attunement>& getAttunements() const;
     const std::vector<Spell>& getAllSpells() const;
+    const Spell* getSpellById(int id) const;
     int getMonsterHP() const;
     int getMonsterSpeed() const;
     int getMonsterAttackDamage() const;
@@ -23,6 +26,7 @@ public:
     const Room* getRoomById(int roomId) const;
 
 private:
+    std::vector<Attunement> attunements;
     std::vector<Spell> spells;
     int monsterHP;
     int monsterSpeed;

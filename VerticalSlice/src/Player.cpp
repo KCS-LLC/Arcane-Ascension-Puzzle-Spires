@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "DataManager.h"
 
 Player::Player(int initialHp, const std::vector<Spell>& initialSpells) 
     : maxHp(initialHp), currentHp(initialHp), spells(initialSpells) {
@@ -14,6 +15,16 @@ Player::Player(int initialHp, const std::vector<Spell>& initialSpells)
     mana[GemType::Perception] = 0;
     mana[GemType::Transference] = 0;
     mana[GemType::Enhancement] = 0;
+}
+
+void Player::setAttunement(const Attunement& attunement, const DataManager& dataManager) {
+    spells.clear();
+    for (int spellId : attunement.starting_spell_ids) {
+        const Spell* spell = dataManager.getSpellById(spellId);
+        if (spell) {
+            spells.push_back(*spell);
+        }
+    }
 }
 
 int Player::getMana(GemType type) const { return mana.at(type); }
@@ -37,7 +48,8 @@ int Player::castSpell(int spellIndex) {
     const Spell& spell = spells[spellIndex];
     if (mana[spell.costType] >= spell.costAmount) {
         mana[spell.costType] -= spell.costAmount;
-        return spell.damage;
+        // Spell casting logic is now more complex, handled in Game.cpp
+        return 1; // Indicate success
     }
     return 0; // Not enough mana
 }
