@@ -24,7 +24,7 @@ Game::Game()
 
       monster(0, 0),
 
-      currentState(GameState::Judgement),
+      currentState(GameState::Judgement_Intro),
 
       isAnimatingSwap(false),
 

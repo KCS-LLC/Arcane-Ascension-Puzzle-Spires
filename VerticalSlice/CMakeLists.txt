@@ -49,6 +49,7 @@ set(SOURCE_FILES
     src/UIManager.cpp
     src/main.cpp
     src/PCH.h
+    src/Judgement.h
 )
 target_sources(game PRIVATE ${SOURCE_FILES})
 
