@@ -1,9 +1,9 @@
+#include "PCH.h"
 #include "DataManager.h"
+#include "Structs.h"
+#include "SpireData.h"
 #include "json.hpp"
-#include "StringUtils.h" // For stringToGemType
-#include <fstream>
-#include <iostream>
-#include <algorithm>
+#include "StringUtils.h"
 
 using json = nlohmann::json;
 

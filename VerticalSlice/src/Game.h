@@ -1,19 +1,15 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <SFML/Graphics.hpp>
-#include <vector>
-#include <optional>
-#include <map>
-#include <memory>
-#include <set>
+#include "GemType.h" // For GemType, which is still in use
 #include "Board.h"
 #include "Player.h"
 #include "Monster.h"
 #include "DataManager.h"
-#include "UIManager.h"
-#include "Constants.h"
 #include "SpireData.h"
+
+// Forward declarations
+class UIManager;
 
 class Game {
 public:

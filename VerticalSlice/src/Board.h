@@ -1,13 +1,10 @@
-
 #ifndef BOARD_H
 #define BOARD_H
 
-#include <vector>
-#include <set>
-#include <utility>
-#include <SFML/System/Vector2.hpp>
-#include "Player.h" // We need GemType
-#include "Constants.h"
+#include "GemType.h" // Keep this for now
+
+// Forward declaration for Player class
+class Player;
 
 struct Gem {
     GemType type;

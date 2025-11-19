@@ -1,4 +1,8 @@
+#include "PCH.h"
 #include "StringUtils.h"
+#include "SpireData.h"
+#include "Structs.h"
+#include "GemType.h"
 
 std::string roomTypeToString(RoomType type) {
     switch (type) {

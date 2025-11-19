@@ -1,8 +1,6 @@
 #ifndef SPIRE_DATA_H
 #define SPIRE_DATA_H
 
-#include <vector>
-#include <string>
 #include "json.hpp"
 
 // --- Spire Data Structures ---

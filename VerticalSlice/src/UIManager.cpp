@@ -1,9 +1,11 @@
+#include "PCH.h"
 #include "UIManager.h"
-#include "SpireData.h"
+#include "Player.h"
+#include "Monster.h"
 #include "DataManager.h"
+#include "SpireData.h"
+#include "Structs.h"
 #include "StringUtils.h"
-#include <string>
-#include <algorithm>
 
 UIManager::UIManager(const sf::Font& fontRef)
     : font(fontRef),

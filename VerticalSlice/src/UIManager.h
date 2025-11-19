@@ -1,17 +1,16 @@
 #ifndef UIMANAGER_H
 #define UIMANAGER_H
 
-#include <SFML/Graphics.hpp>
-#include <vector>
-#include <optional>
-#include <set>
-#include "Player.h"
-#include "Monster.h"
-#include "Constants.h"
-#include "Structs.h"
+#include <map>
+#include "GemType.h"
 
-struct Room; // Forward declaration
-class DataManager; // Forward declaration
+// Forward declarations
+class Player;
+class Monster;
+class DataManager;
+struct Room;
+struct Attunement;
+enum class GameState;
 
 // A structure to represent a command sent from the UI to the Game
 enum class UIActionType { CastSpell, ChangeRoom, SelectAttunement };

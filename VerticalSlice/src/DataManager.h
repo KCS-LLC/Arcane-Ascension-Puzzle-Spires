@@ -1,10 +1,10 @@
 #ifndef DATAMANAGER_H
 #define DATAMANAGER_H
 
-#include <vector>
-#include <string>
-#include "Structs.h" // Contains Spell, Attunement, etc.
 #include "SpireData.h"
+#include "Structs.h"
+
+// Forward declarations
 
 class DataManager {
 public:

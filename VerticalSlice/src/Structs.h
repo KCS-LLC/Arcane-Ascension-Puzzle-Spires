@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <map>
 #include "GemType.h"
 
 enum class EffectType { Damage, Heal, Stun, Shield };

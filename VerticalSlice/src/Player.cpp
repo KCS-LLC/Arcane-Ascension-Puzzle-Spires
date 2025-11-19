@@ -1,5 +1,7 @@
+#include "PCH.h"
 #include "Player.h"
 #include "DataManager.h"
+#include "Structs.h"
 
 Player::Player(int initialHp, const std::vector<Spell>& initialSpells) 
     : maxHp(initialHp), currentHp(initialHp), spells(initialSpells) {

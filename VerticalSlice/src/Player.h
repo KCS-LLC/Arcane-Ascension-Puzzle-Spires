@@ -1,11 +1,8 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <map>
-#include <string>
-#include <vector>
-#include "Structs.h"
 #include "GemType.h"
+#include "Structs.h"
 
 // Forward declarations
 class DataManager;

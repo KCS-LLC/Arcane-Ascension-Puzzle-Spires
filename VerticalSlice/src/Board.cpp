@@ -1,10 +1,6 @@
-
+#include "PCH.h"
 #include "Board.h"
-#include <random>
-#include <ctime>
-#include <vector>
-#include <iostream>
-
+#include "Player.h" // Still needed for the full Player definition
 
 Board::Board() {
     grid.resize(BOARD_HEIGHT, std::vector<Gem>(BOARD_WIDTH));

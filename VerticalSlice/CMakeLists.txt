@@ -39,9 +39,21 @@ set(SFML_LIBRARIES
 # Add an executable target named "game"
 add_executable(game "")
 
-# Automatically find all .cpp files in the 'src' directory
-file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")
+set(SOURCE_FILES
+    src/Board.cpp
+    src/DataManager.cpp
+    src/Game.cpp
+    src/Monster.cpp
+    src/Player.cpp
+    src/StringUtils.cpp
+    src/UIManager.cpp
+    src/main.cpp
+    src/PCH.h
+)
 target_sources(game PRIVATE ${SOURCE_FILES})
+
+# Enable Precompiled Headers
+target_precompile_headers(game PRIVATE src/PCH.h)
 
 # Add the SFML_STATIC definition, which is required
 target_compile_definitions(game PRIVATE SFML_STATIC)

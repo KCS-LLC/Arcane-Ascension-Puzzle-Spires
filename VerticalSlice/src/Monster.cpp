@@ -1,3 +1,4 @@
+#include "PCH.h"
 #include "Monster.h"
 
 Monster::Monster(int maxHp, int speed) 

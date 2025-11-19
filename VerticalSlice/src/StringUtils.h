@@ -1,11 +1,16 @@
 #ifndef STRING_UTILS_H
 #define STRING_UTILS_H
 
-#include "SpireData.h"
-#include "Structs.h"
-#include "GemType.h"
-#include <string>
-#include <SFML/Graphics.hpp>
+// Forward declarations
+enum class RoomType;
+enum class DoorColor;
+enum class GemType;
+enum class EffectType;
+enum class TargetType;
+
+namespace sf {
+    class Color;
+}
 
 std::string roomTypeToString(RoomType type);
 std::string doorColorToString(DoorColor color);
