@@ -1,5 +1,10 @@
 # Next Steps
 
+## Phase 0: Core Game Introduction
+- **Objective:** Implement the initial player experience for character creation and attunement assignment.
+- **Key Tasks:**
+    - **[TODO]** **Implement the Judgement Phase:** Develop the UI and logic for character creation, including the Visage's assessment, puzzle gauntlet, and trial run.
+
 ## Recent Development Log (November 7, 2025)
 
 ### Problem Encountered:
@@ -52,3 +57,20 @@ Each step will be followed by a compilation to verify correctness before proceed
 ## Developer Notes
 - The rendering system is now robust. Any new sprites added to the `assets` folder and mapped in `Game::loadTextures` will be automatically scaled to fit the `TILE_SIZE`.
 - The next logical step is to begin implementing the `Room` and `Floor` classes to support the core gameplay loop.
+
+## Phase 5: Core Gameplay Refinements
+- **Objective:** Refine fundamental gameplay mechanics for accuracy and depth.
+- **Key Tasks:**
+    - **[TODO]** **Implement Merge and Upgrade Treasure System:** Integrate the new treasure mechanics as defined in `Treasure.md`. This involves:
+        1.  Updating `GemSubType.h` with new Treasure Tiers (`Coin Pile`, `Coin Bag`, `Coin Bag Bundle`, `Treasure Chest`).
+        2.  Updating `Game::loadTextures` to include sprites for new Treasure Tiers.
+        3.  Refactoring `Board::findMatches` to detect Treasure merges (3, 4, or 5 of a kind) and identify pieces for upgrade/removal based on placement rules (swapped tile, then left-bottom most).
+        4.  Refactoring `Board::processMatches` to remove consumed Treasure pieces, apply upgrades (changing `primaryType`, `subType`, `level`), and handle Grand Fusions (match of 5 creating three upgraded tiles).
+        5.  Modifying `Game::applyMatchConsequences` to correctly process upgraded Treasure and accumulate total value.
+        6.  Updating `Game::render` to display the new Treasure gem sprites.
+    - **[TODO]** **Implement robust gem generation logic:** Ensure the board only spawns Attack (Skulls) and relevant Mana types (player's and monster's combined unique mana affinities). Treasure (Coins) should not be generated. This involves:
+        1. Updating `MonsterData` struct in `Structs.h` with `mana_affinities`.
+        2. Updating `DataManager.cpp` to load monster mana affinities.
+        3. Adding `manaAffinities` member to the `Monster` class.
+        4. Modifying `Board::getRandomGem` to accept `Player` and `Monster` objects.
+        5. Implementing new generation logic in `Board::getRandomGem` to create a spawn pool from unique player/monster mana subtypes and Skull gems, ensuring correct filtering and no Coin generation.
