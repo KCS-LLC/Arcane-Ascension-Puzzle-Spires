@@ -193,7 +193,7 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
 }
 
 void UIManager::update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager) {
-    if (currentState == GameState::Judgement) {
+    if (currentState == GameState::Judgement_Intro) {
         // No dynamic updates needed on the Judgement screen yet
         return;
     }
@@ -350,7 +350,7 @@ void UIManager::update(const Player& player, const Monster& monster, GameState c
 
 void UIManager::render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect) {
     switch (currentState) {
-        case GameState::Judgement:
+        case GameState::Judgement_Intro:
             window.draw(judgementTitle);
             for(const auto& button : attunementButtons) window.draw(button);
             for(const auto& text : attunementButtonTexts) window.draw(text);
@@ -405,7 +405,7 @@ bool UIManager::handleEvent(const sf::Event& event, GameState currentState, cons
         if (mbp->button == sf::Mouse::Button::Left) {
             sf::Vector2f mousePos(mbp->position);
 
-            if (currentState == GameState::Judgement) {
+            if (currentState == GameState::Judgement_Intro) {
                 for (size_t i = 0; i < attunementButtons.size(); ++i) {
                     if (attunementButtons[i].getGlobalBounds().contains(mousePos)) {
                         outAction = {UIActionType::SelectAttunement, -1, -1, attunements[i].id};
