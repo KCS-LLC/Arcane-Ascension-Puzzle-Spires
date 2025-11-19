@@ -1,16 +1,15 @@
 #pragma once
 
-enum class GemType {
+enum class GemSubType {
     Empty,
-    Skull,
-    // Primary Mana
+    Generic,
+    // Mana Subtypes
     Fire,
     Water,
     Earth,
     Air,
     Light,
     Umbral,
-    // Secondary Mana
     Enhancement,
     Perception,
     Transference,
@@ -18,11 +17,9 @@ enum class GemType {
     Death,
     Mental,
     Raw,
-    // Action Gems
+    // Attack Subtypes
+    Skull,
     Sword,
-    Coin,
-
-    // For random generation range
-    FirstMana = Fire,
-    LastMana = Raw
+    // Treasure Subtypes
+    Coin
 };

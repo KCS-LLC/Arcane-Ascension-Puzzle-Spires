@@ -1,15 +1,10 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "GemType.h" // Keep this for now
+#include "Gem.h" // Include the new Gem struct definition
 
 // Forward declaration for Player class
 class Player;
-
-struct Gem {
-    GemType type;
-    // In the full game, this would also store Aura rank, etc.
-};
 
 class Board {
 public:
@@ -23,13 +18,13 @@ public:
     
     // Match detection and resolution
     std::set<std::pair<int, int>> findMatches();
-    void processMatches(const std::set<std::pair<int, int>>& matches);
+    void processMatches(const std::set<std::pair<int, int>>& matches, std::vector<Gem>& matchedGems);
 
     struct FallInfo {
         int col;
         int startRow;
         int endRow;
-        GemType type;
+        Gem gem;
     };
     std::vector<FallInfo> applyGravityAndRefill(const Player& player);
     std::vector<std::pair<sf::Vector2i, sf::Vector2i>> findAllValidSwaps();
@@ -42,7 +37,7 @@ private:
 
     void fillBoard(const Player& player);
     bool hasMatches();
-    GemType getRandomGemType(const Player& player);
+    Gem getRandomGem(const Player& player);
 };
 
 #endif // BOARD_H

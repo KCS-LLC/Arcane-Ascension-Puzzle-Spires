@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GemType.h"
+#include "GemSubType.h"
 
 enum class EffectType { Damage, Heal, Stun, Shield };
 enum class TargetType { Player, Monster };
@@ -14,7 +14,7 @@ struct Effect {
 struct Spell {
     int id;
     std::string name;
-    GemType costType;
+    GemSubType costType;
     int costAmount;
     std::vector<Effect> effects;
 };
@@ -24,7 +24,7 @@ struct Attunement {
     std::string name;
     std::string description;
     std::vector<int> starting_spell_ids;
-    std::vector<GemType> mana_types;
+    std::vector<GemSubType> mana_types;
 };
 
 struct MonsterData {

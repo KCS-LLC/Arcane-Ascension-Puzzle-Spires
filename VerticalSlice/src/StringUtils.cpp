@@ -2,7 +2,7 @@
 #include "StringUtils.h"
 #include "SpireData.h"
 #include "Structs.h"
-#include "GemType.h"
+#include "GemSubType.h"
 
 std::string roomTypeToString(RoomType type) {
     switch (type) {
@@ -55,23 +55,24 @@ sf::Color doorColorToSfColor(DoorColor color) {
     }
 }
 
-GemType stringToGemType(const std::string& s) {
-    if (s == "fire") return GemType::Fire;
-    if (s == "water") return GemType::Water;
-    if (s == "earth") return GemType::Earth;
-    if (s == "air") return GemType::Air;
-    if (s == "light") return GemType::Light;
-    if (s == "umbral") return GemType::Umbral;
-    if (s == "enhancement") return GemType::Enhancement;
-    if (s == "perception") return GemType::Perception;
-    if (s == "transference") return GemType::Transference;
-    if (s == "life") return GemType::Life;
-    if (s == "death") return GemType::Death;
-    if (s == "mental") return GemType::Mental;
-    if (s == "raw") return GemType::Raw;
-    if (s == "sword") return GemType::Sword;
-    if (s == "coin") return GemType::Coin;
-    return GemType::Skull; // Default
+GemSubType stringToGemSubType(const std::string& s) {
+    if (s == "fire") return GemSubType::Fire;
+    if (s == "water") return GemSubType::Water;
+    if (s == "earth") return GemSubType::Earth;
+    if (s == "air") return GemSubType::Air;
+    if (s == "light") return GemSubType::Light;
+    if (s == "umbral") return GemSubType::Umbral;
+    if (s == "enhancement") return GemSubType::Enhancement;
+    if (s == "perception") return GemSubType::Perception;
+    if (s == "transference") return GemSubType::Transference;
+    if (s == "life") return GemSubType::Life;
+    if (s == "death") return GemSubType::Death;
+    if (s == "mental") return GemSubType::Mental;
+    if (s == "raw") return GemSubType::Raw;
+    if (s == "sword") return GemSubType::Sword;
+    if (s == "coin") return GemSubType::Coin;
+    if (s == "skull") return GemSubType::Skull;
+    return GemSubType::Generic; // Default
 }
 
 EffectType stringToEffectType(const std::string& s) {
