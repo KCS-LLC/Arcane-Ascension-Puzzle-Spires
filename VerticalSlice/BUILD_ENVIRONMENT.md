@@ -32,13 +32,30 @@ All game assets (fonts, sprites, etc.) must be located in a directory named `ass
 
 ---
 
-## Compiler Command
+## 3. Build Process (CMake)
 
-The command below includes all current source files.
+This project uses CMake to generate build files. The recommended toolchain on Windows is MSYS2 with MinGW-w64.
 
-```bash
-g++ -g -DSFML_STATIC "src/main.cpp" "src/Game.cpp" "src/Board.cpp" "src/Player.cpp" "src/Monster.cpp" "src/DataManager.cpp" "src/UIManager.cpp" "src/StringUtils.cpp" -o "game.exe" -I "C:/SFML-3.0.2-mingw/include" -L "C:/SFML-3.0.2-mingw/lib" -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32 -lfreetype -lwinmm -lgdi32 -luser32 -lkernel32
-```
+1.  **Create a Build Directory:**
+    From the `VerticalSlice` directory, create and navigate to a build directory.
+    ```bash
+    mkdir build
+    cd build
+    ```
+
+2.  **Configure with CMake:**
+    Run CMake to generate the Makefiles.
+    ```bash
+    cmake .. -G "MinGW Makefiles"
+    ```
+
+3.  **Compile the Project:**
+    Use `mingw32-make` to compile the executable.
+    ```bash
+    mingw32-make
+    ```
+The final executable, `game.exe`, along with the required `assets` and `data` directories, will be located in the `build` directory.
+
 
 ## Dependencies
 
