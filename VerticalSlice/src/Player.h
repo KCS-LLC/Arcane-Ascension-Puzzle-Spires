@@ -21,6 +21,7 @@ public:
     int getMana(GemType type) const;
     int getMaxMana() const { return maxMana; }
     const std::vector<Spell>& getSpells() const;
+    const std::vector<GemType>& getManaTypes() const;
 
     void takeDamage(int amount);
     void addMana(GemType type, int amount);
@@ -32,6 +33,7 @@ private:
     int maxMana = 100; // Default max mana, can be adjusted
     std::map<GemType, int> mana;
     std::vector<Spell> spells;
+    std::vector<GemType> availableManaTypes;
 };
 
 #endif // PLAYER_H

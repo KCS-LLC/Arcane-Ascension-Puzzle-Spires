@@ -25,6 +25,11 @@ void Player::setAttunement(const Attunement& attunement, const DataManager& data
             spells.push_back(*spell);
         }
     }
+    availableManaTypes = attunement.mana_types;
+}
+
+const std::vector<GemType>& Player::getManaTypes() const {
+    return availableManaTypes;
 }
 
 int Player::getMana(GemType type) const { return mana.at(type); }

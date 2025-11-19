@@ -173,7 +173,7 @@ void Game::processEvents() {
 
 void Game::startNewCombat() {
     monster.reset();
-    board.initialize();
+    board.initialize(player);
     currentState = GameState::Playing;
 }
 
@@ -245,7 +245,7 @@ void Game::update() {
             if (animationClock.getElapsedTime().asSeconds() >= destructionAnimationDuration) {
                 isAnimatingDestruction = false;
                 board.processMatches(destroyingGems);
-                fallInfo = board.applyGravityAndRefill();
+                fallInfo = board.applyGravityAndRefill(player);
                 isAnimatingRefill = true;
                 animationClock.restart();
             }
@@ -272,7 +272,7 @@ void Game::update() {
         } else if (isReshuffling) {
             if (animationClock.getElapsedTime().asSeconds() >= reshuffleAnimationDuration) {
                 isReshuffling = false;
-                board.initialize();
+                board.initialize(player);
                 currentState = GameState::Playing;
             }
         }
@@ -429,7 +429,7 @@ void Game::moveToRoom(int destinationRoomId) {
             case RoomType::Boss:
                 // TODO: Load the correct monster for this room
                 monster.reset(); // For now, just reset the current monster
-                board.initialize();
+                board.initialize(player);
                 currentState = GameState::Playing;
                 break;
             case RoomType::Treasure:

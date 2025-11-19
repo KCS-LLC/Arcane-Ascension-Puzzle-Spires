@@ -37,7 +37,7 @@ All game assets (fonts, sprites, etc.) must be located in a directory named `ass
 The command below includes all current source files.
 
 ```bash
-g++ -g -DSFML_STATIC "src/main.cpp" "src/Game.cpp" "src/Board.cpp" "src/Player.cpp" "src/Monster.cpp" "src/DataManager.cpp" "src/UIManager.cpp" -o "game.exe" -I "C:/Program Files (x86)/SFML/include" -L "C:/Program Files (x86)/SFML/lib" -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32 -lfreetype -lwinmm -lgdi32 -luser32 -lkernel32
+g++ -g -DSFML_STATIC "src/main.cpp" "src/Game.cpp" "src/Board.cpp" "src/Player.cpp" "src/Monster.cpp" "src/DataManager.cpp" "src/UIManager.cpp" "src/StringUtils.cpp" -o "game.exe" -I "C:/SFML-3.0.2-mingw/include" -L "C:/SFML-3.0.2-mingw/lib" -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32 -lfreetype -lwinmm -lgdi32 -luser32 -lkernel32
 ```
 
 ## Dependencies
