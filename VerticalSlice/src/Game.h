@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "GemType.h" // For GemType, which is still in use
+#include "Gem.h" // Use the full Gem definition
 #include "Board.h"
 #include "Player.h"
 #include "Monster.h"
@@ -22,7 +22,7 @@ private:
     void render();
     void loadTextures();
     void handleSwap(sf::Vector2i tile1, sf::Vector2i tile2);
-    void applyMatchConsequences(const std::map<GemType, int>& matchResults);
+    void applyMatchConsequences(const std::vector<Gem>& matchResults);
     void moveToRoom(int destinationRoomId);
     void startNewCombat();
 
@@ -32,7 +32,7 @@ private:
     Monster monster;
     DataManager dataManager;
     std::unique_ptr<UIManager> uiManager;
-    std::map<GemType, sf::Texture> gemTextures;
+    std::map<GemSubType, sf::Texture> gemTextures;
 
     Floor currentFloor;
     const Room* currentRoom;
@@ -48,6 +48,7 @@ private:
     bool isAnimatingDestruction;
     bool isAnimatingRefill;
     bool isReshuffling;
+    bool isRevertingInvalidSwap;
     std::pair<sf::Vector2i, sf::Vector2i> animatingGems;
     std::set<std::pair<int, int>> destroyingGems;
     std::vector<Board::FallInfo> fallInfo;

@@ -1,0 +1,3 @@
+C:/Users/renga/SteamGame/VerticalSlice/build/CMakeFiles/game.dir
+C:/Users/renga/SteamGame/VerticalSlice/build/CMakeFiles/edit_cache.dir
+C:/Users/renga/SteamGame/VerticalSlice/build/CMakeFiles/rebuild_cache.dir

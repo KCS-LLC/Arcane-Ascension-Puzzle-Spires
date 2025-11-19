@@ -5,18 +5,10 @@
 
 Player::Player(int initialHp, const std::vector<Spell>& initialSpells) 
     : maxHp(initialHp), currentHp(initialHp), spells(initialSpells) {
-    mana[GemType::Air] = 0;
-    mana[GemType::Fire] = 0;
-    mana[GemType::Earth] = 0;
-    mana[GemType::Water] = 0;
-    mana[GemType::Umbral] = 0;
-    mana[GemType::Light] = 0;
-    mana[GemType::Life] = 0;
-    mana[GemType::Death] = 0;
-    mana[GemType::Mental] = 0;
-    mana[GemType::Perception] = 0;
-    mana[GemType::Transference] = 0;
-    mana[GemType::Enhancement] = 0;
+    // Initialize all possible mana subtypes to 0
+    for (int i = static_cast<int>(GemSubType::Fire); i <= static_cast<int>(GemSubType::Raw); ++i) {
+        mana[static_cast<GemSubType>(i)] = 0;
+    }
 }
 
 void Player::setAttunement(const Attunement& attunement, const DataManager& dataManager) {
@@ -30,11 +22,17 @@ void Player::setAttunement(const Attunement& attunement, const DataManager& data
     availableManaTypes = attunement.mana_types;
 }
 
-const std::vector<GemType>& Player::getManaTypes() const {
+const std::vector<GemSubType>& Player::getManaTypes() const {
     return availableManaTypes;
 }
 
-int Player::getMana(GemType type) const { return mana.at(type); }
+int Player::getMana(GemSubType type) const { 
+    auto it = mana.find(type);
+    if (it != mana.end()) {
+        return it->second;
+    }
+    return 0; // Return 0 if mana type not found, though it should be initialized
+}
 
 int Player::getCurrentHp() const { return currentHp; }
 
@@ -42,9 +40,13 @@ const std::vector<Spell>& Player::getSpells() const { return spells; }
 
 void Player::takeDamage(int amount) { currentHp -= amount; }
 
-void Player::addMana(GemType type, int amount) {
-    if (type != GemType::Skull && type != GemType::Empty) {
-        mana[type] += amount;
+void Player::addMana(GemSubType type, int amount) {
+    auto it = mana.find(type);
+    if (it != mana.end()) {
+        it->second += amount;
+        if (it->second > maxMana) {
+            it->second = maxMana;
+        }
     }
 }
 
@@ -53,7 +55,7 @@ int Player::castSpell(int spellIndex) {
         return 0; // Invalid index
     }
     const Spell& spell = spells[spellIndex];
-    if (mana[spell.costType] >= spell.costAmount) {
+    if (getMana(spell.costType) >= spell.costAmount) {
         mana[spell.costType] -= spell.costAmount;
         // Spell casting logic is now more complex, handled in Game.cpp
         return 1; // Indicate success

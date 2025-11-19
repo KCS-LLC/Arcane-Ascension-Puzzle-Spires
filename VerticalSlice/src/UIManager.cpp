@@ -129,8 +129,11 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     manaTitle.setPosition({leftPanel.getPosition().x + 20, leftPanel.getPosition().y + 120});
 
     float manaBarY = leftPanel.getPosition().y + 160;
-    const std::vector<GemType> manaTypes = { GemType::Fire, GemType::Water, GemType::Earth, GemType::Light, GemType::Air, GemType::Umbral }; // Add all types to be displayed
-    for (const auto& type : manaTypes) {
+    const std::vector<GemSubType> manaSubTypes = { 
+        GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air, 
+        GemSubType::Light, GemSubType::Umbral 
+    }; 
+    for (const auto& type : manaSubTypes) {
         sf::RectangleShape back;
         back.setSize({panelWidth - 40, 15});
         back.setPosition({leftPanel.getPosition().x + 20, manaBarY});
@@ -142,18 +145,18 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
         front.setPosition({leftPanel.getPosition().x + 20, manaBarY});
         // Set color based on mana type
         switch(type) {
-            case GemType::Fire: front.setFillColor(sf::Color::Red); break;
-            case GemType::Water: front.setFillColor(sf::Color::Blue); break;
-            case GemType::Earth: front.setFillColor(sf::Color::Green); break;
-            case GemType::Light: front.setFillColor(sf::Color::Yellow); break;
-            case GemType::Air: front.setFillColor(sf::Color(173, 216, 230)); break; // Light blue
-            case GemType::Umbral: front.setFillColor(sf::Color(128, 0, 128)); break; // Purple
+            case GemSubType::Fire: front.setFillColor(sf::Color::Red); break;
+            case GemSubType::Water: front.setFillColor(sf::Color::Blue); break;
+            case GemSubType::Earth: front.setFillColor(sf::Color::Green); break;
+            case GemSubType::Light: front.setFillColor(sf::Color::Yellow); break;
+            case GemSubType::Air: front.setFillColor(sf::Color(173, 216, 230)); break; // Light blue
+            case GemSubType::Umbral: front.setFillColor(sf::Color(128, 0, 128)); break; // Purple
             default: break;
         }
         manaBarFronts[type] = front;
         manaBarY += 25;
     }
-
+    
     // --- Game Over Text ---
     gameOverText.setFont(font);
     gameOverText.setCharacterSize(48);

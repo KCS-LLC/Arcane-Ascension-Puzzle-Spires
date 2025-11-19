@@ -16,7 +16,7 @@ void Board::initialize(const Player& player) {
 void Board::fillBoard(const Player& player) {
     for (int r = 0; r < BOARD_HEIGHT; ++r) {
         for (int c = 0; c < BOARD_WIDTH; ++c) {
-            grid[r][c] = { getRandomGemType(player) };
+            grid[r][c] = getRandomGem(player);
         }
     }
 }
@@ -43,15 +43,20 @@ std::set<std::pair<int, int>> Board::findMatches() {
     std::set<std::pair<int, int>> matchedGems;
     for (int r = 0; r < BOARD_HEIGHT; ++r) {
         for (int c = 0; c < BOARD_WIDTH; ++c) {
-            if (grid[r][c].type == GemType::Empty) continue;
+            if (grid[r][c].primaryType == PrimaryGemType::Empty) continue;
+            
+            auto isMatch = [&](const Gem& g1, const Gem& g2) {
+                return g1.primaryType == g2.primaryType && g1.subType == g2.subType;
+            };
+
             // Horizontal matches
-            if (c + 2 < BOARD_WIDTH && grid[r][c].type == grid[r][c+1].type && grid[r][c].type == grid[r][c+2].type) {
+            if (c + 2 < BOARD_WIDTH && isMatch(grid[r][c], grid[r][c+1]) && isMatch(grid[r][c], grid[r][c+2])) {
                 matchedGems.insert({r, c});
                 matchedGems.insert({r, c+1});
                 matchedGems.insert({r, c+2});
             }
             // Vertical matches
-            if (r + 2 < BOARD_HEIGHT && grid[r][c].type == grid[r+1][c].type && grid[r][c].type == grid[r+2][c].type) {
+            if (r + 2 < BOARD_HEIGHT && isMatch(grid[r][c], grid[r+1][c]) && isMatch(grid[r][c], grid[r+2][c])) {
                 matchedGems.insert({r, c});
                 matchedGems.insert({r+1, c});
                 matchedGems.insert({r+2, c});
@@ -61,9 +66,11 @@ std::set<std::pair<int, int>> Board::findMatches() {
     return matchedGems;
 }
 
-void Board::processMatches(const std::set<std::pair<int, int>>& matches) {
+void Board::processMatches(const std::set<std::pair<int, int>>& matches, std::vector<Gem>& matchedGems) {
+    matchedGems.clear();
     for (const auto& pos : matches) {
-        grid[pos.first][pos.second].type = GemType::Empty;
+        matchedGems.push_back(grid[pos.first][pos.second]);
+        grid[pos.first][pos.second] = { PrimaryGemType::Empty, GemSubType::Empty, 0 };
     }
 }
 
@@ -72,19 +79,19 @@ std::vector<Board::FallInfo> Board::applyGravityAndRefill(const Player& player) 
     for (int c = 0; c < BOARD_WIDTH; ++c) {
         int emptyRow = BOARD_HEIGHT - 1;
         for (int r = BOARD_HEIGHT - 1; r >= 0; --r) {
-            if (grid[r][c].type != GemType::Empty) {
+            if (grid[r][c].primaryType != PrimaryGemType::Empty) {
                 if (emptyRow != r) {
-                    fallInfos.push_back({c, r, emptyRow, grid[r][c].type});
+                    fallInfos.push_back({c, r, emptyRow, grid[r][c]});
                     grid[emptyRow][c] = grid[r][c];
-                    grid[r][c].type = GemType::Empty;
+                    grid[r][c] = { PrimaryGemType::Empty, GemSubType::Empty, 0 };
                 }
                 emptyRow--;
             }
         }
         
         for (int r = emptyRow; r >= 0; --r) {
-            grid[r][c] = { getRandomGemType(player) };
-            fallInfos.push_back({c, r - (emptyRow + 1), r, grid[r][c].type});
+            grid[r][c] = getRandomGem(player);
+            fallInfos.push_back({c, r - (emptyRow + 1), r, grid[r][c]});
         }
     }
     return fallInfos;
@@ -117,22 +124,28 @@ std::vector<std::pair<sf::Vector2i, sf::Vector2i>> Board::findAllValidSwaps() {
 }
 
 bool Board::hasMatches() {
-
     return !findMatches().empty();
 }
 
-GemType Board::getRandomGemType(const Player& player) {
-    const auto& manaTypes = player.getManaTypes();
-    if (manaTypes.empty()) {
-        // Fallback for player with no attunement selected yet
-        const std::vector<GemType> fallbackTypes = { GemType::Skull, GemType::Coin, GemType::Fire, GemType::Water, GemType::Earth };
-        return fallbackTypes[rand() % fallbackTypes.size()];
-    }
+Gem Board::getRandomGem(const Player& player) {
+    const auto& manaSubTypes = player.getManaTypes();
+    
+    std::vector<Gem> possibleGems;
 
-    // Create a pool of possible gems: Player's mana types + Skull + Coin
-    std::vector<GemType> possibleGems = manaTypes;
-    possibleGems.push_back(GemType::Skull);
-    possibleGems.push_back(GemType::Coin);
+    if (manaSubTypes.empty()) {
+        // Fallback for player with no attunement selected yet
+        possibleGems.push_back({PrimaryGemType::Attack, GemSubType::Skull, 1});
+        possibleGems.push_back({PrimaryGemType::Treasure, GemSubType::Coin, 1});
+        possibleGems.push_back({PrimaryGemType::Mana, GemSubType::Fire, 1});
+        possibleGems.push_back({PrimaryGemType::Mana, GemSubType::Water, 1});
+    } else {
+        // Create a pool of possible gems: Player's mana types + Skull + Coin
+        for (const auto& subType : manaSubTypes) {
+            possibleGems.push_back({PrimaryGemType::Mana, subType, 1});
+        }
+        possibleGems.push_back({PrimaryGemType::Attack, GemSubType::Skull, 1});
+        possibleGems.push_back({PrimaryGemType::Treasure, GemSubType::Coin, 1});
+    }
     
     return possibleGems[rand() % possibleGems.size()];
 }

@@ -2,7 +2,7 @@
 #define UIMANAGER_H
 
 #include <map>
-#include "GemType.h"
+#include "GemSubType.h"
 
 // Forward declarations
 class Player;
@@ -51,8 +51,8 @@ private:
     sf::RectangleShape playerHpBarFront;
     sf::RectangleShape monsterHpBarBack;
     sf::RectangleShape monsterHpBarFront;
-    std::map<GemType, sf::RectangleShape> manaBarBacks;
-    std::map<GemType, sf::RectangleShape> manaBarFronts;
+    std::map<GemSubType, sf::RectangleShape> manaBarBacks;
+    std::map<GemSubType, sf::RectangleShape> manaBarFronts;
 
     sf::Text gameOverText;
     std::vector<sf::RectangleShape> spellButtons;

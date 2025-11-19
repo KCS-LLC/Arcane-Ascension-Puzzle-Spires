@@ -1,0 +1,282 @@
+{
+    "floorNumber": 1,
+    "rooms": [
+        {
+            "connections": [
+                {
+                    "color": "Yellow",
+                    "destinationId": 6
+                },
+                {
+                    "color": "Green",
+                    "destinationId": 8
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 9
+                }
+            ],
+            "id": 0,
+            "name": "Entrance",
+            "type": "Entrance"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 0
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 4
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 5
+                }
+            ],
+            "id": 8,
+            "name": "Hallowed Garden",
+            "type": "EnduranceChallenge"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Blue",
+                    "destinationId": 2
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 3
+                },
+                {
+                    "color": "Green",
+                    "destinationId": 8
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 12
+                },
+                {
+                    "color": "Orange",
+                    "destinationId": 13
+                }
+            ],
+            "id": 5,
+            "monsterId": "monster_5",
+            "name": "Burning Chamber",
+            "type": "Combat"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 1
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 5
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 6
+                },
+                {
+                    "color": "Indigo",
+                    "destinationId": 7
+                },
+                {
+                    "color": "Green",
+                    "destinationId": 11
+                }
+            ],
+            "id": 2,
+            "name": "Flooded Nexus",
+            "type": "Puzzle"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 0
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 2
+                },
+                {
+                    "color": "Indigo",
+                    "destinationId": 7
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 12
+                },
+                {
+                    "color": "Orange",
+                    "destinationId": 13
+                }
+            ],
+            "id": 6,
+            "name": "Shattered Hall",
+            "type": "Trap"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 0
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 10
+                }
+            ],
+            "id": 9,
+            "name": "Whispering Nexus",
+            "type": "Puzzle"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Green",
+                    "destinationId": 8
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 12
+                },
+                {
+                    "color": "Indigo",
+                    "destinationId": 14
+                }
+            ],
+            "id": 4,
+            "name": "Burning Library",
+            "type": "Puzzle"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 3
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 4
+                }
+            ],
+            "id": 14,
+            "name": "Burning Observatory",
+            "type": "MagicChallenge"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Blue",
+                    "destinationId": 2
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 12
+                }
+            ],
+            "id": 1,
+            "monsterId": "monster_1",
+            "name": "Guardian's Antechamber",
+            "type": "Boss"
+        },
+        {
+            "connections": [
+                {
+                    "color": "White",
+                    "destinationId": 1
+                },
+                {
+                    "color": "Blue",
+                    "destinationId": 4
+                },
+                {
+                    "color": "Red",
+                    "destinationId": 5
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 6
+                }
+            ],
+            "id": 12,
+            "name": "Flooded Armory",
+            "type": "Trap"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 5
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 6
+                }
+            ],
+            "id": 13,
+            "name": "Shattered Sanctum",
+            "type": "AgilityChallenge"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Blue",
+                    "destinationId": 2
+                },
+                {
+                    "color": "Yellow",
+                    "destinationId": 6
+                }
+            ],
+            "id": 7,
+            "name": "Forgotten Armory",
+            "type": "MagicChallenge"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Blue",
+                    "destinationId": 2
+                }
+            ],
+            "id": 11,
+            "name": "Forgotten Library",
+            "type": "EnduranceChallenge"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Blue",
+                    "destinationId": 9
+                }
+            ],
+            "id": 10,
+            "name": "Sunken Crypt",
+            "type": "Puzzle"
+        },
+        {
+            "connections": [
+                {
+                    "color": "Red",
+                    "destinationId": 5
+                },
+                {
+                    "color": "Indigo",
+                    "destinationId": 14
+                }
+            ],
+            "id": 3,
+            "monsterId": "monster_3",
+            "name": "Burning Sanctum",
+            "type": "Combat"
+        }
+    ],
+    "startRoomId": 0
+}

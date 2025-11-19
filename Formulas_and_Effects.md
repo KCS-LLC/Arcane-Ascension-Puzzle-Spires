@@ -36,6 +36,7 @@ These formulas govern the primary calculations for health, damage, and action sp
 *   **Spell Damage Calculation:**
     Spell effects are based on the mana spent, modified by a Power Tier which reflects the heir's mastery over that mana type.
     `Base Spell Damage = (Mana Cost of Spell) * (Power Tier Multiplier)`
+    *   **Developer Note:** Currently, all spells deal a fixed 1 damage in the prototype. This formula and associated tiers are placeholders and will be fully implemented in a future iteration to reflect mana cost and Power Tier more accurately.
 
     *   **Power Tier Table (based on Max Mana of Spell's Type):**
         | Tier Name | Max Mana Requirement | Power Multiplier |

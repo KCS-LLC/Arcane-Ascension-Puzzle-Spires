@@ -29,7 +29,7 @@ bool DataManager::loadAttunements(const std::string& path) {
             }
 
             for (const auto& mana_type : item.at("mana_types")) {
-                attunement.mana_types.push_back(stringToGemType(mana_type.get<std::string>()));
+                attunement.mana_types.push_back(stringToGemSubType(mana_type.get<std::string>()));
             }
             attunements.push_back(attunement);
         }
@@ -55,7 +55,7 @@ bool DataManager::loadSpells(const std::string& path) {
             spell.id = item.at("id").get<int>();
             spell.name = item.at("name").get<std::string>();
             spell.costAmount = item.at("costAmount").get<int>();
-            spell.costType = stringToGemType(item.at("costType").get<std::string>());
+            spell.costType = stringToGemSubType(item.at("costType").get<std::string>());
             
             spell.effects.clear();
             for (const auto& effect_data : item.at("effects")) {
