@@ -246,93 +246,135 @@ void Game::processEvents() {
 
                     });
 
-                    if (it != attunements.end()) {
+                                                            if (it != attunements.end()) {
 
-                        player.setAttunement(*it, dataManager);
+                                                                player.setAttunement(*it, dataManager);
 
-                        startNewCombat();
+                                                                // The actual game start (e.g., first combat or exploration) is now triggered
 
-                    }
+                                                                // by the end of the Judgement phase.
 
-                }
+                                                                // startNewCombat(); // This is now obsolete here.
 
-                // If it was just a click on a panel, we do nothing.
+                                                            }
 
-                continue; // In any case, the UI handled it, so we're done with this event.
+                                                        } else if (uiAction.type == UIActionType::JudgementComplete) {
 
-            }
+                                                            player.finalizeJudgement(m_judgementResults);
 
+                                                            currentState = GameState::Exploration; // Transition to the main game
 
+                                                        }
 
-                        // 2. If the UI didn't handle it, check for board clicks (only in combat or trials)
+                                                        // If it was just a click on a panel, we do nothing.
 
+                                                        continue; // In any case, the UI handled it, so we're done with this event.
 
-
-                        if (currentState == GameState::Playing || currentState == GameState::Judgement_TacticalTrial || currentState == GameState::Judgement_ManaAffinityTrial) {
-                            const int c = (mbp->position.x - boardOrigin.x) / TILE_SIZE;
-                            const int r = (mbp->position.y - boardOrigin.y) / TILE_SIZE;
-                            if (c < 0 || c >= BOARD_WIDTH || r < 0 || r >= BOARD_HEIGHT) continue;
-
-                            if (currentState == GameState::Judgement_ManaAffinityTrial && !m_manaAffinityChoice.has_value()) {
-                                // Player is choosing their mana affinity
-                                Gem clickedGem = board.getGem(r, c);
-                                if (clickedGem.primaryType == PrimaryGemType::Mana) {
-                                    m_manaAffinityChoice = clickedGem.primaryType;
-                                    std::cout << "Selected Mana Affinity: " << (int)m_manaAffinityChoice.value() << std::endl;
-                                } else {
-                                    std::cout << "Please select a Mana gem for your affinity." << std::endl;
                                 }
-                            } else {
-                                dragStartTile = sf::Vector2i(c, r);
-                                if (selectedTile.has_value() && selectedTile.value() != dragStartTile.value()) {
-                                    handleSwap(*selectedTile, *dragStartTile);
-                                    selectedTile = std::nullopt;
-                                    dragStartTile = std::nullopt;
-                                } else {
-                                    selectedTile = sf::Vector2i(c, r);
+
+                    
+
+                                // 2. If the UI didn't handle it, check for board clicks (only in combat or trials)
+
+                                if (currentState == GameState::Playing || currentState == GameState::Judgement_TacticalTrial || currentState == GameState::Judgement_ManaAffinityTrial) {
+
+                                    const int c = (mbp->position.x - boardOrigin.x) / TILE_SIZE;
+
+                                    const int r = (mbp->position.y - boardOrigin.y) / TILE_SIZE;
+
+                                    if (c < 0 || c >= BOARD_WIDTH || r < 0 || r >= BOARD_HEIGHT) continue;
+
+                    
+
+                                    if (currentState == GameState::Judgement_ManaAffinityTrial && !m_manaAffinityChoice.has_value()) {
+
+                                        // Player is choosing their mana affinity
+
+                                        Gem clickedGem = board.getGem(r, c);
+
+                                        if (clickedGem.primaryType == PrimaryGemType::Mana) {
+
+                                            m_manaAffinityChoice = clickedGem.primaryType;
+
+                                            std::cout << "Selected Mana Affinity: " << (int)m_manaAffinityChoice.value() << std::endl;
+
+                                        } else {
+
+                                            std::cout << "Please select a Mana gem for your affinity." << std::endl;
+
+                                        }
+
+                                    } else {
+
+                                        dragStartTile = sf::Vector2i(c, r);
+
+                                        if (selectedTile.has_value() && selectedTile.value() != dragStartTile.value()) {
+
+                                            handleSwap(*selectedTile, *dragStartTile);
+
+                                            selectedTile = std::nullopt;
+
+                                            dragStartTile = std::nullopt;
+
+                                        } else {
+
+                                            selectedTile = sf::Vector2i(c, r);
+
+                                        }
+
+                                    }
+
                                 }
+
                             }
+
+                    
+
+                                    // Handle drag-and-drop swaps (only in combat)
+
+                    
+
+                                    if (currentState == GameState::Playing) {
+
+                    
+
+                                        if (auto* mbr = event->getIf<sf::Event::MouseButtonReleased>()) {
+
+                    
+
+                                            if (mbr->button != sf::Mouse::Button::Left) continue;
+
+                    
+
+                                            if (dragStartTile.has_value()) {
+
+                    
+
+                                                const int c = (mbr->position.x - boardOrigin.x) / TILE_SIZE;
+
+                                        const int r = (mbr->position.y - boardOrigin.y) / TILE_SIZE;
+
+                                        sf::Vector2i endTile(c, r);
+
+                                        if (endTile != *dragStartTile) {
+
+                                            handleSwap(*dragStartTile, endTile);
+
+                                            selectedTile = std::nullopt;
+
+                                        }
+
+                                        dragStartTile = std::nullopt;
+
+                                    }
+
+                                }
+
+                            }
+
                         }
 
-        }
-
-
-
-        // Handle drag-and-drop swaps (only in combat)
-
-        if (currentState == GameState::Playing) {
-
-            if (auto* mbr = event->getIf<sf::Event::MouseButtonReleased>()) {
-
-                if (mbr->button != sf::Mouse::Button::Left) continue;
-
-                if (dragStartTile.has_value()) {
-
-                    const int c = (mbr->position.x - boardOrigin.x) / TILE_SIZE;
-
-                    const int r = (mbr->position.y - boardOrigin.y) / TILE_SIZE;
-
-                    sf::Vector2i endTile(c, r);
-
-                    if (endTile != *dragStartTile) {
-
-                        handleSwap(*dragStartTile, endTile);
-
-                        selectedTile = std::nullopt;
-
                     }
-
-                    dragStartTile = std::nullopt;
-
-                }
-
-            }
-
-        }
-
-    }
-
-}
 
 
 
@@ -634,33 +676,47 @@ void Game::update() {
 
                                 startNextJudgementTrial();
 
-            }
+                                    }
 
-        } else if (currentState == GameState::Judgement_ManaAffinityTrial) {
-            if (m_manaAffinityChoice.has_value() && (m_currentTrialTurn >= m_currentJudgementTrial.turnLimit || m_currentAffinityScore >= m_currentJudgementTrial.scoreGoal)) {
-                std::cout << "Mana Affinity Trial Objective Met or Turn Limit Reached! Recording affinity score." << std::endl;
-                m_judgementResults.trialScores[m_currentJudgementTrial.type] = m_currentAffinityScore;
-                startNextJudgementTrial();
-            }
-        }
+                                } else if (currentState == GameState::Judgement_ManaAffinityTrial) {
 
+                                    if (m_manaAffinityChoice.has_value() && (m_currentTrialTurn >= m_currentJudgementTrial.turnLimit || m_currentAffinityScore >= m_currentJudgementTrial.scoreGoal)) {
 
+                                        std::cout << "Mana Affinity Trial Objective Met or Turn Limit Reached! Recording affinity score." << std::endl;
 
-    // --- Damage Effect Logic ---
+                                        m_judgementResults.trialScores[m_currentJudgementTrial.type] = m_currentAffinityScore;
 
-    if (showPlayerDamageEffect && playerDamageClock.getElapsedTime().asMilliseconds() > 200) {
+                                        startNextJudgementTrial();
 
-        showPlayerDamageEffect = false;
+                                    }
 
-    }
+                                } else if (currentState == GameState::Judgement_Summary) {
 
+                                    // Logic for the summary screen can go here. For now, it just waits for a click.
 
+                                    // In the future, this is where we would finalize the player's stats based on results.
 
-    // --- UI Updates ---
+                                }
 
-    uiManager->update(player, monster, currentState, currentRoom, visitedRoomIds, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTrialTurn, m_manaAffinityChoice);
+                        
 
-}
+                            // --- Damage Effect Logic ---
+
+                        
+
+                            if (showPlayerDamageEffect && playerDamageClock.getElapsedTime().asMilliseconds() > 200) {
+
+                                showPlayerDamageEffect = false;
+
+                            }
+
+                        
+
+                            // --- UI Updates ---
+
+                            uiManager->update(player, monster, currentState, currentRoom, visitedRoomIds, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTrialTurn, m_manaAffinityChoice, m_judgementResults);
+
+                        }
 
 
 

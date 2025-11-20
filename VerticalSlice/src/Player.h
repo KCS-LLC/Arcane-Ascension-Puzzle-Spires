@@ -3,6 +3,7 @@
 
 #include "GemSubType.h"
 #include "Structs.h"
+#include "Judgement.h"
 
 // Forward declarations
 class DataManager;
@@ -24,7 +25,11 @@ public:
     void addMana(GemSubType type, int amount);
     int castSpell(int spellIndex);
 
+    void finalizeJudgement(const JudgementResults& results);
+
 private:
+    void setStartingStats(int tactical_score, int mana_affinity_score);
+
     int currentHp;
     int maxHp;
     int maxMana = 100; // Default max mana, can be adjusted

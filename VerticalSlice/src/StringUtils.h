@@ -16,6 +16,7 @@ namespace sf {
 
 std::string roomTypeToString(RoomType type);
 std::string primaryGemTypeToString(PrimaryGemType type);
+std::string gemSubtypeToString(GemSubType type);
 std::string doorColorToString(DoorColor color);
 sf::Color doorColorToSfColor(DoorColor color);
 GemSubType stringToGemSubType(const std::string& s);
