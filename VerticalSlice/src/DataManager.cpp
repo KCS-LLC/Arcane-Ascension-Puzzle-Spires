@@ -72,6 +72,18 @@ DataManager::DataManager() : monsterHP(0), monsterSpeed(0), monsterAttackDamage(
     if (!loadGemCatalog("data/gems.json")) {
         std::cerr << "Failed to load gem catalog." << std::endl;
     }
+    if (!loadAttunements("data/attunements.json")) {
+        std::cerr << "Failed to load attunements." << std::endl;
+    }
+    if (!loadSpells("data/spells.json")) {
+        std::cerr << "Failed to load spells." << std::endl;
+    }
+    if (!loadMonsterData("data/monster.json")) {
+        std::cerr << "Failed to load monster data." << std::endl;
+    }
+    if (!loadFloor("data/floor1.json")) {
+        std::cerr << "Failed to load floor data." << std::endl;
+    }
     if (!loadJudgementTrials()) {
         std::cerr << "Failed to load judgement trials." << std::endl;
     }
