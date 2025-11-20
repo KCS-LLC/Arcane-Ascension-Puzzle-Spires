@@ -14,7 +14,7 @@ enum class JudgementTrialType {
 // Defines a single trial for the Judgement phase
 struct JudgementTrial {
     JudgementTrialType type;
-    std::string boardLayoutFile; // Path to a JSON file defining the board state
+    std::vector<std::vector<Gem>> boardLayout; // 2D vector to store the actual board state
     int turnLimit = 0;
     int scoreGoal = 0;
 };
