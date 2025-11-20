@@ -1,22 +1,31 @@
+#pragma once
 #ifndef DATAMANAGER_H
 #define DATAMANAGER_H
 
+#include <vector>
+#include <string>
+#include <map>
+#include <SFML/Graphics/Font.hpp>
 #include "Structs.h"
 #include "Judgement.h"
-#include <SFML/Graphics/Font.hpp>
-
-// Forward declarations
 
 class DataManager {
 public:
     DataManager();
 
+    // Loading functions
+    bool loadPrimaryGemTypes(const std::string& path);
+    bool loadSecondaryGemTypes(const std::string& path);
+    bool loadGemCatalog(const std::string& path);
     bool loadAttunements(const std::string& path);
     bool loadSpells(const std::string& path);
     bool loadMonsterData(const std::string& path);
     bool loadFloor(const std::string& path);
-    bool loadGemDefinitions(const std::string& path);
 
+    // Getters
+    const GemCatalogEntry* getGemCatalogEntry(GemSubType subType) const;
+    const SecondaryGemTypeData* getSecondaryGemTypeData(int secondaryTypeId) const;
+    PrimaryGemType getPrimaryGemType(GemSubType subType) const;
     const std::vector<Attunement>& getAttunements() const;
     const Attunement* getAttunementById(const std::string& id) const;
     const std::vector<Spell>& getAllSpells() const;
@@ -30,10 +39,15 @@ public:
     const std::vector<JudgementTrial>& getJudgementTrials() const;
     const sf::Font& getFont() const;
 
-
 private:
     bool loadJudgementTrials();
 
+    // Data Maps
+    std::map<PrimaryGemType, std::string> m_primaryGemTypes;
+    std::map<int, SecondaryGemTypeData> m_secondaryGemTypes;
+    std::map<GemSubType, GemCatalogEntry> m_gemCatalog;
+
+    // Other Data Members
     std::vector<Attunement> attunements;
     std::vector<Spell> spells;
     int monsterHP;

@@ -2,7 +2,7 @@
   {
     "id": 1,
     "name": "Fireball",
-    "costType": "fire",
+    "costType": 1,
     "costAmount": 10,
     "effects": [
       {
@@ -15,7 +15,7 @@
   {
     "id": 2,
     "name": "Ice Shard",
-    "costType": "water",
+    "costType": 2,
     "costAmount": 10,
     "effects": [
       {
@@ -28,7 +28,7 @@
   {
     "id": 3,
     "name": "Stone Shield",
-    "costType": "earth",
+    "costType": 3,
     "costAmount": 15,
     "effects": [
       {
@@ -41,7 +41,7 @@
   {
     "id": 4,
     "name": "Healing Light",
-    "costType": "light",
+    "costType": 5,
     "costAmount": 20,
     "effects": [
       {

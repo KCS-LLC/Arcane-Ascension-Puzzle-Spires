@@ -48,6 +48,7 @@ set(SOURCE_FILES
     src/StringUtils.cpp
     src/UIManager.cpp
     src/main.cpp
+    src/GemFactory.cpp
     src/BaseGem.cpp
     src/ManaGem.cpp
     src/AttackGem.cpp

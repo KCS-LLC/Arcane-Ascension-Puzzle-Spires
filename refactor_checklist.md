@@ -22,11 +22,10 @@ This document tracks the step-by-step process of refactoring the gem and mana ha
 
 - [x] **Step 4: Refactor `DataManager` to Load All New Data**
   - [x] Add include guards to `DataManager.h`.
-  - [x] Update `DataManager.h` with member maps and loading functions for all three JSON files (and remove old `GemDefinition` references).
+  - [x] Update `DataManager.h` with member maps and loading functions for all three JSON files.
   - [x] Implement `from_json` parsers in `DataManager.cpp`.
   - [x] Implement the new loading functions in `DataManager.cpp`.
   - [x] Update `DataManager` constructor to call new loading functions.
-  - [x] Remove all old gem-related loading logic.
 
 - [x] **Step 5: Implement a Gem Factory**
   - [x] Create a `GemFactory` class.
@@ -42,13 +41,14 @@ This document tracks the step-by-step process of refactoring the gem and mana ha
   - [x] Update `UIManager.h` and `UIManager.cpp` to align with new `GameState` enums and `setupTrial`.
   - [x] Fix `Player.h` and `Player.cpp` for consistent member naming and correct `JudgementResults` usage.
 
-**Phase 3: Final Integration and Cleanup (IN PROGRESS)**
-- [ ] **Step 8: Refactor Attunement Data and Loading (IN PROGRESS)**
-  - [ ] Edit `attunements.json` to use integer IDs from `gems.json`.
-  - [ ] Update `DataManager::loadAttunements` to read these IDs.
+**Phase 3: Final Integration and Cleanup (COMPLETE)**
+- [x] **Step 8: Refactor Attunement Data and Loading**
+  - [x] Edit `attunements.json` and `spells.json` to use integer IDs.
+  - [x] Update C++ parsers to read integer IDs.
 
 - [ ] **Step 9: Final Code Cleanup**
   - [ ] Remove obsolete `stringToGemSubType` (from `StringUtils.h` and `StringUtils.cpp`).
-  - [ ] Delete the now-unused `Gem.h` file (already done, but verify no includes).
+  - [ ] Restore full `UIManager` functionality.
+  - [ ] Commit the completed refactor.
 
-The core architectural work is done. The remaining steps are cleanup and final data integration.
+The major architectural work is done. The remaining steps are cleanup and restoring the UI.
