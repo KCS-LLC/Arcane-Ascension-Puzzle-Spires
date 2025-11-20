@@ -1,3 +1,4 @@
+#include "PCH.h"
 #include "BaseGem.h"
 
 BaseGem::BaseGem(const GemCatalogEntry* catalogEntry, const sf::Texture& texture) 

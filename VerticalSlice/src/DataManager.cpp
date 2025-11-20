@@ -9,15 +9,6 @@
 
 using json = nlohmann::json;
 
-void from_json(const json& j, GemDefinition& gd) {
-    j.at("id").get_to(gd.id);
-    j.at("name").get_to(gd.name);
-    gd.subType = stringToGemSubType(j.at("subType").get<std::string>());
-    if (j.contains("texturePath")) {
-        j.at("texturePath").get_to(gd.texturePath);
-    }
-}
-
 void from_json(const json& j, Teleporter& t) {
     t.color = stringToDoorColor(j.at("color").get<std::string>());
     j.at("destinationId").get_to(t.destinationRoomId);
@@ -44,12 +35,18 @@ void from_json(const json& j, Floor& f) {
 // =================================================================================
 
 DataManager::DataManager() : monsterHP(0), monsterSpeed(0), monsterAttackDamage(0) {
+    if (!m_font.openFromFile("assets/OpenSans-Regular.ttf")) {
+        std::cerr << "Failed to load font." << std::endl;
+    }
     if (!loadJudgementTrials()) {
         std::cerr << "Failed to load judgement trials." << std::endl;
     }
-    loadGemDefinitions("data/gem_definitions.json");
+    // loadGemDefinitions("data/gem_definitions.json"); // Obsolete
 }
 
+const sf::Font& DataManager::getFont() const {
+    return m_font;
+}
 bool DataManager::loadAttunements(const std::string& path) {
     std::vector<std::string> attunementFiles = {
         path,
@@ -210,15 +207,9 @@ bool DataManager::loadJudgementTrials() {
             trial.trialId = data.at("trialId").get<std::string>();
             trial.objective = data.at("objective").get<std::string>();
             trial.type = static_cast<JudgementTrialType>(data.at("type").get<int>());
-            if (data.contains("boardLayout")) {
-                for (const auto& j_row : data["boardLayout"]) {
-                    std::vector<Gem> row;
-                    for (const auto& j_gem : j_row) {
-                        row.emplace_back(static_cast<GemSubType>(j_gem["subType"]), j_gem["level"]);
-                    }
-                    trial.boardLayout.push_back(row);
-                }
-            }
+            
+            // Board layout is no longer loaded this way; it's dynamic.
+
             trial.turnLimit = data.at("turnLimit").get<int>();
             if (data.contains("timeLimit")) {
                 trial.timeLimit = data.at("timeLimit").get<int>();
@@ -238,27 +229,3 @@ bool DataManager::loadJudgementTrials() {
 }
 
 const std::vector<JudgementTrial>& DataManager::getJudgementTrials() const { return m_judgementTrials; }
-
-const std::map<GemSubType, GemDefinition>& DataManager::getGemDefinitions() const { return m_gemDefinitions; }
-
-bool DataManager::loadGemDefinitions(const std::string& path) {
-    std::ifstream f(path);
-    if (!f.is_open()) {
-        std::cerr << "Could not open gem definitions file: " << path << std::endl;
-        return false;
-    }
-    try {
-        json data = json::parse(f);
-        for (const auto& item : data) {
-            GemDefinition gemDef = item.get<GemDefinition>();
-            m_gemDefinitions[gemDef.subType] = gemDef;
-        }
-    } catch (json::parse_error& e) {
-        std::cerr << "JSON parse error in gem definitions file: " << e.what() << std::endl;
-        return false;
-    } catch (json::exception& e) {
-        std::cerr << "JSON data error in gem definitions file: " << e.what() << std::endl;
-        return false;
-    }
-    return true;
-}

@@ -4,7 +4,7 @@
 
 class AttackGem : public BaseGem {
 public:
-    AttackGem(const GemCatalogEntry* catalogEntry, const sf::Texture& texture) 
+    AttackGem(const GemCatalogEntry* catalogEntry, const sf::Texture& texture)
         : BaseGem(catalogEntry, texture) {}
 
     void onMatch(Board& board, Player& player, Monster& monster) override;

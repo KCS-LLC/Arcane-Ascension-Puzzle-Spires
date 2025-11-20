@@ -2,8 +2,7 @@
 
 #include <string>
 #include <vector>
-#include <map>
-#include "Gem.h"
+#include "GemSubType.h"
 
 // Represents the type of tactical trial
 enum class JudgementTrialType {
@@ -19,14 +18,14 @@ struct JudgementTrial {
     std::string trialId;
     std::string objective;
     JudgementTrialType type;
-    std::vector<std::vector<Gem>> boardLayout;
-    int turnLimit = 0;
+    int turnLimit;
     int timeLimit = 0;
-    int scoreGoal = 0;
+    int scoreGoal;
 };
 
 // Stores the player's performance across all Judgement trials
 struct JudgementResults {
-    std::map<std::string, int> trialScores;
-    int totalTreasureValue = 0;
+    int powerScore = 0;
+    int hasteScore = 0;
+    int controlScore = 0;
 };

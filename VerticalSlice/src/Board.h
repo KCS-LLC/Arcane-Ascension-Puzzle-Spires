@@ -1,40 +1,43 @@
-#ifndef BOARD_H
-#define BOARD_H
+#pragma once
 
-#include "Gem.h" // Include the new Gem struct definition
+#include <vector>
+#include <memory>
+#include <set>
+#include "BaseGem.h"
+#include "GemFactory.h"
 
-// Forward declaration for Player class
-class Player;
+// Forward declarations
+class Player; 
+class Monster;
 
 class Board {
 public:
-    struct FallInfo {
-        Gem gem;
-        int startRow, endRow, col;
+    Board(int width, int height, GemFactory& factory);
 
-        FallInfo(const Gem& g, int sr, int er, int c) : gem(g), startRow(sr), endRow(er), col(c) {}
-    };
-
-    Board();
-    void initialize(const Player& player);
-    void initialize(const std::vector<std::vector<Gem>>& layout, const Player& player);
+    void initialize(const std::vector<GemSubType>& possibleGems);
     void initializeForPowerTrial();
 
-    const Gem& getGem(int r, int c) const;
+    void render(sf::RenderWindow& window);
+    BaseGem* getGemAt(int r, int c);
+
+    // Gameplay logic
     bool canSwap(int r1, int c1, int r2, int c2);
     void swapGems(int r1, int c1, int r2, int c2);
-
     std::set<std::pair<int, int>> findMatches();
-    void processMatches(const std::set<std::pair<int, int>>& matches, std::vector<Gem>& matchedGems);
-    std::vector<FallInfo> applyGravityAndRefill(const Player& player);
-    std::vector<FallInfo> applyGravityAndRefill(const std::vector<GemSubType>& availableGemSubTypes);
-    std::vector<std::pair<sf::Vector2i, sf::Vector2i>> findAllValidSwaps() const;
+    void removeGems(const std::set<std::pair<int, int>>& matches);
+    
+    struct FallInfo {
+        int row;
+        int col;
+        int fallToRow;
+    };
+    std::vector<FallInfo> applyGravity();
+    void refill(const std::vector<GemSubType>& possibleGems);
+
 
 private:
-    std::vector<std::vector<Gem>> m_grid;
-    void fillBoard(const Player& player);
-    bool hasMatches();
-    Gem getRandomGem(const Player& player);
+    int m_width;
+    int m_height;
+    GemFactory& m_gemFactory;
+    std::vector<std::vector<std::unique_ptr<BaseGem>>> m_grid;
 };
-
-#endif // BOARD_H

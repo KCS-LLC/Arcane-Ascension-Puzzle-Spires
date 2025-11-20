@@ -48,8 +48,10 @@ set(SOURCE_FILES
     src/StringUtils.cpp
     src/UIManager.cpp
     src/main.cpp
-    src/PCH.h
-    src/Judgement.h
+    src/BaseGem.cpp
+    src/ManaGem.cpp
+    src/AttackGem.cpp
+    src/TreasureGem.cpp
 )
 target_sources(game PRIVATE ${SOURCE_FILES})
 

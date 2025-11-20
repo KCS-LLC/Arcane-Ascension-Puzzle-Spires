@@ -1,6 +1,6 @@
 # Refactor Checklist: Object-Oriented Gem Architecture
 
-This document tracks the step-by-step process of refactoring the gem system to a fully normalized, data-driven, and object-oriented architecture.
+This document tracks the step-by-step process of refactoring the gem and mana handling system to a fully normalized, data-driven, and object-oriented architecture.
 
 **Phase 1: Data Foundation (COMPLETE)**
 - [x] **Step 1: Create and Populate New JSON Data Files**
@@ -8,41 +8,47 @@ This document tracks the step-by-step process of refactoring the gem system to a
   - [x] Create `secondary_gem_types.json` with prefixed IDs.
   - [x] Create `gems.json` (replacing `gem_definitions.json`).
 
-**Phase 2: C++ Architecture Refactor**
-- [ ] **Step 2: Implement Core C++ Structs and Enums**
-  - [ ] Create `PrimaryGemType.h` with the `PrimaryGemType` enum.
-  - [ ] Create `Structs.h` containing:
-    - [ ] `SecondaryGemTypeData` struct (for `secondary_gem_types.json`).
-    - [ ] `GemCatalogEntry` struct (for `gems.json`).
-  - [ ] Implement `from_json` specializations for the new structs.
+**Phase 2: C++ Architecture Refactor (COMPLETE)**
+- [x] **Step 2: Implement Core C++ Structs and Enums**
+  - [x] Create `PrimaryGemType.h` with the `PrimaryGemType` enum.
+  - [x] Consolidate all data structures into `Structs.h`.
+  - [x] Remove `SpireData.h`.
 
-- [ ] **Step 3: Implement Object-Oriented Gem Classes**
-  - [ ] Create `BaseGem.h`, the abstract base class with a virtual `onMatch` method.
-  - [ ] Create concrete subclasses: `ManaGem`, `AttackGem`, `TreasureGem`, etc., inheriting from `BaseGem`.
-  - [ ] Implement the specific `onMatch` logic for each subclass.
+- [x] **Step 3: Implement Object-Oriented Gem Classes**
+  - [x] Create `BaseGem.h`, the abstract base class with a virtual `onMatch` method.
+  - [x] Create concrete subclasses: `ManaGem`, `AttackGem`, `TreasureGem`.
+  - [x] Implement the specific `onMatch` logic for each subclass.
+  - [x] Update `CMakeLists.txt` to include new .cpp files.
 
-- [ ] **Step 4: Refactor `DataManager` to Load All New Data**
-  - [ ] Update `DataManager.h` with member maps and loading functions for all three JSON files.
-  - [ ] Implement the new loading functions in `DataManager.cpp`.
-  - [ ] Remove all old gem-related loading logic.
+- [x] **Step 4: Refactor `DataManager` to Load All New Data**
+  - [x] Add include guards to `DataManager.h`.
+  - [x] Update `DataManager.h` with member maps and loading functions for all three JSON files (and remove old `GemDefinition` references).
+  - [x] Implement `from_json` parsers in `DataManager.cpp`.
+  - [x] Implement the new loading functions in `DataManager.cpp`.
+  - [x] Update `DataManager` constructor to call new loading functions.
+  - [x] Remove all old gem-related loading logic.
 
-- [ ] **Step 5: Implement a Gem Factory**
-  - [ ] Create a `GemFactory` class that takes a `GemSubType` ID.
-  - [ ] The factory will use the data from `DataManager` to determine the `PrimaryGemType`.
-  - [ ] It will then create and return a `std::unique_ptr<BaseGem>` of the correct subclass (e.g., `ManaGem`, `AttackGem`).
+- [x] **Step 5: Implement a Gem Factory**
+  - [x] Create a `GemFactory` class.
+  - [x] Implement `GemFactory` to create `std::unique_ptr<BaseGem>` instances.
 
-- [ ] **Step 6: Refactor the `Board` to Use Gem Objects**
-  - [ ] Change the board's internal grid from `Gem` structs to `std::vector<std::unique_ptr<BaseGem>>`.
-  - [ ] Update board logic (`initialize`, `findMatches`, etc.) to use the `GemFactory` to create gems.
-  - [ ] Rewrite `resolveMatches` to be a simple, polymorphic call: `gem->onMatch(boardContext)`.
+- [x] **Step 6: Refactor the `Board` to Use Gem Objects**
+  - [x] Change the board's internal grid to `std::vector<std::unique_ptr<BaseGem>>`.
+  - [x] Update `Board.h` and `Board.cpp` to use the `GemFactory` to create gems.
+  - [x] Implement polymorphic `onMatch` call in `Game::resolveMatches`.
 
-**Phase 3: Final Integration and Cleanup**
-- [ ] **Step 7: Refactor Attunement Data and Loading**
+- [x] **Step 7: Refactor Game Loop and UI Integration**
+  - [x] Update `Game.h` and `Game.cpp` to use new `Board` and `BaseGem` interfaces.
+  - [x] Update `UIManager.h` and `UIManager.cpp` to align with new `GameState` enums and `setupTrial`.
+  - [x] Fix `Player.h` and `Player.cpp` for consistent member naming and correct `JudgementResults` usage.
+
+**Phase 3: Final Integration and Cleanup (IN PROGRESS)**
+- [ ] **Step 8: Refactor Attunement Data and Loading (IN PROGRESS)**
   - [ ] Edit `attunements.json` to use integer IDs from `gems.json`.
   - [ ] Update `DataManager::loadAttunements` to read these IDs.
 
-- [ ] **Step 8: Final Code Cleanup**
-  - [ ] Delete the obsolete `stringToGemSubType` function.
-  - [ ] Move `#include "json.hpp"` to `PCH.h` and remove redundant includes.
-  - [ ] Delete the now-unused `Gem.h` file (the simple struct).
+- [ ] **Step 9: Final Code Cleanup**
+  - [ ] Remove obsolete `stringToGemSubType` (from `StringUtils.h` and `StringUtils.cpp`).
+  - [ ] Delete the now-unused `Gem.h` file (already done, but verify no includes).
 
+The core architectural work is done. The remaining steps are cleanup and final data integration.

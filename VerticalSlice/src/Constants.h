@@ -1,20 +1,22 @@
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#pragma once
 
-// Game constants
-const int WINDOW_WIDTH = 1280;
-const int WINDOW_HEIGHT = 720;
-const int BOARD_WIDTH = 8;
-const int BOARD_HEIGHT = 8;
-const int TILE_SIZE = 64;
+constexpr int TILE_SIZE = 64;
+constexpr int BOARD_WIDTH = 8;
+constexpr int BOARD_HEIGHT = 8;
+constexpr int WINDOW_WIDTH = 800;
+constexpr int WINDOW_HEIGHT = 600;
 
-// Enum for the main game states
 enum class GameState {
     Loading,
-    Playing,
     Animating,
+    Playing,
     GameOver,
+    Judgement_Intro,
+    Judgement_Trial,
+    Judgement_Summary,
+    Judgement_AttunementReveal,
     Exploration,
+    Combat,
     Treasure,
     Special,
     Puzzle,
@@ -23,10 +25,5 @@ enum class GameState {
     AgilityChallenge,
     EnduranceChallenge,
     MagicChallenge,
-    Judgement_TacticalTrial,
-    Judgement_ManaAffinityTrial,
-    Judgement_Summary,
-    Judgement_AttunementReveal
+    Exit
 };
-
-#endif // CONSTANTS_H

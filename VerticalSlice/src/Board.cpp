@@ -1,191 +1,156 @@
 #include "PCH.h"
 #include "Board.h"
-#include "Player.h"
+#include "Game.h" // For gemTextures
 #include <random>
+#include <iostream>
 
-Board::Board() {
-    m_grid.resize(BOARD_HEIGHT, std::vector<Gem>(BOARD_WIDTH));
-}
-
-void Board::initialize(const Player& player) {
-    fillBoard(player);
-    while (hasMatches() || findAllValidSwaps().empty()) {
-        fillBoard(player);
+Board::Board(int width, int height, GemFactory& factory)
+    : m_width(width), m_height(height), m_gemFactory(factory) {
+    m_grid.resize(m_height);
+    for (int r = 0; r < m_height; ++r) {
+        m_grid[r].resize(m_width);
     }
 }
 
-void Board::initialize(const std::vector<std::vector<Gem>>& layout, const Player& player) {
-    std::cout << "Initializing board with layout..." << std::endl;
-    m_grid = layout;
+void Board::initialize(const std::vector<GemSubType>& possibleGems) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distrib(0, possibleGems.size() - 1);
 
-    // Keep regenerating the board until no matches are present.
-    while (hasMatches() || findAllValidSwaps().empty()) {
-        fillBoard(player);
+    for (int r = 0; r < m_height; ++r) {
+        for (int c = 0; c < m_width; ++c) {
+            GemSubType type;
+            do {
+                type = possibleGems[distrib(gen)];
+                m_grid[r][c] = m_gemFactory.createGem(type, gemTextures.at(type));
+            } while (findMatches().count({r, c})); // Ensure no matches on creation
+             if (m_grid[r][c]) {
+                m_grid[r][c]->setPosition(c * 64, r * 64); // Assuming 64x64 gems
+            }
+        }
     }
 }
 
 void Board::initializeForPowerTrial() {
-    std::cout << "Initializing board for power trial..." << std::endl;
-    std::random_device rd;
+    // Simplified for now - will need the robust logic later
+    std::vector<GemSubType> trialGems = { GemSubType::Fire, GemSubType::Skull };
+     std::random_device rd;
     std::mt19937 gen(rd());
-    std::bernoulli_distribution dist(0.5); // 50% chance for Skull
+    std::uniform_int_distribution<> distrib(0, trialGems.size() - 1);
 
-    const int max_retries = 10000;
-    for (int i = 0; i < max_retries; ++i) {
-        for (int r = 0; r < BOARD_HEIGHT; ++r) {
-            for (int c = 0; c < BOARD_WIDTH; ++c) {
-                GemSubType type = dist(gen) ? GemSubType::Skull : GemSubType::Fire;
-                m_grid[r][c] = Gem(type, 1);
-            }
-        }
-        if (!hasMatches() && !findAllValidSwaps().empty()) {
-            return; // Found a valid board
-        }
-    }
-
-    // Fallback to a guaranteed valid pattern if random generation fails
-    std::cout << "Random generation failed, falling back to checkerboard." << std::endl;
-    for (int r = 0; r < BOARD_HEIGHT; ++r) {
-        for (int c = 0; c < BOARD_WIDTH; ++c) {
-            if ((r + c) % 2 == 0) {
-                m_grid[r][c] = Gem(GemSubType::Fire, 1);
-            } else {
-                m_grid[r][c] = Gem(GemSubType::Skull, 1);
+    for (int r = 0; r < m_height; ++r) {
+        for (int c = 0; c < m_width; ++c) {
+            GemSubType type = trialGems[(r + c) % 2]; // Checkerboard for now
+            m_grid[r][c] = m_gemFactory.createGem(type, gemTextures.at(type));
+            if (m_grid[r][c]) {
+                m_grid[r][c]->setPosition(c * 64, r * 64);
             }
         }
     }
 }
 
-void Board::fillBoard(const Player& player) {
-    for (int r = 0; r < BOARD_HEIGHT; ++r) {
-        for (int c = 0; c < BOARD_WIDTH; ++c) {
-            m_grid[r][c] = getRandomGem(player);
+void Board::render(sf::RenderWindow& window) {
+    for (int r = 0; r < m_height; ++r) {
+        for (int c = 0; c < m_width; ++c) {
+            if (m_grid[r][c]) {
+                m_grid[r][c]->render(window);
+            }
         }
     }
 }
 
-const Gem& Board::getGem(int r, int c) const {
-    return m_grid[r][c];
+BaseGem* Board::getGemAt(int r, int c) {
+    if (r >= 0 && r < m_height && c >= 0 && c < m_width) {
+        return m_grid[r][c].get();
+    }
+    return nullptr;
 }
 
 bool Board::canSwap(int r1, int c1, int r2, int c2) {
-    if (r1 < 0 || r1 >= BOARD_HEIGHT || c1 < 0 || c1 >= BOARD_WIDTH ||
-        r2 < 0 || r2 >= BOARD_HEIGHT || c2 < 0 || c2 >= BOARD_WIDTH) {
-        return false;
-    }
-    return abs(r1 - r2) + abs(c1 - c2) == 1;
+    // Basic adjacency check
+    return (std::abs(r1 - r2) == 1 && c1 == c2) || (std::abs(c1 - c2) == 1 && r1 == r2);
 }
 
 void Board::swapGems(int r1, int c1, int r2, int c2) {
-    std::swap(m_grid[r1][c1], m_grid[r2][c2]);
+    m_grid[r1][c1].swap(m_grid[r2][c2]);
+    if (m_grid[r1][c1]) {
+        m_grid[r1][c1]->setPosition(c1 * 64, r1 * 64);
+    }
+    if (m_grid[r2][c2]) {
+        m_grid[r2][c2]->setPosition(c2 * 64, r2 * 64);
+    }
 }
 
 std::set<std::pair<int, int>> Board::findMatches() {
     std::set<std::pair<int, int>> matches;
-    for (int r = 0; r < BOARD_HEIGHT; ++r) {
-        for (int c = 0; c < BOARD_WIDTH; ++c) {
-            if (m_grid[r][c].primaryType == PrimaryGemType::Empty) continue;
-            if (c > 1 && m_grid[r][c].subType == m_grid[r][c - 1].subType && m_grid[r][c].subType == m_grid[r][c - 2].subType) {
-                matches.insert({r, c}); matches.insert({r, c - 1}); matches.insert({r, c - 2});
+    // Horizontal matches
+    for (int r = 0; r < m_height; ++r) {
+        for (int c = 0; c < m_width - 2; ++c) {
+            BaseGem* gem1 = getGemAt(r, c);
+            BaseGem* gem2 = getGemAt(r, c + 1);
+            BaseGem* gem3 = getGemAt(r, c + 2);
+            if (gem1 && gem2 && gem3 && gem1->getSubType() == gem2->getSubType() && gem2->getSubType() == gem3->getSubType()) {
+                matches.insert({r, c});
+                matches.insert({r, c + 1});
+                matches.insert({r, c + 2});
             }
-            if (r > 1 && m_grid[r][c].subType == m_grid[r - 1][c].subType && m_grid[r][c].subType == m_grid[r - 2][c].subType) {
-                matches.insert({r, c}); matches.insert({r - 1, c}); matches.insert({r - 2, c});
+        }
+    }
+    // Vertical matches
+    for (int c = 0; c < m_width; ++c) {
+        for (int r = 0; r < m_height - 2; ++r) {
+             BaseGem* gem1 = getGemAt(r, c);
+             BaseGem* gem2 = getGemAt(r + 1, c);
+             BaseGem* gem3 = getGemAt(r + 2, c);
+             if (gem1 && gem2 && gem3 && gem1->getSubType() == gem2->getSubType() && gem2->getSubType() == gem3->getSubType()) {
+                matches.insert({r, c});
+                matches.insert({r + 1, c});
+                matches.insert({r + 2, c});
             }
         }
     }
     return matches;
 }
 
-void Board::processMatches(const std::set<std::pair<int, int>>& matches, std::vector<Gem>& matchedGems) {
+void Board::removeGems(const std::set<std::pair<int, int>>& matches) {
     for (const auto& pos : matches) {
-        matchedGems.push_back(m_grid[pos.first][pos.second]);
-        m_grid[pos.first][pos.second] = Gem(GemSubType::Generic, 0);
+        m_grid[pos.first][pos.second].reset(); // unique_ptr reset() deletes the object
     }
 }
 
-std::vector<Board::FallInfo> Board::applyGravityAndRefill(const Player& player) {
-    return applyGravityAndRefill(player.getManaTypes());
-}
-
-std::vector<Board::FallInfo> Board::applyGravityAndRefill(const std::vector<GemSubType>& availableGemSubTypes) {
+std::vector<Board::FallInfo> Board::applyGravity() {
     std::vector<FallInfo> fallInfo;
-    std::random_device rd;
-    std::mt19937 gen(rd());
-
-    for (int c = 0; c < BOARD_WIDTH; ++c) {
-        int emptyRow = BOARD_HEIGHT - 1;
-        for (int r = BOARD_HEIGHT - 1; r >= 0; --r) {
-            if (m_grid[r][c].primaryType != PrimaryGemType::Empty) {
-                if (r != emptyRow) {
-                    m_grid[emptyRow][c] = m_grid[r][c];
-                    fallInfo.emplace_back(m_grid[r][c], r, emptyRow, c);
-                    m_grid[r][c] = Gem(GemSubType::Generic, 0); 
-                }
+    for (int c = 0; c < m_width; ++c) {
+        int emptyRow = -1;
+        for (int r = m_height - 1; r >= 0; --r) {
+            if (!m_grid[r][c] && emptyRow == -1) {
+                emptyRow = r;
+            }
+            if (m_grid[r][c] && emptyRow != -1) {
+                m_grid[emptyRow][c] = std::move(m_grid[r][c]);
+                fallInfo.push_back({r, c, emptyRow});
+                m_grid[emptyRow][c]->setPosition(c * 64, emptyRow * 64);
                 emptyRow--;
             }
-        }
-
-        for (int r = emptyRow; r >= 0; --r) {
-            GemSubType newSubType = GemSubType::Generic;
-            if (!availableGemSubTypes.empty()) {
-                std::uniform_int_distribution<> distrib(0, availableGemSubTypes.size() - 1);
-                newSubType = availableGemSubTypes[distrib(gen)];
-            } else {
-                std::uniform_int_distribution<> distrib(1, 6);
-                newSubType = static_cast<GemSubType>(distrib(gen));
-            }
-            m_grid[r][c] = Gem(newSubType, 1);
-            fallInfo.emplace_back(m_grid[r][c], - (emptyRow - r + 1), r, c);
         }
     }
     return fallInfo;
 }
 
-std::vector<std::pair<sf::Vector2i, sf::Vector2i>> Board::findAllValidSwaps() const {
-    std::vector<std::pair<sf::Vector2i, sf::Vector2i>> validSwaps;
-    for (int r = 0; r < BOARD_HEIGHT; ++r) {
-        for (int c = 0; c < BOARD_WIDTH; ++c) {
-            // Swap right
-            if (c + 1 < BOARD_WIDTH) {
-                Board temp = *this;
-                temp.swapGems(r, c, r, c + 1);
-                if (temp.hasMatches()) validSwaps.push_back({{c, r}, {c + 1, r}});
-            }
-            // Swap down
-            if (r + 1 < BOARD_HEIGHT) {
-                Board temp = *this;
-                temp.swapGems(r, c, r + 1, c);
-                if (temp.hasMatches()) validSwaps.push_back({{c, r}, {c, r + 1}});
-            }
-        }
-    }
-    return validSwaps;
-}
-
-bool Board::hasMatches() {
-    return findMatches().size() > 0;
-}
-
-Gem Board::getRandomGem(const Player& player) {
+void Board::refill(const std::vector<GemSubType>& possibleGems) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    double skullChance = 0.1; 
-    std::bernoulli_distribution skull_dist(skullChance);
+    std::uniform_int_distribution<> distrib(0, possibleGems.size() - 1);
 
-    if (skull_dist(gen)) {
-        return Gem(GemSubType::Skull, 1);
-    } else {
-        const auto& manaTypes = player.getManaTypes();
-        if (manaTypes.empty()) {
-             // Fallback for player without attunement
-            const std::vector<GemSubType> defaultManaTypes = {
-                GemSubType::Fire, GemSubType::Water, GemSubType::Earth,
-                GemSubType::Air, GemSubType::Light, GemSubType::Umbral
-            };
-            std::uniform_int_distribution<> distrib(0, defaultManaTypes.size() - 1);
-            return Gem(defaultManaTypes[distrib(gen)], 1);
+    for (int r = 0; r < m_height; ++r) {
+        for (int c = 0; c < m_width; ++c) {
+            if (!m_grid[r][c]) {
+                GemSubType type = possibleGems[distrib(gen)];
+                m_grid[r][c] = m_gemFactory.createGem(type, gemTextures.at(type));
+                 if (m_grid[r][c]) {
+                    m_grid[r][c]->setPosition(c * 64, r * 64);
+                }
+            }
         }
-        std::uniform_int_distribution<> distrib(0, manaTypes.size() - 1);
-        return Gem(manaTypes[distrib(gen)], 1);
     }
 }

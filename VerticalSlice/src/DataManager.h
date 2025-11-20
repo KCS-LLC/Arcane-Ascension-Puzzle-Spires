@@ -1,5 +1,9 @@
+#ifndef DATAMANAGER_H
+#define DATAMANAGER_H
+
 #include "Structs.h"
 #include "Judgement.h"
+#include <SFML/Graphics/Font.hpp>
 
 // Forward declarations
 
@@ -24,18 +28,21 @@ public:
     const Floor& getFloor() const;
     const Room* getRoomById(int roomId) const;
     const std::vector<JudgementTrial>& getJudgementTrials() const;
-    const std::map<GemSubType, GemDefinition>& getGemDefinitions() const;
+    const sf::Font& getFont() const;
+
 
 private:
-    bool loadJudgementTrials(); // Declare this here
+    bool loadJudgementTrials();
+
     std::vector<Attunement> attunements;
     std::vector<Spell> spells;
     int monsterHP;
     int monsterSpeed;
     int monsterAttackDamage;
     std::string monsterName;
-    Floor currentFloor; // Add this missing member
-    std::vector<JudgementTrial> m_judgementTrials; // Add this missing member
-
-    std::map<GemSubType, GemDefinition> m_gemDefinitions;
+    Floor currentFloor;
+    std::vector<JudgementTrial> m_judgementTrials;
+    sf::Font m_font;
 };
+
+#endif // DATAMANAGER_H

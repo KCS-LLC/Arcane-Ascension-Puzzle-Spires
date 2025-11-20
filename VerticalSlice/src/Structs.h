@@ -36,10 +36,21 @@ struct Attunement {
     std::vector<GemSubType> mana_types;
 };
 
-struct GemDefinition {
+// New: Represents an entry from secondary_gem_types.json
+struct SecondaryGemTypeData {
     int id;
     std::string name;
-    GemSubType subType;
+    PrimaryGemType primaryType;
+    std::string category;
+    int oppositeId;
+};
+
+// New: Represents an entry from gems.json
+struct GemCatalogEntry {
+    int id; // Corresponds to GemSubType enum
+    std::string name;
+    int secondaryTypeId;
+    int level;
     std::string texturePath;
 };
 

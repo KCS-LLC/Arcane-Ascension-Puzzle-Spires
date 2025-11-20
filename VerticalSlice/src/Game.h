@@ -1,16 +1,17 @@
-#ifndef GAME_H
-#define GAME_H
+#pragma once
 
-#include "Gem.h" // Use the full Gem definition
+#include <SFML/Graphics.hpp>
 #include "Board.h"
+#include "DataManager.h"
 #include "Player.h"
 #include "Monster.h"
-#include "DataManager.h"
+#include "UIManager.h"
+#include "Constants.h"
+#include "GemFactory.h"
 #include "Structs.h"
-#include "Judgement.h"
 
-// Forward declarations
-class UIManager;
+// Forward-declaration of the global texture map
+extern std::map<GemSubType, sf::Texture> gemTextures;
 
 class Game {
 public:
@@ -19,65 +20,30 @@ public:
 
 private:
     void processEvents();
-    void update();
+    void update(sf::Time deltaTime);
     void render();
     void loadTextures();
-    void handleSwap(sf::Vector2i tile1, sf::Vector2i tile2);
-    void applyMatchConsequences(const std::vector<Gem>& matchResults);
-    void moveToRoom(int destinationRoomId);
-    void startNewCombat();
-    void initializeJudgement();
-    void startNextJudgementTrial();
+    void handleInput(sf::Event event);
+    void resolveMatches(const std::set<std::pair<int, int>>& matches);
+    void setupJudgementTrial(const JudgementTrial& trial);
 
-    sf::RenderWindow window;
-    Board board;
-    Player player;
-    Monster monster;
+    sf::RenderWindow m_window;
     DataManager dataManager;
-    std::unique_ptr<UIManager> uiManager;
-    std::map<GemSubType, sf::Texture> gemTextures;
+    Player m_player;
+    Monster m_monster;
+    UIManager m_uiManager;
+    GemFactory m_gemFactory;
+    Board m_board;
 
-    Floor currentFloor;
-    const Room* currentRoom;
-    std::vector<int> roomHistory;
-    std::set<int> visitedRoomIds;
-    std::set<int> clearedRoomIds;
-
-    // Game State
-    GameState currentState = GameState::Loading;
-    GameState m_preAnimationState;
-    sf::Clock animationClock;
-
-    // Judgement State
-    JudgementResults m_judgementResults;
+    GameState m_gameState;
+    
+    // Judgement trial state
+    std::vector<JudgementTrial> m_judgementTrials;
+    int m_currentTrialIndex;
     JudgementTrial m_currentJudgementTrial;
-    size_t m_currentJudgementTrialIndex = 0;
-    int m_currentScore = 0;
-    int m_currentAffinityScore = 0;
-    int m_currentTrialTurn = 0;
-    std::optional<PrimaryGemType> m_manaAffinityChoice;
-    std::vector<Gem> m_matchedGemsInTurn;
+    sf::Clock m_trialClock;
     sf::Clock m_pulseClock;
-    sf::Clock m_trialTimer;
-    std::vector<JudgementTrial> m_pendingJudgementTrials;
 
-    bool isAnimatingSwap;
-    bool isAnimatingDestruction;
-    bool isAnimatingRefill;
-    bool isReshuffling;
-    bool isRevertingInvalidSwap;
-    std::pair<sf::Vector2i, sf::Vector2i> animatingGems;
-    std::set<std::pair<int, int>> destroyingGems;
-    std::vector<Board::FallInfo> fallInfo;
-
-    std::optional<sf::Vector2i> selectedTile;
-    std::optional<sf::Vector2i> dragStartTile;
-
-    sf::Font font;
-    sf::Vector2f boardOrigin;
-
-    sf::Clock playerDamageClock;
-    bool showPlayerDamageEffect = false;
+    // Gem selection
+    sf::Vector2i m_selectedGem = sf::Vector2i(-1, -1);
 };
-
-#endif // GAME_H
