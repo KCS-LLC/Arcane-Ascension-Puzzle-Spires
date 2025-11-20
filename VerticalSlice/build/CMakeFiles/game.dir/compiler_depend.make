@@ -429,8 +429,11 @@ CMakeFiles/game.dir/src/DataManager.cpp.obj: CMakeFiles/game.dir/cmake_pch.hxx \
   C:/msys64/ucrt64/include/string.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/DataManager.cpp \
   C:/Users/renga/SteamGame/VerticalSlice/src/DataManager.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/Gem.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/GemSubType.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/Judgement.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/PCH.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/PrimaryGemType.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/SpireData.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/StringUtils.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/Structs.h \
@@ -458,6 +461,8 @@ CMakeFiles/game.dir/src/Game.cpp.obj: CMakeFiles/game.dir/cmake_pch.hxx \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/memory_resource.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/move.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/ptr_traits.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/bits/random.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/bits/random.tcc \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/range_access.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/refwrap.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/requires_hosted.h \
@@ -470,6 +475,7 @@ CMakeFiles/game.dir/src/Game.cpp.obj: CMakeFiles/game.dir/cmake_pch.hxx \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_iterator.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_iterator_base_types.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_numeric.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/bits/uniform_int_dist.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/utility.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/valarray_after.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/valarray_array.h \
@@ -511,6 +517,7 @@ CMakeFiles/game.dir/src/Game.cpp.obj: CMakeFiles/game.dir/cmake_pch.hxx \
   C:/msys64/ucrt64/include/c++/15.2.0/ostream \
   C:/msys64/ucrt64/include/c++/15.2.0/pstl/execution_defs.h \
   C:/msys64/ucrt64/include/c++/15.2.0/pstl/glue_numeric_defs.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/random \
   C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
   C:/msys64/ucrt64/include/c++/15.2.0/streambuf \
   C:/msys64/ucrt64/include/c++/15.2.0/string \
@@ -536,16 +543,24 @@ CMakeFiles/game.dir/src/Game.cpp.obj: CMakeFiles/game.dir/cmake_pch.hxx \
   C:/msys64/ucrt64/include/c++/15.2.0/vector \
   C:/msys64/ucrt64/include/c++/15.2.0/version \
   C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/c++config.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/opt_random.h \
   C:/msys64/ucrt64/include/crtdefs.h \
   C:/msys64/ucrt64/include/math.h \
   C:/msys64/ucrt64/include/sec_api/string_s.h \
   C:/msys64/ucrt64/include/string.h \
+  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/emmintrin.h \
+  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mm_malloc.h \
+  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mmintrin.h \
+  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mwaitintrin.h \
+  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/pmmintrin.h \
+  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/xmmintrin.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/Board.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/DataManager.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/Game.cpp \
   C:/Users/renga/SteamGame/VerticalSlice/src/Game.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/Gem.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/GemSubType.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/Judgement.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/Monster.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/PCH.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/Player.h \
@@ -666,10 +681,13 @@ CMakeFiles/game.dir/src/Player.cpp.obj: CMakeFiles/game.dir/cmake_pch.hxx \
   C:/msys64/ucrt64/include/sec_api/string_s.h \
   C:/msys64/ucrt64/include/string.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/DataManager.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/Gem.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/GemSubType.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/Judgement.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/PCH.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/Player.cpp \
   C:/Users/renga/SteamGame/VerticalSlice/src/Player.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/PrimaryGemType.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/SpireData.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/Structs.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/json.hpp
@@ -780,6 +798,7 @@ CMakeFiles/game.dir/src/StringUtils.cpp.obj: CMakeFiles/game.dir/cmake_pch.hxx \
   C:/msys64/ucrt64/include/string.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/GemSubType.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/PCH.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/PrimaryGemType.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/SpireData.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/StringUtils.cpp \
   C:/Users/renga/SteamGame/VerticalSlice/src/StringUtils.h \
@@ -891,10 +910,13 @@ CMakeFiles/game.dir/src/UIManager.cpp.obj: CMakeFiles/game.dir/cmake_pch.hxx \
   C:/msys64/ucrt64/include/sec_api/string_s.h \
   C:/msys64/ucrt64/include/string.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/DataManager.h \
-  C:/Users/renga/SteamGame/VerticalSlice/src/GemType.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/Gem.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/GemSubType.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/Judgement.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/Monster.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/PCH.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/Player.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/PrimaryGemType.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/SpireData.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/StringUtils.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/Structs.h \
@@ -1009,10 +1031,13 @@ CMakeFiles/game.dir/src/main.cpp.obj: CMakeFiles/game.dir/cmake_pch.hxx \
   C:/Users/renga/SteamGame/VerticalSlice/src/Board.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/DataManager.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/Game.h \
-  C:/Users/renga/SteamGame/VerticalSlice/src/GemType.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/Gem.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/GemSubType.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/Judgement.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/Monster.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/PCH.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/Player.h \
+  C:/Users/renga/SteamGame/VerticalSlice/src/PrimaryGemType.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/SpireData.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/Structs.h \
   C:/Users/renga/SteamGame/VerticalSlice/src/UIManager.h \
@@ -1024,8 +1049,6 @@ C:/Users/renga/SteamGame/VerticalSlice/src/main.cpp:
 
 C:/Users/renga/SteamGame/VerticalSlice/src/UIManager.cpp:
 
-C:/Users/renga/SteamGame/VerticalSlice/src/GemType.h:
-
 C:/Users/renga/SteamGame/VerticalSlice/src/Monster.cpp:
 
 C:/Users/renga/SteamGame/VerticalSlice/src/UIManager.h:
@@ -1036,11 +1059,23 @@ C:/Users/renga/SteamGame/VerticalSlice/src/Game.h:
 
 C:/Users/renga/SteamGame/VerticalSlice/src/Game.cpp:
 
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/pmmintrin.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mwaitintrin.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mmintrin.h:
+
+C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/opt_random.h:
+
+C:/msys64/ucrt64/include/c++/15.2.0/bits/random.h:
+
 C:/Users/renga/SteamGame/VerticalSlice/src/json.hpp:
 
 C:/Users/renga/SteamGame/VerticalSlice/src/StringUtils.h:
 
 C:/Users/renga/SteamGame/VerticalSlice/src/SpireData.h:
+
+C:/Users/renga/SteamGame/VerticalSlice/src/Judgement.h:
 
 C:/Users/renga/SteamGame/VerticalSlice/src/DataManager.h:
 
@@ -1298,6 +1333,8 @@ C:/msys64/ucrt64/include/assert.h:
 
 C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_facets_nonio.h:
 
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/emmintrin.h:
+
 C:/msys64/ucrt64/include/c++/15.2.0/bits/erase_if.h:
 
 C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator_args.h:
@@ -1402,6 +1439,8 @@ C:/SFML-3.0.2-mingw/include/SFML/Graphics/Shape.hpp:
 
 C:/SFML-3.0.2-mingw/include/SFML/Graphics/ConvexShape.hpp:
 
+C:/msys64/ucrt64/include/c++/15.2.0/random:
+
 C:/SFML-3.0.2-mingw/include/SFML/System/Time.inl:
 
 C:/msys64/ucrt64/include/pthread.h:
@@ -1501,6 +1540,8 @@ C:/msys64/ucrt64/include/c++/15.2.0/bits/istream.tcc:
 C:/msys64/ucrt64/include/sys/types.h:
 
 C:/msys64/ucrt64/include/c++/15.2.0/sstream:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/xmmintrin.h:
 
 C:/SFML-3.0.2-mingw/include/SFML/Graphics/Rect.hpp:
 
@@ -1619,6 +1660,8 @@ C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_raw_storage_iter.h:
 C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_tempbuf.h:
 
 C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_vector.h:
+
+C:/msys64/ucrt64/include/c++/15.2.0/bits/random.tcc:
 
 C:/msys64/ucrt64/include/c++/15.2.0/bits/uniform_int_dist.h:
 

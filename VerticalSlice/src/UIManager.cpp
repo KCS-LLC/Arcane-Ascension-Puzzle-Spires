@@ -87,6 +87,49 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     boardFrame.setOutlineColor(sf::Color(80, 80, 80));
     boardFrame.setOutlineThickness(2.f);
 
+    // --- Judgement Trial UI Setup ---
+    float trialUiY = rightPanel.getPosition().y + 20;
+    trialTypeText.setPosition({rightPanel.getPosition().x + 20, trialUiY});
+    trialTypeText.setCharacterSize(24);
+    trialTypeText.setFillColor(sf::Color::White);
+
+    trialUiY += 40;
+    turnLimitText.setPosition({rightPanel.getPosition().x + 20, trialUiY});
+    turnLimitText.setCharacterSize(20);
+    turnLimitText.setFillColor(sf::Color::White);
+
+    trialUiY += 30;
+    scoreGoalText.setPosition({rightPanel.getPosition().x + 20, trialUiY});
+    scoreGoalText.setCharacterSize(20);
+    scoreGoalText.setFillColor(sf::Color::White);
+
+    trialUiY += 30;
+    currentTrialScoreText.setPosition({rightPanel.getPosition().x + 20, trialUiY});
+    currentTrialScoreText.setCharacterSize(20);
+    currentTrialScoreText.setFillColor(sf::Color::White);
+    
+    trialUiY += 40;
+    manaAffinityPromptText.setPosition({rightPanel.getPosition().x + 20, trialUiY});
+    manaAffinityPromptText.setCharacterSize(20);
+    manaAffinityPromptText.setFillColor(sf::Color::Yellow);
+
+    trialUiY += 30;
+    manaAffinityChoiceText.setPosition({rightPanel.getPosition().x + 20, trialUiY});
+    manaAffinityChoiceText.setCharacterSize(20);
+    manaAffinityChoiceText.setFillColor(sf::Color::Cyan);
+
+    // --- Judgement Summary UI ---
+    judgementSummaryTitle.setString("Judgement Complete");
+    judgementSummaryTitle.setCharacterSize(36);
+    judgementSummaryTitle.setFillColor(sf::Color::White);
+    textRect = judgementSummaryTitle.getLocalBounds();
+    judgementSummaryTitle.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
+    judgementSummaryTitle.setPosition({(float)windowSize.x / 2.0f, 100.f});
+
+    judgementResultsText.setCharacterSize(24);
+    judgementResultsText.setFillColor(sf::Color::White);
+    judgementResultsText.setPosition({(float)windowSize.x / 2.0f - 250, 200.f});
+
     // --- Titles ---
     playerPanelTitle.setFont(font);
     playerPanelTitle.setString("Player");
@@ -201,7 +244,7 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     setupPlaceholderTitle(magicTitle, "Magic Challenge\n(Click to continue)");
 }
 
-void UIManager::update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice) {
+void UIManager::update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const JudgementResults& results) {
     // Common updates for all states where the main UI elements are visible
     // ... (existing update logic)
 
@@ -216,22 +259,39 @@ void UIManager::update(const Player& player, const Monster& monster, GameState c
             case JudgementTrialType::ManaAffinity: trialTypeStr = "Mana Affinity Trial"; break;
             default: trialTypeStr = "Unknown Trial"; break;
         }
-        trialTypeText.setString("Trial Type: " + trialTypeStr);
+        trialTypeText.setString("Trial: " + trialTypeStr);
         turnLimitText.setString("Turns Left: " + std::to_string(currentTrial.turnLimit - currentTrialTurn));
         scoreGoalText.setString("Score Goal: " + std::to_string(currentTrial.scoreGoal));
 
         if (currentState == GameState::Judgement_TacticalTrial) {
-            currentTrialScoreText.setString("Current Score: " + std::to_string(currentScore));
+            currentTrialScoreText.setString("Score: " + std::to_string(currentScore));
         } else if (currentState == GameState::Judgement_ManaAffinityTrial) {
             if (manaAffinityChoice.has_value()) {
-                manaAffinityPromptText.setString("Affinity: " + primaryGemTypeToString(manaAffinityChoice.value()));
-                manaAffinityChoiceText.setString("Matched: " + std::to_string(currentScore)); // For mana affinity, currentScore tracks matched gems
+                manaAffinityPromptText.setString("Affinity: Mana");
+                manaAffinityChoiceText.setString("Matched: " + std::to_string(currentScore));
             } else {
                 manaAffinityPromptText.setString("Choose your Mana Affinity!");
                 manaAffinityChoiceText.setString("");
             }
         }
+    } else if (currentState == GameState::Judgement_Summary) {
+        std::string summary;
+        for(const auto& pair : results.trialScores) {
+            std::string typeStr;
+            switch (pair.first) {
+                case JudgementTrialType::Tactical: typeStr = "Tactical"; break;
+                case JudgementTrialType::Power: typeStr = "Power"; break;
+                case JudgementTrialType::Haste: typeStr = "Haste"; break;
+                case JudgementTrialType::Control: typeStr = "Control"; break;
+                case JudgementTrialType::ManaAffinity: typeStr = "Mana Affinity"; break;
+                default: typeStr = "Unknown"; break;
+            }
+            summary += typeStr + " Score: " + std::to_string(pair.second) + "\n";
+        }
+        summary += "\nClick to continue...";
+        judgementResultsText.setString(summary);
     }
+
     if (currentState == GameState::Judgement_Intro) {
         // No dynamic updates needed on the Judgement screen yet
         return;
@@ -405,11 +465,12 @@ void UIManager::render(sf::RenderWindow& window, GameState currentState, bool sh
             window.draw(trialTypeText);
             window.draw(turnLimitText);
             window.draw(scoreGoalText);
-            window.draw(currentTrialScoreText);
+            
             if (currentState == GameState::Judgement_ManaAffinityTrial) {
                 window.draw(manaAffinityPromptText);
                 window.draw(manaAffinityChoiceText);
-                // Potentially draw a highlight on the chosen mana affinity gem if needed
+            } else {
+                window.draw(currentTrialScoreText);
             }
             break;
         case GameState::Judgement_Summary:
@@ -473,6 +534,9 @@ bool UIManager::handleEvent(const sf::Event& event, GameState currentState, cons
                         return true;
                     }
                 }
+            } else if (currentState == GameState::Judgement_Summary) {
+                outAction = {UIActionType::JudgementComplete};
+                return true;
             }
 
             if (currentState == GameState::Playing) {

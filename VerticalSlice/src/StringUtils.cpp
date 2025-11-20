@@ -98,3 +98,26 @@ std::string primaryGemTypeToString(PrimaryGemType type) {
         default: return "Unknown";
     }
 }
+
+std::string gemSubtypeToString(GemSubType type) {
+    switch (type) {
+        case GemSubType::Fire: return "Fire";
+        case GemSubType::Water: return "Water";
+        case GemSubType::Earth: return "Earth";
+        case GemSubType::Air: return "Air";
+        case GemSubType::Light: return "Light";
+        case GemSubType::Umbral: return "Umbral";
+        case GemSubType::Life: return "Life";
+        case GemSubType::Death: return "Death";
+        case GemSubType::Mental: return "Mental";
+        case GemSubType::Perception: return "Perception";
+        case GemSubType::Transference: return "Transference";
+        case GemSubType::Enhancement: return "Enhancement";
+        case GemSubType::Raw: return "Raw";
+        case GemSubType::Sword: return "Sword";
+        case GemSubType::Coin: return "Coin";
+        case GemSubType::Skull: return "Skull";
+        case GemSubType::Generic: return "Generic";
+        default: return "Unknown";
+    }
+}

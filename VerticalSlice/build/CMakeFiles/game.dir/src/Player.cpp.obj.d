@@ -4,6 +4,12 @@ CMakeFiles/game.dir/src/Player.cpp.obj: \
  C:\Users\renga\SteamGame\VerticalSlice\src\Player.h \
  C:\Users\renga\SteamGame\VerticalSlice\src\GemSubType.h \
  C:\Users\renga\SteamGame\VerticalSlice\src\Structs.h \
+ C:\Users\renga\SteamGame\VerticalSlice\src\Judgement.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/string \
+ C:/msys64/ucrt64/include/c++/15.2.0/vector \
+ C:/msys64/ucrt64/include/c++/15.2.0/map \
+ C:\Users\renga\SteamGame\VerticalSlice\src\Gem.h \
+ C:\Users\renga\SteamGame\VerticalSlice\src\PrimaryGemType.h \
  C:\Users\renga\SteamGame\VerticalSlice\src\DataManager.h \
  C:\Users\renga\SteamGame\VerticalSlice\src\SpireData.h \
  C:\Users\renga\SteamGame\VerticalSlice\src\json.hpp \
@@ -22,7 +28,6 @@ CMakeFiles/game.dir/src/Player.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/typeinfo \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/functexcept.h \
  C:/msys64/ucrt64/include/c++/15.2.0/unordered_map \
- C:/msys64/ucrt64/include/c++/15.2.0/vector \
  C:/msys64/ucrt64/include/c++/15.2.0/array \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_algobase.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/version.h \
@@ -30,7 +35,6 @@ CMakeFiles/game.dir/src/Player.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/iosfwd \
  C:/msys64/ucrt64/include/c++/15.2.0/iterator \
  C:/msys64/ucrt64/include/c++/15.2.0/memory \
- C:/msys64/ucrt64/include/c++/15.2.0/string \
  C:/msys64/ucrt64/include/c++/15.2.0/utility \
  C:/msys64/ucrt64/include/c++/15.2.0/forward_list \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/requires_hosted.h \
@@ -46,7 +50,6 @@ CMakeFiles/game.dir/src/Player.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/range_access.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/forward_list.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/memory_resource.h \
- C:/msys64/ucrt64/include/c++/15.2.0/map \
  C:/msys64/ucrt64/include/c++/15.2.0/valarray \
  C:/msys64/ucrt64/include/c++/15.2.0/cmath \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/cpp_type_traits.h \

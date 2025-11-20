@@ -3,6 +3,7 @@ CMakeFiles/game.dir/src/StringUtils.cpp.obj: \
  C:\Users\renga\SteamGame\VerticalSlice\src\PCH.h \
  C:\Users\renga\SteamGame\VerticalSlice\src\StringUtils.h \
  C:\Users\renga\SteamGame\VerticalSlice\src\GemSubType.h \
+ C:\Users\renga\SteamGame\VerticalSlice\src\PrimaryGemType.h \
  C:\Users\renga\SteamGame\VerticalSlice\src\SpireData.h \
  C:\Users\renga\SteamGame\VerticalSlice\src\json.hpp \
  C:/msys64/ucrt64/include/c++/15.2.0/algorithm \
