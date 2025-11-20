@@ -1,0 +1,10 @@
+[
+  { "id": 1, "name": "Attack" },
+  { "id": 2, "name": "Mana" },
+  { "id": 3, "name": "Treasure" },
+  { "id": 4, "name": "Ability" },
+  { "id": 5, "name": "Trap" },
+  { "id": 6, "name": "Target" },
+  { "id": 7, "name": "Goal" },
+  { "id": 8, "name": "Special" }
+]

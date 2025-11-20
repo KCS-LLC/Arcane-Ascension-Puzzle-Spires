@@ -1,0 +1,24 @@
+[
+  // Attack Subtypes (Primary Type ID: 1)
+  { "id": 1001, "name": "Skull", "primaryTypeId": 1, "category": "Physical", "oppositeId": null },
+  { "id": 1002, "name": "Sword", "primaryTypeId": 1, "category": "Physical", "oppositeId": null },
+
+  // Mana Subtypes (Primary Type ID: 2)
+  { "id": 2001, "name": "Fire", "primaryTypeId": 2, "category": "Elemental", "oppositeId": 2002 },
+  { "id": 2002, "name": "Water", "primaryTypeId": 2, "category": "Elemental", "oppositeId": 2001 },
+  { "id": 2003, "name": "Earth", "primaryTypeId": 2, "category": "Elemental", "oppositeId": 2004 },
+  { "id": 2004, "name": "Air", "primaryTypeId": 2, "category": "Elemental", "oppositeId": 2003 },
+  { "id": 2005, "name": "Light", "primaryTypeId": 2, "category": "Spiritual", "oppositeId": 2006 },
+  { "id": 2006, "name": "Umbral", "primaryTypeId": 2, "category": "Spiritual", "oppositeId": 2005 },
+  { "id": 2007, "name": "Life", "primaryTypeId": 2, "category": "Spiritual", "oppositeId": 2008 },
+  { "id": 2008, "name": "Death", "primaryTypeId": 2, "category": "Spiritual", "oppositeId": 2007 },
+  { "id": 2009, "name": "Mental", "primaryTypeId": 2, "category": "Mental", "oppositeId": 2010 },
+  { "id": 2010, "name": "Perception", "primaryTypeId": 2, "category": "Mental", "oppositeId": 2009 },
+  { "id": 2011, "name": "Transference", "primaryTypeId": 2, "category": "Support", "oppositeId": 2012 },
+  { "id": 2012, "name": "Enhancement", "primaryTypeId": 2, "category": "Support", "oppositeId": 2011 },
+  { "id": 2013, "name": "Raw", "primaryTypeId": 2, "category": "Primal", "oppositeId": null },
+  { "id": 2014, "name": "Grey", "primaryTypeId": 2, "category": "Gray", "oppositeId": null },
+
+  // Treasure Subtypes (Primary Type ID: 3)
+  { "id": 3001, "name": "Coin", "primaryTypeId": 3, "category": "Currency", "oppositeId": null }
+]

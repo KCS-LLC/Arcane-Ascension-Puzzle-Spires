@@ -1,0 +1,21 @@
+[
+  { "id": 0, "name": "Empty Gem", "secondaryTypeId": null, "level": 1, "texturePath": null },
+  { "id": 1, "name": "Generic Gem", "secondaryTypeId": null, "level": 1, "texturePath": null },
+  { "id": 2, "name": "Fire Gem", "secondaryTypeId": 2001, "level": 1, "texturePath": "assets/gem_fire.png" },
+  { "id": 3, "name": "Water Gem", "secondaryTypeId": 2002, "level": 1, "texturePath": "assets/gem_water.png" },
+  { "id": 4, "name": "Earth Gem", "secondaryTypeId": 2003, "level": 1, "texturePath": "assets/gem_earth.png" },
+  { "id": 5, "name": "Air Gem", "secondaryTypeId": 2004, "level": 1, "texturePath": "assets/gem_air.png" },
+  { "id": 6, "name": "Light Gem", "secondaryTypeId": 2005, "level": 1, "texturePath": "assets/gem_light.png" },
+  { "id": 7, "name": "Umbral Gem", "secondaryTypeId": 2006, "level": 1, "texturePath": "assets/gem_umbral.png" },
+  { "id": 8, "name": "Enhancement Gem", "secondaryTypeId": 2012, "level": 1, "texturePath": "assets/gem_enhancement.png" },
+  { "id": 9, "name": "Perception Gem", "secondaryTypeId": 2010, "level": 1, "texturePath": "assets/gem_perception.png" },
+  { "id": 10, "name": "Transference Gem", "secondaryTypeId": 2011, "level": 1, "texturePath": "assets/gem_transference.png" },
+  { "id": 11, "name": "Life Gem", "secondaryTypeId": 2007, "level": 1, "texturePath": "assets/gem_life.png" },
+  { "id": 12, "name": "Death Gem", "secondaryTypeId": 2008, "level": 1, "texturePath": "assets/gem_death.png" },
+  { "id": 13, "name": "Mental Gem", "secondaryTypeId": 2009, "level": 1, "texturePath": "assets/gem_mental.png" },
+  { "id": 14, "name": "Raw Gem", "secondaryTypeId": 2013, "level": 1, "texturePath": null },
+  { "id": 15, "name": "Skull Gem", "secondaryTypeId": 1001, "level": 1, "texturePath": "assets/fist.png" },
+  { "id": 16, "name": "Sword Gem", "secondaryTypeId": 1002, "level": 1, "texturePath": null },
+  { "id": 17, "name": "Coin Gem", "secondaryTypeId": 3001, "level": 1, "texturePath": "assets/gem_coin.png" },
+  { "id": 18, "name": "Grey Gem", "secondaryTypeId": 2014, "level": 1, "texturePath": null }
+]
