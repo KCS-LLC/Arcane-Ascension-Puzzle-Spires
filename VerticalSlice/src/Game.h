@@ -7,6 +7,7 @@
 #include "Monster.h"
 #include "DataManager.h"
 #include "SpireData.h"
+#include "Judgement.h"
 
 // Forward declarations
 class UIManager;
@@ -25,6 +26,8 @@ private:
     void applyMatchConsequences(const std::vector<Gem>& matchResults);
     void moveToRoom(int destinationRoomId);
     void startNewCombat();
+    void initializeJudgement();
+    void startNextJudgementTrial();
 
     sf::RenderWindow window;
     Board board;
@@ -43,6 +46,12 @@ private:
     // Game State
     GameState currentState;
     sf::Clock animationClock;
+
+    // Judgement State
+    JudgementResults m_judgementResults;
+    std::vector<JudgementTrial> m_pendingJudgementTrials;
+    JudgementTrial m_currentJudgementTrial;
+    int m_currentTrialTurn = 0;
 
     bool isAnimatingSwap;
     bool isAnimatingDestruction;

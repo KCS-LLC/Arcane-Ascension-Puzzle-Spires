@@ -3,10 +3,10 @@
 #include "Board.h"
 #include "Player.h"
 #include "Monster.h"
-#include "DataManager.h"
 #include "UIManager.h"
 #include "SpireData.h"
 #include "StringUtils.h"
+#include <random>
 
 // Constants for the turn-based speed system
 const int MATCH_SPEED_COST = 30;
@@ -23,8 +23,6 @@ Game::Game()
       player(100, {}), 
 
       monster(0, 0),
-
-      currentState(GameState::Judgement_Intro),
 
       isAnimatingSwap(false),
 
@@ -95,7 +93,9 @@ Game::Game()
     loadTextures();
 
     uiManager->setup(player, window.getSize(), boardOrigin, dataManager.getAttunements());
-
+    
+    initializeJudgement();
+    startNextJudgementTrial();
 }
 
 
@@ -958,10 +958,66 @@ void Game::moveToRoom(int destinationRoomId) {
 
         }
 
-    } else {
+        } else {
 
-        std::cerr << "Error: Tried to move to a non-existent room ID: " << destinationRoomId << std::endl;
+            std::cerr << "Error: Tried to move to a non-existent room ID: " << destinationRoomId << std::endl;
+
+        }
 
     }
 
-}
+    
+
+    void Game::initializeJudgement() {
+
+        m_pendingJudgementTrials = dataManager.getJudgementTrials();
+
+        // Use a random device and a seeded generator for shuffling
+
+        std::random_device rd;
+
+        std::mt19937 g(rd());
+
+            std::shuffle(m_pendingJudgementTrials.begin(), m_pendingJudgementTrials.end(), g);
+
+        }
+
+        
+
+        void Game::startNextJudgementTrial() {
+
+            if (m_pendingJudgementTrials.empty()) {
+
+                currentState = GameState::Judgement_Summary;
+
+                std::cout << "All Judgement trials completed." << std::endl;
+
+                return;
+
+            }
+
+        
+
+            m_currentJudgementTrial = m_pendingJudgementTrials.back();
+
+            m_pendingJudgementTrials.pop_back();
+
+        
+
+            m_currentTrialTurn = 0;
+
+        
+
+            // TODO: Load the board layout from m_currentJudgementTrial.boardLayoutFile
+
+            // For now, just initialize a standard board.
+
+            board.initialize(player); 
+
+        
+
+            currentState = GameState::Judgement_TacticalTrial;
+
+            std::cout << "Starting Judgement Trial: " << m_currentJudgementTrial.boardLayoutFile << std::endl;
+
+        }
