@@ -1,0 +1,20 @@
+[
+  { "id": 0, "name": "Empty", "subType": "Empty" },
+  { "id": 1, "name": "Generic", "subType": "Generic" },
+  { "id": 2, "name": "Fire", "subType": "Fire", "texturePath": "assets/gem_fire.png" },
+  { "id": 3, "name": "Water", "subType": "Water", "texturePath": "assets/gem_water.png" },
+  { "id": 4, "name": "Earth", "subType": "Earth", "texturePath": "assets/gem_earth.png" },
+  { "id": 5, "name": "Air", "subType": "Air", "texturePath": "assets/gem_air.png" },
+  { "id": 6, "name": "Light", "subType": "Light", "texturePath": "assets/gem_light.png" },
+  { "id": 7, "name": "Umbral", "subType": "Umbral", "texturePath": "assets/gem_umbral.png" },
+  { "id": 8, "name": "Enhancement", "subType": "Enhancement", "texturePath": "assets/gem_enhancement.png" },
+  { "id": 9, "name": "Perception", "subType": "Perception", "texturePath": "assets/gem_perception.png" },
+  { "id": 10, "name": "Transference", "subType": "Transference", "texturePath": "assets/gem_transference.png" },
+  { "id": 11, "name": "Life", "subType": "Life", "texturePath": "assets/gem_life.png" },
+  { "id": 12, "name": "Death", "subType": "Death", "texturePath": "assets/gem_death.png" },
+  { "id": 13, "name": "Mental", "subType": "Mental", "texturePath": "assets/gem_mental.png" },
+  { "id": 14, "name": "Raw", "subType": "Raw" },
+  { "id": 15, "name": "Skull", "subType": "Skull", "texturePath": "assets/fist.png" },
+  { "id": 16, "name": "Sword", "subType": "Sword" },
+  { "id": 17, "name": "Coin", "subType": "Coin", "texturePath": "assets/gem_coin.png" }
+]

@@ -79,13 +79,27 @@ sf::Color doorColorToSfColor(DoorColor color) {
 }
 
 GemSubType stringToGemSubType(const std::string& s) {
-    if (s == "Fire") return GemSubType::Fire;
-    if (s == "Water") return GemSubType::Water;
-    if (s == "Earth") return GemSubType::Earth;
-    if (s == "Air") return GemSubType::Air;
-    if (s == "Light") return GemSubType::Light;
-    if (s == "Umbral") return GemSubType::Umbral;
-    if (s == "Skull") return GemSubType::Skull;
+    std::string lower_s = s;
+    std::transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+
+    if (lower_s == "fire") return GemSubType::Fire;
+    if (lower_s == "water") return GemSubType::Water;
+    if (lower_s == "earth") return GemSubType::Earth;
+    if (lower_s == "air") return GemSubType::Air;
+    if (lower_s == "light") return GemSubType::Light;
+    if (lower_s == "umbral") return GemSubType::Umbral;
+    if (lower_s == "skull") return GemSubType::Skull;
+    if (lower_s == "enhancement") return GemSubType::Enhancement;
+    if (lower_s == "perception") return GemSubType::Perception;
+    if (lower_s == "transference") return GemSubType::Transference;
+    if (lower_s == "life") return GemSubType::Life;
+    if (lower_s == "death") return GemSubType::Death;
+    if (lower_s == "mental") return GemSubType::Mental;
+    if (lower_s == "raw") return GemSubType::Raw;
+    if (lower_s == "sword") return GemSubType::Sword;
+    if (lower_s == "coin") return GemSubType::Coin;
+    if (lower_s == "empty") return GemSubType::Empty;
+    if (lower_s == "generic") return GemSubType::Generic;
     return GemSubType::Generic;
 }
 

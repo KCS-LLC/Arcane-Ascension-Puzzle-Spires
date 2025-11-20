@@ -51,20 +51,14 @@ Game::Game()
 }
 
 void Game::loadTextures() {
-    gemTextures[GemSubType::Fire].loadFromFile("assets/gem_fire.png");
-    gemTextures[GemSubType::Water].loadFromFile("assets/gem_water.png");
-    gemTextures[GemSubType::Earth].loadFromFile("assets/gem_earth.png");
-    gemTextures[GemSubType::Light].loadFromFile("assets/gem_light.png");
-    gemTextures[GemSubType::Skull].loadFromFile("assets/fist.png");
-    gemTextures[GemSubType::Air].loadFromFile("assets/gem_air.png");
-    gemTextures[GemSubType::Umbral].loadFromFile("assets/gem_umbral.png");
-    gemTextures[GemSubType::Life].loadFromFile("assets/gem_life.png");
-    gemTextures[GemSubType::Death].loadFromFile("assets/gem_death.png");
-    gemTextures[GemSubType::Mental].loadFromFile("assets/gem_mental.png");
-    gemTextures[GemSubType::Perception].loadFromFile("assets/gem_perception.png");
-    gemTextures[GemSubType::Transference].loadFromFile("assets/gem_transference.png");
-    gemTextures[GemSubType::Enhancement].loadFromFile("assets/gem_enhancement.png");
-    gemTextures[GemSubType::Coin].loadFromFile("assets/gem_coin.png");
+    for (const auto& pair : dataManager.getGemDefinitions()) {
+        const GemDefinition& gemDef = pair.second;
+        if (!gemDef.texturePath.empty()) {
+            if (!gemTextures[gemDef.subType].loadFromFile(gemDef.texturePath)) {
+                std::cerr << "Error loading texture for gem: " << gemDef.name << " from " << gemDef.texturePath << std::endl;
+            }
+        }
+    }
 }
 
 void Game::run() {
