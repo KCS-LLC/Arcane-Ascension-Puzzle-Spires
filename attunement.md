@@ -33,6 +33,48 @@ Consistently using a specific mana type disproportionately can lead to an Attune
 
 These Attunements are granted by the Serpent Spire and form the initial set of classes available to players. Their abilities focus on creating unique **Static Effect Tiles** or, in the case of Shapers and Enchanters, directly manipulating the board's special tiles.
 
+## 3. Mana Types and Opposites
+
+This section details the various mana types, their categories, and their opposing elements, which are crucial for understanding combat mechanics and spell interactions. The IDs refer to the `GemSubType` enum in the codebase.
+
+### Elemental Mana Types
+
+| Mana Type (GemSubType ID) | Category   | Opposite Mana Type (ID) |
+| :------------------------ | :--------- | :---------------------- |
+| Fire (2)                  | Elemental  | Water (3)               |
+| Water (3)                 | Elemental  | Fire (2)                |
+| Earth (4)                 | Elemental  | Air (5)                 |
+| Air (5)                   | Elemental  | Earth (4)               |
+
+### Spiritual Mana Types
+
+| Mana Type (GemSubType ID) | Category  | Opposite Mana Type (ID) |
+| :------------------------ | :-------- | :---------------------- |
+| Light (6)                 | Spiritual | Umbral (7)              |
+| Umbral (7)                | Spiritual | Light (6)               |
+| Life (11)                 | Spiritual | Death (12)              |
+| Death (12)                | Spiritual | Life (11)               |
+
+### Mental Mana Types
+
+| Mana Type (GemSubType ID) | Category | Opposite Mana Type (ID) |
+| :------------------------ | :------- | :---------------------- |
+| Mental (13)               | Mental   | Perception (9)          |
+| Perception (9)            | Mental   | Mental (13)             |
+
+### Support Mana Types
+
+| Mana Type (GemSubType ID) | Category | Opposite Mana Type (ID) |
+| :------------------------ | :------- | :---------------------- |
+| Transference (10)         | Support  | Enhancement (8)         |
+| Enhancement (8)           | Support  | Transference (10)       |
+
+### Special Mana Types
+
+| Mana Type (GemSubType ID) | Category | Opposite Mana Type (ID) |
+| :------------------------ | :------- | :---------------------- |
+| Grey (18)                 | Gray     | None                    |
+
 ### 2.1. Diviner
 *   **Primary Mana Types:** Mental, Perception
 *   **Focus:** Board manipulation, enemy debuffs, information gathering.
