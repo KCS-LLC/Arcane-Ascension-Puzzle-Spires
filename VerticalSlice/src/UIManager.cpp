@@ -3,8 +3,8 @@
 #include "Player.h"
 #include "Monster.h"
 #include "DataManager.h"
-#include "SpireData.h"
 #include "Structs.h"
+#include "Constants.h"
 #include "StringUtils.h"
 #include "Gem.h"
 

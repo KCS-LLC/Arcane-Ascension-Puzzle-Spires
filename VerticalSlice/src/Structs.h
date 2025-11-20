@@ -1,11 +1,18 @@
 #pragma once
 
+#include <string>
+#include <vector>
 #include "GemSubType.h"
-#include "json.hpp"
-#include "StringUtils.h"
+#include "PrimaryGemType.h"
 
+// --- Enums ---
 enum class EffectType { Damage, Heal, Stun, Shield };
 enum class TargetType { Player, Monster };
+enum class RoomType { Entrance, Combat, Treasure, Boss, Sanctuary, Special, Puzzle, Trap, AgilityChallenge, EnduranceChallenge, MagicChallenge, Unknown };
+enum class DoorColor { Red, Orange, Yellow, Green, Blue, Indigo, Violet, Copper, Silver, Gold, White, Unknown };
+
+
+// --- Data Structures ---
 
 struct Effect {
     EffectType type;
@@ -36,18 +43,28 @@ struct GemDefinition {
     std::string texturePath;
 };
 
-inline void from_json(const nlohmann::json& j, GemDefinition& gd) {
-    j.at("id").get_to(gd.id);
-    j.at("name").get_to(gd.name);
-    gd.subType = stringToGemSubType(j.at("subType").get<std::string>());
-    if (j.contains("texturePath")) {
-        j.at("texturePath").get_to(gd.texturePath);
-    }
-}
-
 struct MonsterData {
     std::string name;
     int hp;
     int speed;
     int attack;
+};
+
+struct Teleporter {
+    DoorColor color;
+    int destinationRoomId;
+};
+
+struct Room {
+    int id;
+    std::string name;
+    RoomType type;
+    std::string monsterId;
+    std::vector<Teleporter> connections;
+};
+
+struct Floor {
+    int floorNumber;
+    std::vector<Room> rooms;
+    int startRoomId;
 };

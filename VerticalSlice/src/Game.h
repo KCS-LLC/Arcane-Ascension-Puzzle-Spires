@@ -6,7 +6,7 @@
 #include "Player.h"
 #include "Monster.h"
 #include "DataManager.h"
-#include "SpireData.h"
+#include "Structs.h"
 #include "Judgement.h"
 
 // Forward declarations

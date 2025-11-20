@@ -1,9 +1,42 @@
 #include "PCH.h"
 #include "StringUtils.h"
-#include "SpireData.h"
 #include "Structs.h"
+#include <algorithm>
+#include <sstream>
 
-// ... (existing string conversion functions) ...
+std::string gemSubTypeToString(GemSubType type) {
+    // This function will need to be updated with all gem types
+    switch (type) {
+        case GemSubType::Fire: return "fire";
+        case GemSubType::Water: return "water";
+        // ... other gem types
+        default: return "unknown";
+    }
+}
+
+GemSubType stringToGemSubType(const std::string& s) {
+    std::string lower_s = s;
+    std::transform(lower_s.begin(), lower_s.end(), lower_s.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+
+    if (lower_s == "fire") return GemSubType::Fire;
+    if (lower_s == "water") return GemSubType::Water;
+    if (lower_s == "earth") return GemSubType::Earth;
+    if (lower_s == "air") return GemSubType::Air;
+    if (lower_s == "light") return GemSubType::Light;
+    if (lower_s == "life") return GemSubType::Life;
+    if (lower_s == "enhancement") return GemSubType::Enhancement;
+    if (lower_s == "transference") return GemSubType::Transference;
+    if (lower_s == "death") return GemSubType::Death;
+    if (lower_s == "umbral") return GemSubType::Umbral;
+    if (lower_s == "mental") return GemSubType::Mental;
+    if (lower_s == "perception") return GemSubType::Perception;
+    if (lower_s == "coin") return GemSubType::Coin;
+    if (lower_s == "skull") return GemSubType::Skull;
+    if (lower_s == "raw") return GemSubType::Raw;
+    if (lower_s == "grey") return GemSubType::Grey;
+    return GemSubType::Empty; // Default case
+}
 
 std::string roomTypeToString(RoomType type) {
     switch (type) {
@@ -18,28 +51,6 @@ std::string roomTypeToString(RoomType type) {
         case RoomType::AgilityChallenge: return "Agility Challenge";
         case RoomType::EnduranceChallenge: return "Endurance Challenge";
         case RoomType::MagicChallenge: return "Magic Challenge";
-        default: return "Unknown";
-    }
-}
-
-std::string primaryGemTypeToString(PrimaryGemType type) {
-    switch (type) {
-        case PrimaryGemType::Attack: return "Attack";
-        case PrimaryGemType::Mana: return "Mana";
-        case PrimaryGemType::Treasure: return "Treasure";
-        default: return "Empty";
-    }
-}
-
-std::string gemSubtypeToString(GemSubType type) {
-    switch (type) {
-        case GemSubType::Fire: return "Fire";
-        case GemSubType::Water: return "Water";
-        case GemSubType::Earth: return "Earth";
-        case GemSubType::Air: return "Air";
-        case GemSubType::Light: return "Light";
-        case GemSubType::Umbral: return "Umbral";
-        case GemSubType::Skull: return "Skull";
         default: return "Unknown";
     }
 }
@@ -78,31 +89,6 @@ sf::Color doorColorToSfColor(DoorColor color) {
     }
 }
 
-GemSubType stringToGemSubType(const std::string& s) {
-    std::string lower_s = s;
-    std::transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
-
-    if (lower_s == "fire") return GemSubType::Fire;
-    if (lower_s == "water") return GemSubType::Water;
-    if (lower_s == "earth") return GemSubType::Earth;
-    if (lower_s == "air") return GemSubType::Air;
-    if (lower_s == "light") return GemSubType::Light;
-    if (lower_s == "umbral") return GemSubType::Umbral;
-    if (lower_s == "skull") return GemSubType::Skull;
-    if (lower_s == "enhancement") return GemSubType::Enhancement;
-    if (lower_s == "perception") return GemSubType::Perception;
-    if (lower_s == "transference") return GemSubType::Transference;
-    if (lower_s == "life") return GemSubType::Life;
-    if (lower_s == "death") return GemSubType::Death;
-    if (lower_s == "mental") return GemSubType::Mental;
-    if (lower_s == "raw") return GemSubType::Raw;
-    if (lower_s == "sword") return GemSubType::Sword;
-    if (lower_s == "coin") return GemSubType::Coin;
-    if (lower_s == "empty") return GemSubType::Empty;
-    if (lower_s == "generic") return GemSubType::Generic;
-    return GemSubType::Generic;
-}
-
 EffectType stringToEffectType(const std::string& s) {
     if (s == "Damage") return EffectType::Damage;
     if (s == "Heal") return EffectType::Heal;
@@ -135,4 +121,34 @@ std::string wordWrap(const std::string& text, unsigned int lineLength) {
     }
     result += line;
     return result;
+}
+
+DoorColor stringToDoorColor(const std::string& s) {
+    if (s == "Red")    return DoorColor::Red;
+    if (s == "Orange") return DoorColor::Orange;
+    if (s == "Yellow") return DoorColor::Yellow;
+    if (s == "Green")  return DoorColor::Green;
+    if (s == "Blue")   return DoorColor::Blue;
+    if (s == "Indigo") return DoorColor::Indigo;
+    if (s == "Violet") return DoorColor::Violet;
+    if (s == "Copper") return DoorColor::Copper;
+    if (s == "Silver") return DoorColor::Silver;
+    if (s == "Gold")   return DoorColor::Gold;
+    if (s == "White")  return DoorColor::White;
+    return DoorColor::Unknown;
+}
+
+RoomType stringToRoomType(const std::string& s) {
+    if (s == "Entrance")  return RoomType::Entrance;
+    if (s == "Combat")    return RoomType::Combat;
+    if (s == "Treasure")  return RoomType::Treasure;
+    if (s == "Boss")      return RoomType::Boss;
+    if (s == "Sanctuary") return RoomType::Sanctuary;
+    if (s == "Special")   return RoomType::Special;
+    if (s == "Puzzle")    return RoomType::Puzzle;
+    if (s == "Trap")      return RoomType::Trap;
+    if (s == "AgilityChallenge") return RoomType::AgilityChallenge;
+    if (s == "EnduranceChallenge") return RoomType::EnduranceChallenge;
+    if (s == "MagicChallenge") return RoomType::MagicChallenge;
+    return RoomType::Unknown;
 }
