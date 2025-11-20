@@ -264,11 +264,15 @@ void Game::processEvents() {
 
 
 
-            // 2. If the UI didn't handle it, check for board clicks (only in combat)
+                        // 2. If the UI didn't handle it, check for board clicks (only in combat or trials)
 
-            if (currentState == GameState::Playing) {
 
-                const int c = (mbp->position.x - boardOrigin.x) / TILE_SIZE;
+
+                        if (currentState == GameState::Playing || currentState == GameState::Judgement_TacticalTrial) {
+
+
+
+                            const int c = (mbp->position.x - boardOrigin.x) / TILE_SIZE;
 
                 const int r = (mbp->position.y - boardOrigin.y) / TILE_SIZE;
 
@@ -352,17 +356,23 @@ void Game::startNewCombat() {
 
 void Game::handleSwap(sf::Vector2i tile1, sf::Vector2i tile2) {
 
-    if (board.canSwap(tile1.y, tile1.x, tile2.y, tile2.x)) {
+        if (board.canSwap(tile1.y, tile1.x, tile2.y, tile2.x)) {
 
-        currentState = GameState::Animating;
+            if (currentState == GameState::Judgement_TacticalTrial) {
 
-        isAnimatingSwap = true;
+                m_currentTrialTurn++;
 
-        animatingGems = {tile1, tile2};
+            }
 
-        animationClock.restart();
+            currentState = GameState::Animating;
 
-    }
+            isAnimatingSwap = true;
+
+            animatingGems = {tile1, tile2};
+
+            animationClock.restart();
+
+        }
 
 }
 
@@ -590,21 +600,31 @@ void Game::update() {
 
     // --- Game State Logic ---
 
-    if (currentState == GameState::Playing) {
+        if (currentState == GameState::Playing) {
 
-        if (player.getCurrentHp() <= 0) {
+            if (player.getCurrentHp() <= 0) {
 
-            currentState = GameState::GameOver;
+                currentState = GameState::GameOver;
 
-        } else if (monster.getCurrentHp() <= 0) {
+            } else if (monster.getCurrentHp() <= 0) {
 
-            clearedRoomIds.insert(currentRoom->id); // Mark room as cleared
+                clearedRoomIds.insert(currentRoom->id); // Mark room as cleared
 
-            currentState = GameState::Exploration; // Player wins, go back to exploring
+                currentState = GameState::Exploration; // Player wins, go back to exploring
+
+            }
+
+        } else if (currentState == GameState::Judgement_TacticalTrial) {
+
+            if (m_currentTrialTurn >= m_currentJudgementTrial.turnLimit) {
+
+                // TODO: Record score
+
+                startNextJudgementTrial();
+
+            }
 
         }
-
-    }
 
 
 
@@ -640,11 +660,15 @@ void Game::render() {
 
 
 
-    // 2. Render the game board and animations ONLY during combat states
+        // 2. Render the game board and animations ONLY during combat states or trials
 
-    if (currentState == GameState::Playing || currentState == GameState::Animating || currentState == GameState::GameOver) {
 
-        if (!isReshuffling) {
+
+        if (currentState == GameState::Playing || currentState == GameState::Animating || currentState == GameState::GameOver || currentState == GameState::Judgement_TacticalTrial) {
+
+
+
+            if (!isReshuffling) {
 
             // Render static gems
 
