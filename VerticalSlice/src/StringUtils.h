@@ -2,6 +2,7 @@
 #define STRING_UTILS_H
 
 #include "GemSubType.h"
+#include "PrimaryGemType.h"
 
 // Forward declarations
 enum class RoomType;
@@ -14,6 +15,7 @@ namespace sf {
 }
 
 std::string roomTypeToString(RoomType type);
+std::string primaryGemTypeToString(PrimaryGemType type);
 std::string doorColorToString(DoorColor color);
 sf::Color doorColorToSfColor(DoorColor color);
 GemSubType stringToGemSubType(const std::string& s);

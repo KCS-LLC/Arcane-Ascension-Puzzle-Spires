@@ -6,6 +6,7 @@
 #include "SpireData.h"
 #include "Structs.h"
 #include "StringUtils.h"
+#include "Gem.h"
 
 UIManager::UIManager(const sf::Font& fontRef)
     : font(fontRef),
@@ -23,7 +24,15 @@ UIManager::UIManager(const sf::Font& fontRef)
       sanctuaryTitle(font),
       agilityTitle(font),
       enduranceTitle(font),
-      magicTitle(font)
+      magicTitle(font),
+      trialTypeText(font),
+      turnLimitText(font),
+      scoreGoalText(font),
+      currentTrialScoreText(font),
+      manaAffinityPromptText(font),
+      manaAffinityChoiceText(font),
+      judgementSummaryTitle(font),
+      judgementResultsText(font)
 {}
 
 void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin, const std::vector<Attunement>& attunements) {
@@ -192,7 +201,37 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     setupPlaceholderTitle(magicTitle, "Magic Challenge\n(Click to continue)");
 }
 
-void UIManager::update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager) {
+void UIManager::update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice) {
+    // Common updates for all states where the main UI elements are visible
+    // ... (existing update logic)
+
+    // Update trial-specific UI elements
+    if (currentState == GameState::Judgement_TacticalTrial || currentState == GameState::Judgement_ManaAffinityTrial) {
+        std::string trialTypeStr;
+        switch (currentTrial.type) {
+            case JudgementTrialType::Tactical: trialTypeStr = "Tactical Trial"; break;
+            case JudgementTrialType::Power: trialTypeStr = "Power Trial"; break;
+            case JudgementTrialType::Haste: trialTypeStr = "Haste Trial"; break;
+            case JudgementTrialType::Control: trialTypeStr = "Control Trial"; break;
+            case JudgementTrialType::ManaAffinity: trialTypeStr = "Mana Affinity Trial"; break;
+            default: trialTypeStr = "Unknown Trial"; break;
+        }
+        trialTypeText.setString("Trial Type: " + trialTypeStr);
+        turnLimitText.setString("Turns Left: " + std::to_string(currentTrial.turnLimit - currentTrialTurn));
+        scoreGoalText.setString("Score Goal: " + std::to_string(currentTrial.scoreGoal));
+
+        if (currentState == GameState::Judgement_TacticalTrial) {
+            currentTrialScoreText.setString("Current Score: " + std::to_string(currentScore));
+        } else if (currentState == GameState::Judgement_ManaAffinityTrial) {
+            if (manaAffinityChoice.has_value()) {
+                manaAffinityPromptText.setString("Affinity: " + primaryGemTypeToString(manaAffinityChoice.value()));
+                manaAffinityChoiceText.setString("Matched: " + std::to_string(currentScore)); // For mana affinity, currentScore tracks matched gems
+            } else {
+                manaAffinityPromptText.setString("Choose your Mana Affinity!");
+                manaAffinityChoiceText.setString("");
+            }
+        }
+    }
     if (currentState == GameState::Judgement_Intro) {
         // No dynamic updates needed on the Judgement screen yet
         return;
@@ -348,12 +387,34 @@ void UIManager::update(const Player& player, const Monster& monster, GameState c
     }
 }
 
-void UIManager::render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect) {
+void UIManager::render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const JudgementResults& results) {
     switch (currentState) {
         case GameState::Judgement_Intro:
             window.draw(judgementTitle);
             for(const auto& button : attunementButtons) window.draw(button);
             for(const auto& text : attunementButtonTexts) window.draw(text);
+            break;
+        case GameState::Judgement_TacticalTrial:
+        case GameState::Judgement_ManaAffinityTrial:
+            // Render common combat/trial UI
+            window.draw(leftPanel);
+            window.draw(rightPanel);
+            window.draw(boardFrame);
+
+            // Render trial-specific info
+            window.draw(trialTypeText);
+            window.draw(turnLimitText);
+            window.draw(scoreGoalText);
+            window.draw(currentTrialScoreText);
+            if (currentState == GameState::Judgement_ManaAffinityTrial) {
+                window.draw(manaAffinityPromptText);
+                window.draw(manaAffinityChoiceText);
+                // Potentially draw a highlight on the chosen mana affinity gem if needed
+            }
+            break;
+        case GameState::Judgement_Summary:
+            window.draw(judgementSummaryTitle);
+            window.draw(judgementResultsText);
             break;
         case GameState::Playing:
         case GameState::Animating:
