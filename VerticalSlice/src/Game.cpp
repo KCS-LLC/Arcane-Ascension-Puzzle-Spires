@@ -268,35 +268,31 @@ void Game::processEvents() {
 
 
 
-                        if (currentState == GameState::Playing || currentState == GameState::Judgement_TacticalTrial) {
-
-
-
+                        if (currentState == GameState::Playing || currentState == GameState::Judgement_TacticalTrial || currentState == GameState::Judgement_ManaAffinityTrial) {
                             const int c = (mbp->position.x - boardOrigin.x) / TILE_SIZE;
+                            const int r = (mbp->position.y - boardOrigin.y) / TILE_SIZE;
+                            if (c < 0 || c >= BOARD_WIDTH || r < 0 || r >= BOARD_HEIGHT) continue;
 
-                const int r = (mbp->position.y - boardOrigin.y) / TILE_SIZE;
-
-                if (c < 0 || c >= BOARD_WIDTH || r < 0 || r >= BOARD_HEIGHT) continue;
-
-                
-
-                dragStartTile = sf::Vector2i(c, r);
-
-                if (selectedTile.has_value() && selectedTile.value() != dragStartTile.value()) {
-
-                    handleSwap(*selectedTile, *dragStartTile);
-
-                    selectedTile = std::nullopt;
-
-                    dragStartTile = std::nullopt;
-
-                } else {
-
-                    selectedTile = sf::Vector2i(c, r);
-
-                }
-
-            }
+                            if (currentState == GameState::Judgement_ManaAffinityTrial && !m_manaAffinityChoice.has_value()) {
+                                // Player is choosing their mana affinity
+                                Gem clickedGem = board.getGem(r, c);
+                                if (clickedGem.primaryType == PrimaryGemType::Mana) {
+                                    m_manaAffinityChoice = clickedGem.primaryType;
+                                    std::cout << "Selected Mana Affinity: " << (int)m_manaAffinityChoice.value() << std::endl;
+                                } else {
+                                    std::cout << "Please select a Mana gem for your affinity." << std::endl;
+                                }
+                            } else {
+                                dragStartTile = sf::Vector2i(c, r);
+                                if (selectedTile.has_value() && selectedTile.value() != dragStartTile.value()) {
+                                    handleSwap(*selectedTile, *dragStartTile);
+                                    selectedTile = std::nullopt;
+                                    dragStartTile = std::nullopt;
+                                } else {
+                                    selectedTile = sf::Vector2i(c, r);
+                                }
+                            }
+                        }
 
         }
 
@@ -391,6 +387,9 @@ void Game::applyMatchConsequences(const std::vector<Gem>& matchedGems) {
         if (currentState == GameState::Judgement_TacticalTrial) {
             m_currentScore += 10; // Example scoring: 10 points per gem matched in a trial
             std::cout << "Judgement Trial Score: " << m_currentScore << " / " << m_currentJudgementTrial.scoreGoal << std::endl;
+        } else if (currentState == GameState::Judgement_ManaAffinityTrial && m_manaAffinityChoice.has_value() && gem.primaryType == m_manaAffinityChoice.value()) {
+            m_currentAffinityScore += gem.level; // Score based on level of affinity gem matched
+            std::cout << "Mana Affinity Score: " << m_currentAffinityScore << " / " << m_currentJudgementTrial.scoreGoal << std::endl;
         }
 
         switch (gem.primaryType) {
@@ -637,6 +636,12 @@ void Game::update() {
 
             }
 
+        } else if (currentState == GameState::Judgement_ManaAffinityTrial) {
+            if (m_manaAffinityChoice.has_value() && (m_currentTrialTurn >= m_currentJudgementTrial.turnLimit || m_currentAffinityScore >= m_currentJudgementTrial.scoreGoal)) {
+                std::cout << "Mana Affinity Trial Objective Met or Turn Limit Reached! Recording affinity score." << std::endl;
+                m_judgementResults.trialScores[m_currentJudgementTrial.type] = m_currentAffinityScore;
+                startNextJudgementTrial();
+            }
         }
 
 
@@ -1046,14 +1051,90 @@ void Game::moveToRoom(int destinationRoomId) {
 
         
 
-                        // For now, just initialize a standard board.
+                                    switch (m_currentJudgementTrial.type) {
 
         
 
-                        board.initialize(m_currentJudgementTrial.boardLayout); 
+                                        case JudgementTrialType::Tactical:
 
         
 
-            currentState = GameState::Judgement_TacticalTrial;
+                                            currentState = GameState::Judgement_TacticalTrial;
+
+        
+
+                                            board.initialize(m_currentJudgementTrial.boardLayout);
+
+        
+
+                                            break;
+
+        
+
+                                        case JudgementTrialType::ManaAffinity:
+
+        
+
+                                            currentState = GameState::Judgement_ManaAffinityTrial;
+
+        
+
+                                            m_manaAffinityChoice = std::nullopt; // Player hasn't chosen yet
+
+        
+
+                                            m_currentAffinityScore = 0;
+
+        
+
+                                            board.initialize(player); // For Mana Affinity, start with a random board for now
+
+        
+
+                                            break;
+
+        
+
+                                        case JudgementTrialType::Power: // Assuming Power, Haste, Control are tactical trials
+
+        
+
+                                        case JudgementTrialType::Haste:
+
+        
+
+                                        case JudgementTrialType::Control:
+
+        
+
+                                            currentState = GameState::Judgement_TacticalTrial;
+
+        
+
+                                            board.initialize(m_currentJudgementTrial.boardLayout);
+
+        
+
+                                            break;
+
+        
+
+                                        default:
+
+        
+
+                                            std::cerr << "Error: Unknown JudgementTrialType encountered." << std::endl;
+
+        
+
+                                            currentState = GameState::Judgement_Summary; // Fallback to summary
+
+        
+
+                                            break;
+
+        
+
+                                    }
 
         }
