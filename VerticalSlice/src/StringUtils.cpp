@@ -88,3 +88,13 @@ TargetType stringToTargetType(const std::string& s) {
     if (s == "monster") return TargetType::Monster;
     return TargetType::Monster; // Default
 }
+
+std::string primaryGemTypeToString(PrimaryGemType type) {
+    switch (type) {
+        case PrimaryGemType::Empty: return "Empty";
+        case PrimaryGemType::Mana: return "Mana";
+        case PrimaryGemType::Attack: return "Attack";
+        case PrimaryGemType::Treasure: return "Treasure";
+        default: return "Unknown";
+    }
+}

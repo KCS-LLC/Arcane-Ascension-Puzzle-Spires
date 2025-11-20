@@ -658,7 +658,7 @@ void Game::update() {
 
     // --- UI Updates ---
 
-    uiManager->update(player, monster, currentState, currentRoom, visitedRoomIds, dataManager);
+    uiManager->update(player, monster, currentState, currentRoom, visitedRoomIds, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTrialTurn, m_manaAffinityChoice);
 
 }
 
@@ -674,7 +674,7 @@ void Game::render() {
 
     // 1. Render UI via UIManager
 
-    uiManager->render(window, currentState, showPlayerDamageEffect);
+    uiManager->render(window, currentState, showPlayerDamageEffect, m_currentJudgementTrial, m_currentScore, m_currentTrialTurn, m_manaAffinityChoice, m_judgementResults);
 
 
 

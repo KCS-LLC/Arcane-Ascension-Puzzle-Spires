@@ -3,6 +3,9 @@
 
 #include <map>
 #include "GemSubType.h"
+#include "Judgement.h"
+#include "PrimaryGemType.h"
+#include "GemSubType.h"
 
 // Forward declarations
 class Player;
@@ -27,8 +30,8 @@ public:
 
     bool handleEvent(const sf::Event& event, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction);
     void setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin, const std::vector<Attunement>& attunements);
-    void update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager);
-    void render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect);
+    void update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice);
+    void render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const JudgementResults& results);
 
     const std::vector<sf::RectangleShape>& getSpellButtons() const;
 
@@ -37,6 +40,17 @@ private:
 
     // Judgement Screen
     sf::Text judgementTitle;
+
+    // Judgement Trial UI
+    sf::Text trialTypeText;
+    sf::Text turnLimitText;
+    sf::Text scoreGoalText;
+    sf::Text currentTrialScoreText;
+    sf::Text manaAffinityPromptText;
+    sf::Text manaAffinityChoiceText;
+    sf::RectangleShape manaAffinityHighlight;
+    sf::Text judgementSummaryTitle;
+    sf::Text judgementResultsText;
     std::vector<sf::RectangleShape> attunementButtons;
     std::vector<sf::Text> attunementButtonTexts;
 

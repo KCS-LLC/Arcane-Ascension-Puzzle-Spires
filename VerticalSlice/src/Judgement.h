@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "Gem.h"
 
 // Represents the type of tactical trial
 enum class JudgementTrialType {
