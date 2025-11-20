@@ -1,6 +1,9 @@
 {
-    "type": "Haste",
-    "boardLayout": [],
-    "turnLimit": 8,
-    "scoreGoal": 300
+    "trialId": "trial_haste",
+    "type": 3,
+    "trialType": "Trial of Haste",
+    "objective": "Score as much as possible in a limited time.",
+    "timeLimit": 30,
+    "scoreGoal": 500,
+    "turnLimit": 99
 }

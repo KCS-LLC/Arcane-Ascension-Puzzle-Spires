@@ -10,10 +10,7 @@ const int TILE_SIZE = 64;
 
 // Enum for the main game states
 enum class GameState {
-    Judgement_Intro,
-    Judgement_TacticalTrial,
-    Judgement_ManaAffinityTrial,
-    Judgement_Summary,
+    Loading,
     Playing,
     Animating,
     GameOver,
@@ -25,7 +22,11 @@ enum class GameState {
     Sanctuary,
     AgilityChallenge,
     EnduranceChallenge,
-    MagicChallenge
+    MagicChallenge,
+    Judgement_TacticalTrial,
+    Judgement_ManaAffinityTrial,
+    Judgement_Summary,
+    Judgement_AttunementReveal
 };
 
 #endif // CONSTANTS_H

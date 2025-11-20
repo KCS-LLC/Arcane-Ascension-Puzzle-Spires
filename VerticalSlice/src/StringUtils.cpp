@@ -2,100 +2,32 @@
 #include "StringUtils.h"
 #include "SpireData.h"
 #include "Structs.h"
-#include "GemSubType.h"
+
+// ... (existing string conversion functions) ...
 
 std::string roomTypeToString(RoomType type) {
     switch (type) {
-        case RoomType::Entrance:  return "Entrance";
-        case RoomType::Combat:    return "Combat";
-        case RoomType::Treasure:  return "Treasure";
-        case RoomType::Boss:      return "Boss";
+        case RoomType::Entrance: return "Entrance";
+        case RoomType::Combat: return "Combat";
+        case RoomType::Treasure: return "Treasure";
+        case RoomType::Boss: return "Boss";
         case RoomType::Sanctuary: return "Sanctuary";
-        case RoomType::Special:   return "Special";
-        case RoomType::Puzzle:    return "Puzzle";
-        case RoomType::Trap:      return "Trap";
-        case RoomType::AgilityChallenge: return "AgilityChallenge";
-        case RoomType::EnduranceChallenge: return "EnduranceChallenge";
-        case RoomType::MagicChallenge: return "MagicChallenge";
-        default:                  return "Unknown";
+        case RoomType::Special: return "Special";
+        case RoomType::Puzzle: return "Puzzle";
+        case RoomType::Trap: return "Trap";
+        case RoomType::AgilityChallenge: return "Agility Challenge";
+        case RoomType::EnduranceChallenge: return "Endurance Challenge";
+        case RoomType::MagicChallenge: return "Magic Challenge";
+        default: return "Unknown";
     }
-}
-
-std::string doorColorToString(DoorColor color) {
-    switch (color) {
-        case DoorColor::Red:    return "Red";
-        case DoorColor::Orange: return "Orange";
-        case DoorColor::Yellow: return "Yellow";
-        case DoorColor::Green:  return "Green";
-        case DoorColor::Blue:   return "Blue";
-        case DoorColor::Indigo: return "Indigo";
-        case DoorColor::Violet: return "Violet";
-        case DoorColor::Copper: return "Copper";
-        case DoorColor::Silver: return "Silver";
-        case DoorColor::Gold:   return "Gold";
-        case DoorColor::White:  return "White";
-        default:                return "Unknown";
-    }
-}
-
-sf::Color doorColorToSfColor(DoorColor color) {
-    switch (color) {
-        case DoorColor::Red:    return sf::Color::Red;
-        case DoorColor::Orange: return sf::Color(255, 165, 0);
-        case DoorColor::Yellow: return sf::Color::Yellow;
-        case DoorColor::Green:  return sf::Color::Green;
-        case DoorColor::Blue:   return sf::Color::Blue;
-        case DoorColor::Indigo: return sf::Color(75, 0, 130);
-        case DoorColor::Violet: return sf::Color(238, 130, 238);
-        case DoorColor::Copper: return sf::Color(184, 115, 51);
-        case DoorColor::Silver: return sf::Color(192, 192, 192);
-        case DoorColor::Gold:   return sf::Color(255, 215, 0);
-        case DoorColor::White:  return sf::Color::White;
-        default:                return sf::Color::Black;
-    }
-}
-
-GemSubType stringToGemSubType(const std::string& s) {
-    if (s == "fire") return GemSubType::Fire;
-    if (s == "water") return GemSubType::Water;
-    if (s == "earth") return GemSubType::Earth;
-    if (s == "air") return GemSubType::Air;
-    if (s == "light") return GemSubType::Light;
-    if (s == "umbral") return GemSubType::Umbral;
-    if (s == "enhancement") return GemSubType::Enhancement;
-    if (s == "perception") return GemSubType::Perception;
-    if (s == "transference") return GemSubType::Transference;
-    if (s == "life") return GemSubType::Life;
-    if (s == "death") return GemSubType::Death;
-    if (s == "mental") return GemSubType::Mental;
-    if (s == "raw") return GemSubType::Raw;
-    if (s == "sword") return GemSubType::Sword;
-    if (s == "coin") return GemSubType::Coin;
-    if (s == "skull") return GemSubType::Skull;
-    return GemSubType::Generic; // Default
-}
-
-EffectType stringToEffectType(const std::string& s) {
-    if (s == "damage") return EffectType::Damage;
-    if (s == "heal") return EffectType::Heal;
-    if (s == "stun") return EffectType::Stun;
-    if (s == "shield") return EffectType::Shield;
-    return EffectType::Damage; // Default
-}
-
-TargetType stringToTargetType(const std::string& s) {
-    if (s == "player") return TargetType::Player;
-    if (s == "monster") return TargetType::Monster;
-    return TargetType::Monster; // Default
 }
 
 std::string primaryGemTypeToString(PrimaryGemType type) {
     switch (type) {
-        case PrimaryGemType::Empty: return "Empty";
-        case PrimaryGemType::Mana: return "Mana";
         case PrimaryGemType::Attack: return "Attack";
+        case PrimaryGemType::Mana: return "Mana";
         case PrimaryGemType::Treasure: return "Treasure";
-        default: return "Unknown";
+        default: return "Empty";
     }
 }
 
@@ -107,17 +39,86 @@ std::string gemSubtypeToString(GemSubType type) {
         case GemSubType::Air: return "Air";
         case GemSubType::Light: return "Light";
         case GemSubType::Umbral: return "Umbral";
-        case GemSubType::Life: return "Life";
-        case GemSubType::Death: return "Death";
-        case GemSubType::Mental: return "Mental";
-        case GemSubType::Perception: return "Perception";
-        case GemSubType::Transference: return "Transference";
-        case GemSubType::Enhancement: return "Enhancement";
-        case GemSubType::Raw: return "Raw";
-        case GemSubType::Sword: return "Sword";
-        case GemSubType::Coin: return "Coin";
         case GemSubType::Skull: return "Skull";
-        case GemSubType::Generic: return "Generic";
         default: return "Unknown";
     }
+}
+
+std::string doorColorToString(DoorColor color) {
+    switch (color) {
+        case DoorColor::Red: return "Red";
+        case DoorColor::Orange: return "Orange";
+        case DoorColor::Yellow: return "Yellow";
+        case DoorColor::Green: return "Green";
+        case DoorColor::Blue: return "Blue";
+        case DoorColor::Indigo: return "Indigo";
+        case DoorColor::Violet: return "Violet";
+        case DoorColor::Copper: return "Copper";
+        case DoorColor::Silver: return "Silver";
+        case DoorColor::Gold: return "Gold";
+        case DoorColor::White: return "White";
+        default: return "Unknown";
+    }
+}
+
+sf::Color doorColorToSfColor(DoorColor color) {
+    switch (color) {
+        case DoorColor::Red: return sf::Color::Red;
+        case DoorColor::Orange: return sf::Color(255, 165, 0);
+        case DoorColor::Yellow: return sf::Color::Yellow;
+        case DoorColor::Green: return sf::Color::Green;
+        case DoorColor::Blue: return sf::Color::Blue;
+        case DoorColor::Indigo: return sf::Color(75, 0, 130);
+        case DoorColor::Violet: return sf::Color(238, 130, 238);
+        case DoorColor::Copper: return sf::Color(184, 115, 51);
+        case DoorColor::Silver: return sf::Color(192, 192, 192);
+        case DoorColor::Gold: return sf::Color(255, 215, 0);
+        case DoorColor::White: return sf::Color::White;
+        default: return sf::Color::Black;
+    }
+}
+
+GemSubType stringToGemSubType(const std::string& s) {
+    if (s == "Fire") return GemSubType::Fire;
+    if (s == "Water") return GemSubType::Water;
+    if (s == "Earth") return GemSubType::Earth;
+    if (s == "Air") return GemSubType::Air;
+    if (s == "Light") return GemSubType::Light;
+    if (s == "Umbral") return GemSubType::Umbral;
+    if (s == "Skull") return GemSubType::Skull;
+    return GemSubType::Generic;
+}
+
+EffectType stringToEffectType(const std::string& s) {
+    if (s == "Damage") return EffectType::Damage;
+    if (s == "Heal") return EffectType::Heal;
+    if (s == "Stun") return EffectType::Stun;
+    if (s == "Shield") return EffectType::Shield;
+    return EffectType::Damage; // Default
+}
+
+TargetType stringToTargetType(const std::string& s) {
+    if (s == "Player") return TargetType::Player;
+    if (s == "Monster") return TargetType::Monster;
+    return TargetType::Monster; // Default
+}
+
+std::string wordWrap(const std::string& text, unsigned int lineLength) {
+    std::stringstream ss(text);
+    std::string line;
+    std::string result;
+    std::string word;
+
+    while (ss >> word) {
+        if (line.length() + word.length() + 1 > lineLength) {
+            result += line + '\n';
+            line = "";
+        }
+        if (!line.empty()) {
+            line += " ";
+        }
+        line += word;
+    }
+    result += line;
+    return result;
 }

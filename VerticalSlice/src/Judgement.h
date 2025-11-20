@@ -16,14 +16,17 @@ enum class JudgementTrialType {
 
 // Defines a single trial for the Judgement phase
 struct JudgementTrial {
+    std::string trialId;
+    std::string objective;
     JudgementTrialType type;
-    std::vector<std::vector<Gem>> boardLayout; // 2D vector to store the actual board state
+    std::vector<std::vector<Gem>> boardLayout;
     int turnLimit = 0;
+    int timeLimit = 0;
     int scoreGoal = 0;
 };
 
 // Stores the player's performance across all Judgement trials
 struct JudgementResults {
-    std::map<JudgementTrialType, int> trialScores;
+    std::map<std::string, int> trialScores;
     int totalTreasureValue = 0;
 };

@@ -22,5 +22,6 @@ sf::Color doorColorToSfColor(DoorColor color);
 GemSubType stringToGemSubType(const std::string& s);
 EffectType stringToEffectType(const std::string& s);
 TargetType stringToTargetType(const std::string& s);
+std::string wordWrap(const std::string& text, unsigned int lineLength);
 
 #endif // STRING_UTILS_H

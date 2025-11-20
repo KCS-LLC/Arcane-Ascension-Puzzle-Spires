@@ -10,7 +10,6 @@
 
 UIManager::UIManager(const sf::Font& fontRef)
     : font(fontRef),
-      judgementTitle(font),
       playerPanelTitle(font),
       monsterPanelTitle(font),
       monsterNameText(font),
@@ -26,44 +25,20 @@ UIManager::UIManager(const sf::Font& fontRef)
       enduranceTitle(font),
       magicTitle(font),
       trialTypeText(font),
+      trialObjectiveText(font),
       turnLimitText(font),
       scoreGoalText(font),
       currentTrialScoreText(font),
       manaAffinityPromptText(font),
       manaAffinityChoiceText(font),
       judgementSummaryTitle(font),
-      judgementResultsText(font)
+      judgementResultsText(font),
+      attunementTitleText(font),
+      attunementNameText(font),
+      attunementDescriptionText(font)
 {}
 
 void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin, const std::vector<Attunement>& attunements) {
-
-    // --- Judgement Screen ---
-    judgementTitle.setString("Choose your Attunement");
-    judgementTitle.setCharacterSize(36);
-    judgementTitle.setFillColor(sf::Color::White);
-    sf::FloatRect textRect = judgementTitle.getLocalBounds();
-    judgementTitle.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
-    judgementTitle.setPosition({(float)windowSize.x / 2.0f, 100.f});
-
-    float buttonY = 200.f;
-    for (const auto& attunement : attunements) {
-        sf::RectangleShape button;
-        button.setSize({300, 50});
-        button.setPosition({(float)windowSize.x / 2.0f - 150, buttonY});
-        button.setFillColor(sf::Color(80, 80, 80));
-        attunementButtons.push_back(button);
-
-        sf::Text text(font);
-        text.setString(attunement.name);
-        text.setCharacterSize(24);
-        text.setFillColor(sf::Color::White);
-        textRect = text.getLocalBounds();
-        text.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
-        text.setPosition({button.getPosition().x + button.getSize().x / 2.0f, button.getPosition().y + button.getSize().y / 2.0f});
-        attunementButtonTexts.push_back(text);
-
-        buttonY += 70;
-    }
 
     // --- UI Layout Calculations ---
     const int boardPixelWidth = BOARD_WIDTH * TILE_SIZE;
@@ -93,7 +68,12 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     trialTypeText.setCharacterSize(24);
     trialTypeText.setFillColor(sf::Color::White);
 
-    trialUiY += 40;
+    trialUiY += 35;
+    trialObjectiveText.setPosition({rightPanel.getPosition().x + 20, trialUiY});
+    trialObjectiveText.setCharacterSize(18);
+    trialObjectiveText.setFillColor(sf::Color::Yellow);
+
+    trialUiY += 35;
     turnLimitText.setPosition({rightPanel.getPosition().x + 20, trialUiY});
     turnLimitText.setCharacterSize(20);
     turnLimitText.setFillColor(sf::Color::White);
@@ -122,13 +102,27 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     judgementSummaryTitle.setString("Judgement Complete");
     judgementSummaryTitle.setCharacterSize(36);
     judgementSummaryTitle.setFillColor(sf::Color::White);
-    textRect = judgementSummaryTitle.getLocalBounds();
+    sf::FloatRect textRect = judgementSummaryTitle.getLocalBounds();
     judgementSummaryTitle.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
     judgementSummaryTitle.setPosition({(float)windowSize.x / 2.0f, 100.f});
 
     judgementResultsText.setCharacterSize(24);
     judgementResultsText.setFillColor(sf::Color::White);
     judgementResultsText.setPosition({(float)windowSize.x / 2.0f - 250, 200.f});
+
+    // --- Attunement Reveal UI ---
+    attunementTitleText.setString("Your Attunement");
+    attunementTitleText.setCharacterSize(36);
+    attunementTitleText.setFillColor(sf::Color::White);
+    textRect = attunementTitleText.getLocalBounds();
+    attunementTitleText.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
+    attunementTitleText.setPosition({(float)windowSize.x / 2.0f, 100.f});
+
+    attunementNameText.setCharacterSize(48);
+    attunementNameText.setFillColor(sf::Color::Cyan);
+    
+    attunementDescriptionText.setCharacterSize(22);
+    attunementDescriptionText.setFillColor(sf::Color::White);
 
     // --- Titles ---
     playerPanelTitle.setFont(font);
@@ -260,6 +254,7 @@ void UIManager::update(const Player& player, const Monster& monster, GameState c
             default: trialTypeStr = "Unknown Trial"; break;
         }
         trialTypeText.setString("Trial: " + trialTypeStr);
+        trialObjectiveText.setString(wordWrap("Objective: " + currentTrial.objective, 35));
         turnLimitText.setString("Turns Left: " + std::to_string(currentTrial.turnLimit - currentTrialTurn));
         scoreGoalText.setString("Score Goal: " + std::to_string(currentTrial.scoreGoal));
 
@@ -275,26 +270,33 @@ void UIManager::update(const Player& player, const Monster& monster, GameState c
             }
         }
     } else if (currentState == GameState::Judgement_Summary) {
-        std::string summary;
-        for(const auto& pair : results.trialScores) {
-            std::string typeStr;
-            switch (pair.first) {
-                case JudgementTrialType::Tactical: typeStr = "Tactical"; break;
-                case JudgementTrialType::Power: typeStr = "Power"; break;
-                case JudgementTrialType::Haste: typeStr = "Haste"; break;
-                case JudgementTrialType::Control: typeStr = "Control"; break;
-                case JudgementTrialType::ManaAffinity: typeStr = "Mana Affinity"; break;
-                default: typeStr = "Unknown"; break;
+        std::stringstream ss;
+        ss << "Judgement Results:\n\n";
+        for (const auto& pair : results.trialScores) {
+            if (pair.first == "trial_power") {
+                ss << "  - Power Score: " << pair.second << "\n";
+            } else if (pair.first == "trial_haste") {
+                ss << "  - Haste Score: " << pair.second << "\n";
+            } else if (pair.first == "trial_control") {
+                ss << "  - Control Score: " << pair.second << "\n";
             }
-            summary += typeStr + " Score: " + std::to_string(pair.second) + "\n";
         }
-        summary += "\nClick to continue...";
-        judgementResultsText.setString(summary);
-    }
+        ss << "\nClick to continue...";
+        judgementResultsText.setString(ss.str());
+    } else if (currentState == GameState::Judgement_AttunementReveal) {
+        const Attunement* attunement = dataManager.getAttunementById(player.getAttunementId());
+        if (attunement) {
+            attunementNameText.setString(attunement->name);
+            attunementDescriptionText.setString(wordWrap(attunement->description, 60));
 
-    if (currentState == GameState::Judgement_Intro) {
-        // No dynamic updates needed on the Judgement screen yet
-        return;
+            // Center the name text
+            sf::FloatRect textRect = attunementNameText.getLocalBounds();
+            attunementNameText.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
+            attunementNameText.setPosition({WINDOW_WIDTH / 2.0f, 200.f});
+            
+            // Position the description below the name
+            attunementDescriptionText.setPosition({WINDOW_WIDTH / 2.0f - 300, 280.f});
+        }
     }
     
     // Update monster name
@@ -447,13 +449,10 @@ void UIManager::update(const Player& player, const Monster& monster, GameState c
     }
 }
 
-void UIManager::render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const JudgementResults& results) {
-    switch (currentState) {
-        case GameState::Judgement_Intro:
-            window.draw(judgementTitle);
-            for(const auto& button : attunementButtons) window.draw(button);
-            for(const auto& text : attunementButtonTexts) window.draw(text);
-            break;
+void UIManager::render(sf::RenderWindow& window, GameState currentState, GameState preAnimationState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const JudgementResults& results) {
+    GameState stateToRender = (currentState == GameState::Animating) ? preAnimationState : currentState;
+
+    switch (stateToRender) {
         case GameState::Judgement_TacticalTrial:
         case GameState::Judgement_ManaAffinityTrial:
             // Render common combat/trial UI
@@ -463,10 +462,11 @@ void UIManager::render(sf::RenderWindow& window, GameState currentState, bool sh
 
             // Render trial-specific info
             window.draw(trialTypeText);
+            window.draw(trialObjectiveText);
             window.draw(turnLimitText);
             window.draw(scoreGoalText);
             
-            if (currentState == GameState::Judgement_ManaAffinityTrial) {
+            if (stateToRender == GameState::Judgement_ManaAffinityTrial) {
                 window.draw(manaAffinityPromptText);
                 window.draw(manaAffinityChoiceText);
             } else {
@@ -477,8 +477,12 @@ void UIManager::render(sf::RenderWindow& window, GameState currentState, bool sh
             window.draw(judgementSummaryTitle);
             window.draw(judgementResultsText);
             break;
+        case GameState::Judgement_AttunementReveal:
+            window.draw(attunementTitleText);
+            window.draw(attunementNameText);
+            window.draw(attunementDescriptionText);
+            break;
         case GameState::Playing:
-        case GameState::Animating:
         case GameState::GameOver:
             window.draw(leftPanel);
             window.draw(rightPanel);
@@ -527,14 +531,7 @@ bool UIManager::handleEvent(const sf::Event& event, GameState currentState, cons
         if (mbp->button == sf::Mouse::Button::Left) {
             sf::Vector2f mousePos(mbp->position);
 
-            if (currentState == GameState::Judgement_Intro) {
-                for (size_t i = 0; i < attunementButtons.size(); ++i) {
-                    if (attunementButtons[i].getGlobalBounds().contains(mousePos)) {
-                        outAction = {UIActionType::SelectAttunement, -1, -1, attunements[i].id};
-                        return true;
-                    }
-                }
-            } else if (currentState == GameState::Judgement_Summary) {
+            if (currentState == GameState::Judgement_Summary) {
                 outAction = {UIActionType::JudgementComplete};
                 return true;
             }

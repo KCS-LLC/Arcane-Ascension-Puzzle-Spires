@@ -72,25 +72,49 @@ void Player::setStartingStats(int tactical_score, int mana_affinity_score) {
     currentHp = maxHp; // Start with full health
 }
 
-void Player::finalizeJudgement(const JudgementResults& results) {
-    int tactical_score = 0;
-    int mana_affinity_score = 0;
+std::string Player::determineAttunement(const JudgementResults& results, const DataManager& dataManager) const {
+    if (results.trialScores.empty()) {
+        return "elementalist"; // Default fallback
+    }
+
+    std::string bestTrialId = "";
+    int maxScore = -1;
 
     for (const auto& pair : results.trialScores) {
-        switch (pair.first) {
-            case JudgementTrialType::Tactical:
-            case JudgementTrialType::Power:
-            case JudgementTrialType::Haste:
-            case JudgementTrialType::Control:
-                tactical_score += pair.second;
-                break;
-            case JudgementTrialType::ManaAffinity:
-                mana_affinity_score += pair.second;
-                break;
+        if (pair.second > maxScore) {
+            maxScore = pair.second;
+            bestTrialId = pair.first;
         }
     }
 
-    setStartingStats(tactical_score, mana_affinity_score);
+    if (bestTrialId == "trial_power") {
+        return "executioner";
+    } else if (bestTrialId == "trial_haste") {
+        return "elementalist";
+    } else if (bestTrialId == "trial_control") {
+        return "guardian";
+    }
 
-    // Future logic could also award starting items or spells based on Treasure scores, etc.
+    return "elementalist"; // Default fallback
+}
+
+const std::string& Player::getAttunementId() const {
+    return m_attunementId;
+}
+
+void Player::finalizeJudgement(const JudgementResults& results, const DataManager& dataManager) {
+    // For now, let's just assign a default attunement for testing
+    m_attunementId = determineAttunement(results, dataManager);
+    const Attunement* finalAttunement = dataManager.getAttunementById(m_attunementId);
+
+    if (finalAttunement) {
+        setAttunement(*finalAttunement, dataManager);
+    } else {
+        std::cerr << "Could not find final attunement with id: " << m_attunementId << std::endl;
+        // Fallback to a default
+        const Attunement* fallback = dataManager.getAttunementById("adept");
+        if (fallback) {
+            setAttunement(*fallback, dataManager);
+        }
+    }
 }

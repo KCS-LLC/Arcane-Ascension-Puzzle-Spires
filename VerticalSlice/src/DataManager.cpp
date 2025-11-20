@@ -12,28 +12,44 @@ DataManager::DataManager() : monsterHP(0), monsterSpeed(0), monsterAttackDamage(
 }
 
 bool DataManager::loadAttunements(const std::string& path) {
-    std::ifstream f(path);
-    if (!f.is_open()) {
-        std::cerr << "Could not open attunement file: " << path << std::endl;
-        return false;
-    }
+    std::vector<std::string> attunementFiles = {
+        path,
+        "data/executioner.json"
+    };
 
     try {
-        json data = json::parse(f);
-        for (const auto& item : data) {
-            Attunement attunement;
-            attunement.id = item.at("id").get<std::string>();
-            attunement.name = item.at("name").get<std::string>();
-            attunement.description = item.at("description").get<std::string>();
+        for (const auto& filePath : attunementFiles) {
+            std::ifstream f(filePath);
+            if (!f.is_open()) {
+                std::cerr << "Could not open attunement file: " << filePath << std::endl;
+                continue; // Skip this file
+            }
             
-            for (const auto& spell_id : item.at("starting_spells")) {
-                attunement.starting_spell_ids.push_back(spell_id.get<int>());
+            json data = json::parse(f);
+            // If the file contains an array of attunements
+            if (data.is_array()) {
+                for (const auto& item : data) {
+                    Attunement attunement;
+                    attunement.id = item.at("id").get<std::string>();
+                    attunement.name = item.at("name").get<std::string>();
+                    attunement.description = item.at("description").get<std::string>();
+                    attunement.starting_spell_ids = item.at("starting_spells").get<std::vector<int>>();
+                    for (const auto& mana_type : item.at("mana_types")) {
+                        attunement.mana_types.push_back(stringToGemSubType(mana_type.get<std::string>()));
+                    }
+                    attunements.push_back(attunement);
+                }
+            } else if (data.is_object()) { // If the file contains a single attunement object
+                Attunement attunement;
+                attunement.id = data.at("id").get<std::string>();
+                attunement.name = data.at("name").get<std::string>();
+                attunement.description = data.at("description").get<std::string>();
+                attunement.starting_spell_ids = data.at("starting_spells").get<std::vector<int>>();
+                for (const auto& mana_type : data.at("mana_types")) {
+                    attunement.mana_types.push_back(stringToGemSubType(mana_type.get<std::string>()));
+                }
+                attunements.push_back(attunement);
             }
-
-            for (const auto& mana_type : item.at("mana_types")) {
-                attunement.mana_types.push_back(stringToGemSubType(mana_type.get<std::string>()));
-            }
-            attunements.push_back(attunement);
         }
     } catch (json::parse_error& e) {
         std::cerr << "JSON parse error in attunement file: " << e.what() << std::endl;
@@ -98,6 +114,16 @@ bool DataManager::loadMonsterData(const std::string& path) {
 
 const std::vector<Attunement>& DataManager::getAttunements() const {
     return attunements;
+}
+
+const Attunement* DataManager::getAttunementById(const std::string& id) const {
+    auto it = std::find_if(attunements.begin(), attunements.end(), [&](const Attunement& a) {
+        return a.id == id;
+    });
+    if (it != attunements.end()) {
+        return &(*it);
+    }
+    return nullptr;
 }
 
 const std::vector<Spell>& DataManager::getAllSpells() const {
@@ -170,48 +196,49 @@ void DataManager::loadJudgementTrials() {
         "data/trial_control.json"
     };
 
-    for (const auto& filePath : trialFiles) {
-        std::ifstream f(filePath);
-        if (!f.is_open()) {
-            std::cerr << "Could not open judgement trial file: " << filePath << std::endl;
-            continue;
-        }
-
-        try {
-            json data = json::parse(f);
-            JudgementTrial trial;
-            std::string typeStr = data.at("type").get<std::string>();
-            if (typeStr == "Power") {
-                trial.type = JudgementTrialType::Power;
-            } else if (typeStr == "Haste") {
-                trial.type = JudgementTrialType::Haste;
-            } else if (typeStr == "Control") {
-                trial.type = JudgementTrialType::Control;
-            } else {
-                std::cerr << "Unknown JudgementTrialType: " << typeStr << " in " << filePath << std::endl;
+    try {
+        for (const auto& filePath : trialFiles) {
+            std::ifstream f(filePath);
+            if (!f.is_open()) {
+                std::cerr << "Could not open judgement trial file: " << filePath << std::endl;
                 continue;
             }
-            trial.boardLayout.resize(BOARD_HEIGHT);
-            for (int r = 0; r < BOARD_HEIGHT; ++r) {
-                trial.boardLayout[r].resize(BOARD_WIDTH);
-                for (int c = 0; c < BOARD_WIDTH; ++c) {
-                    // Assuming 'boardLayout' in JSON is a 2D array of ints, where each int represents GemSubType
-                    // Need to convert int to GemSubType and create a Gem object
-                    // For simplicity, let's assume 0 for Empty, and other values map directly to GemSubType
-                    int gemSubTypeInt = data.at("boardLayout")[r][c].get<int>();
-                    trial.boardLayout[r][c] = Gem(static_cast<GemSubType>(gemSubTypeInt), 1); // Default level to 1
+
+            json data = json::parse(f);
+            JudgementTrial trial;
+            trial.trialId = data.at("trialId").get<std::string>();
+            trial.objective = data.at("objective").get<std::string>();
+            trial.type = static_cast<JudgementTrialType>(data.at("type").get<int>());
+
+            if (data.contains("boardLayout")) {
+                for (const auto& j_row : data["boardLayout"]) {
+                    std::vector<Gem> row;
+                    for (const auto& j_gem : j_row) {
+                        row.emplace_back(
+                            static_cast<GemSubType>(j_gem["subType"]),
+                            j_gem["level"]
+                        );
+                    }
+                    trial.boardLayout.push_back(row);
                 }
             }
+
             trial.turnLimit = data.at("turnLimit").get<int>();
+            if (data.contains("timeLimit")) {
+                trial.timeLimit = data.at("timeLimit").get<int>();
+            }
             trial.scoreGoal = data.at("scoreGoal").get<int>();
             m_judgementTrials.push_back(trial);
-
-        } catch (json::parse_error& e) {
-            std::cerr << "JSON parse error in judgement trial file " << filePath << ": " << e.what() << std::endl;
-        } catch (json::exception& e) {
-            std::cerr << "JSON data error in judgement trial file " << filePath << ": " << e.what() << std::endl;
         }
+    } catch (json::parse_error& e) {
+        std::cerr << "JSON parse error in judgement trial files: " << e.what() << std::endl;
+        assert(false);
+    } catch (json::exception& e) {
+        std::cerr << "JSON data error in judgement trial files: " << e.what() << std::endl;
+        assert(false);
     }
+
+    assert(!m_judgementTrials.empty() && "No judgement trials were loaded!");
 }
 
 const std::vector<JudgementTrial>& DataManager::getJudgementTrials() const {

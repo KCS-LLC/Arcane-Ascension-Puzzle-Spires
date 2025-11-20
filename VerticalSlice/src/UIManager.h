@@ -16,7 +16,7 @@ struct Attunement;
 enum class GameState;
 
 // A structure to represent a command sent from the UI to the Game
-enum class UIActionType { CastSpell, ChangeRoom, SelectAttunement, JudgementComplete };
+enum class UIActionType { CastSpell, ChangeRoom, JudgementComplete };
 struct UIAction {
     UIActionType type;
     int spellIndex = -1;
@@ -31,18 +31,17 @@ public:
     bool handleEvent(const sf::Event& event, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction);
     void setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin, const std::vector<Attunement>& attunements);
     void update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const JudgementResults& results);
-    void render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const JudgementResults& results);
+    void render(sf::RenderWindow& window, GameState currentState, GameState preAnimationState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const JudgementResults& results);
 
     const std::vector<sf::RectangleShape>& getSpellButtons() const;
 
 private:
     sf::Font font;
-
-    // Judgement Screen
-    sf::Text judgementTitle;
+    sf::Clock m_pulseClock;
 
     // Judgement Trial UI
     sf::Text trialTypeText;
+    sf::Text trialObjectiveText;
     sf::Text turnLimitText;
     sf::Text scoreGoalText;
     sf::Text currentTrialScoreText;
@@ -51,8 +50,9 @@ private:
     sf::RectangleShape manaAffinityHighlight;
     sf::Text judgementSummaryTitle;
     sf::Text judgementResultsText;
-    std::vector<sf::RectangleShape> attunementButtons;
-    std::vector<sf::Text> attunementButtonTexts;
+    sf::Text attunementTitleText;
+    sf::Text attunementNameText;
+    sf::Text attunementDescriptionText;
 
     // Titles
     sf::Text playerPanelTitle;

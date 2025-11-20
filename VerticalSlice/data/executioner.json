@@ -1,0 +1,7 @@
+{
+    "id": "executioner",
+    "name": "Executioner",
+    "description": "A master of combat, focusing on overwhelming physical force and destructive power.",
+    "starting_spells": [5, 6],
+    "mana_types": ["fire", "skull", "death", "enhancement"]
+}

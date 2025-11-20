@@ -1,6 +1,18 @@
 {
-    "type": "Control",
-    "boardLayout": [],
-    "turnLimit": 12,
-    "scoreGoal": 400
+    "trialId": "trial_control",
+    "type": 4,
+    "trialType": "Trial of Control",
+    "objective": "Clear all special gems from the board.",
+    "turnLimit": 99,
+    "scoreGoal": 500,
+    "boardLayout": [
+        [ { "subType": 1, "level": 1 }, { "subType": 2, "level": 1 }, { "subType": 3, "level": 1 }, { "subType": 4, "level": 1 }, { "subType": 1, "level": 1 }, { "subType": 2, "level": 1 }, { "subType": 3, "level": 1 }, { "subType": 4, "level": 1 } ],
+        [ { "subType": 10, "level": 1 }, { "subType": 10, "level": 1 }, { "subType": 1, "level": 1 }, { "subType": 2, "level": 1 }, { "subType": 3, "level": 1 }, { "subType": 4, "level": 1 }, { "subType": 1, "level": 1 }, { "subType": 2, "level": 1 } ],
+        [ { "subType": 3, "level": 1 }, { "subType": 4, "level": 1 }, { "subType": 10, "level": 1 }, { "subType": 10, "level": 1 }, { "subType": 1, "level": 1 }, { "subType": 2, "level": 1 }, { "subType": 3, "level": 1 }, { "subType": 4, "level": 1 } ],
+        [ { "subType": 1, "level": 1 }, { "subType": 2, "level": 1 }, { "subType": 3, "level": 1 }, { "subType": 4, "level": 1 }, { "subType": 10, "level": 1 }, { "subType": 10, "level": 1 }, { "subType": 1, "level": 1 }, { "subType": 2, "level": 1 } ],
+        [ { "subType": 3, "level": 1 }, { "subType": 4, "level": 1 }, { "subType": 1, "level": 1 }, { "subType": 2, "level": 1 }, { "subType": 3, "level": 1 }, { "subType": 4, "level": 1 }, { "subType": 10, "level": 1 }, { "subType": 10, "level": 1 } ],
+        [ { "subType": 1, "level": 1 }, { "subType": 2, "level": 1 }, { "subType": 3, "level": 1 }, { "subType": 4, "level": 1 }, { "subType": 1, "level": 1 }, { "subType": 2, "level": 1 }, { "subType": 3, "level": 1 }, { "subType": 4, "level": 1 } ],
+        [ { "subType": 1, "level": 1 }, { "subType": 2, "level": 1 }, { "subType": 3, "level": 1 }, { "subType": 4, "level": 1 }, { "subType": 1, "level": 1 }, { "subType": 2, "level": 1 }, { "subType": 3, "level": 1 }, { "subType": 4, "level": 1 } ],
+        [ { "subType": 1, "level": 1 }, { "subType": 2, "level": 1 }, { "subType": 3, "level": 1 }, { "subType": 4, "level": 1 }, { "subType": 1, "level": 1 }, { "subType": 2, "level": 1 }, { "subType": 3, "level": 1 }, { "subType": 4, "level": 1 } ]
+    ]
 }

@@ -15,6 +15,7 @@ public:
     bool loadFloor(const std::string& path);
 
     const std::vector<Attunement>& getAttunements() const;
+    const Attunement* getAttunementById(const std::string& id) const;
     const std::vector<Spell>& getAllSpells() const;
     const Spell* getSpellById(int id) const;
     int getMonsterHP() const;

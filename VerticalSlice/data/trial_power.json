@@ -1,6 +1,8 @@
 {
-    "type": "Power",
-    "boardLayout": [],
-    "turnLimit": 10,
-    "scoreGoal": 500
+    "trialId": "trial_power",
+    "trialType": "Trial of Power",
+    "objective": "Reach the score goal by matching Skull gems.",
+    "scoreGoal": 1000,
+    "turnLimit": 15,
+    "type": 2
 }

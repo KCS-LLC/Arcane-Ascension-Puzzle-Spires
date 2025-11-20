@@ -44,18 +44,22 @@ private:
     std::set<int> clearedRoomIds;
 
     // Game State
-    GameState currentState;
+    GameState currentState = GameState::Loading;
+    GameState m_preAnimationState;
     sf::Clock animationClock;
 
     // Judgement State
     JudgementResults m_judgementResults;
-    std::vector<JudgementTrial> m_pendingJudgementTrials;
     JudgementTrial m_currentJudgementTrial;
-    int m_currentTrialTurn = 0;
+    size_t m_currentJudgementTrialIndex = 0;
     int m_currentScore = 0;
-    std::vector<Gem> m_matchedGemsInTurn;
-    std::optional<PrimaryGemType> m_manaAffinityChoice;
     int m_currentAffinityScore = 0;
+    int m_currentTrialTurn = 0;
+    std::optional<PrimaryGemType> m_manaAffinityChoice;
+    std::vector<Gem> m_matchedGemsInTurn;
+    sf::Clock m_pulseClock;
+    sf::Clock m_trialTimer;
+    std::vector<JudgementTrial> m_pendingJudgementTrials;
 
     bool isAnimatingSwap;
     bool isAnimatingDestruction;
