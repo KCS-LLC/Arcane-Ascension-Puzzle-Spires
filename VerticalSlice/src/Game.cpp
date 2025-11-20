@@ -1032,11 +1032,11 @@ void Game::moveToRoom(int destinationRoomId) {
 
         
 
-            // TODO: Load the board layout from m_currentJudgementTrial.boardLayoutFile
+                        // For now, just initialize a standard board.
 
-            // For now, just initialize a standard board.
+        
 
-            board.initialize(player); 
+                        board.initialize(m_currentJudgementTrial.boardLayout); 
 
         
 

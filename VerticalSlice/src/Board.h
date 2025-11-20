@@ -11,6 +11,7 @@ public:
     Board();
 
     void initialize(const Player& player); // Fills the board with random gems
+    void initialize(const std::vector<std::vector<Gem>>& layout);
 
     // Core gameplay methods
     bool canSwap(int r1, int c1, int r2, int c2);
