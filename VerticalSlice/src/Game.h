@@ -54,6 +54,8 @@ private:
     int m_currentTrialTurn = 0;
     int m_currentScore = 0;
     std::vector<Gem> m_matchedGemsInTurn;
+    std::optional<PrimaryGemType> m_manaAffinityChoice;
+    int m_currentAffinityScore = 0;
 
     bool isAnimatingSwap;
     bool isAnimatingDestruction;

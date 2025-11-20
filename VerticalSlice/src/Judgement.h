@@ -6,6 +6,8 @@
 
 // Represents the type of tactical trial
 enum class JudgementTrialType {
+    Tactical,
+    ManaAffinity,
     Power,
     Haste,
     Control
