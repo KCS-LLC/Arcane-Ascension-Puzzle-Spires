@@ -13,6 +13,17 @@ void Board::initialize(const Player& player) {
     } while (hasMatches() || findAllValidSwaps().empty());
 }
 
+void Board::initialize(const std::vector<std::vector<Gem>>& layout) {
+    if (layout.size() != BOARD_HEIGHT || (BOARD_HEIGHT > 0 && layout[0].size() != BOARD_WIDTH)) {
+        std::cerr << "Error: Provided board layout has incorrect dimensions." << std::endl;
+        // Fallback to random initialization or handle error appropriately
+        // For now, let's just resize and then it will crash or be wrong if dimensions are off
+        grid.resize(BOARD_HEIGHT, std::vector<Gem>(BOARD_WIDTH));
+    } else {
+        grid = layout;
+    }
+}
+
 void Board::fillBoard(const Player& player) {
     for (int r = 0; r < BOARD_HEIGHT; ++r) {
         for (int c = 0; c < BOARD_WIDTH; ++c) {
