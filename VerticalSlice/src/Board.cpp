@@ -70,7 +70,7 @@ void Board::processMatches(const std::set<std::pair<int, int>>& matches, std::ve
     matchedGems.clear();
     for (const auto& pos : matches) {
         matchedGems.push_back(grid[pos.first][pos.second]);
-        grid[pos.first][pos.second] = { PrimaryGemType::Empty, GemSubType::Empty, 0 };
+        grid[pos.first][pos.second] = Gem(); // Use default constructor for empty
     }
 }
 
@@ -83,7 +83,7 @@ std::vector<Board::FallInfo> Board::applyGravityAndRefill(const Player& player) 
                 if (emptyRow != r) {
                     fallInfos.push_back({c, r, emptyRow, grid[r][c]});
                     grid[emptyRow][c] = grid[r][c];
-                    grid[r][c] = { PrimaryGemType::Empty, GemSubType::Empty, 0 };
+                    grid[r][c] = Gem();
                 }
                 emptyRow--;
             }
@@ -134,17 +134,17 @@ Gem Board::getRandomGem(const Player& player) {
 
     if (manaSubTypes.empty()) {
         // Fallback for player with no attunement selected yet
-        possibleGems.push_back({PrimaryGemType::Attack, GemSubType::Skull, 1});
-        possibleGems.push_back({PrimaryGemType::Treasure, GemSubType::Coin, 1});
-        possibleGems.push_back({PrimaryGemType::Mana, GemSubType::Fire, 1});
-        possibleGems.push_back({PrimaryGemType::Mana, GemSubType::Water, 1});
+        possibleGems.push_back(Gem(GemSubType::Skull, 1));
+        possibleGems.push_back(Gem(GemSubType::Coin, 1));
+        possibleGems.push_back(Gem(GemSubType::Fire, 1));
+        possibleGems.push_back(Gem(GemSubType::Water, 1));
     } else {
         // Create a pool of possible gems: Player's mana types + Skull + Coin
         for (const auto& subType : manaSubTypes) {
-            possibleGems.push_back({PrimaryGemType::Mana, subType, 1});
+            possibleGems.push_back(Gem(subType, 1));
         }
-        possibleGems.push_back({PrimaryGemType::Attack, GemSubType::Skull, 1});
-        possibleGems.push_back({PrimaryGemType::Treasure, GemSubType::Coin, 1});
+        possibleGems.push_back(Gem(GemSubType::Skull, 1));
+        possibleGems.push_back(Gem(GemSubType::Coin, 1));
     }
     
     return possibleGems[rand() % possibleGems.size()];

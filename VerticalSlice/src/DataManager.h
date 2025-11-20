@@ -1,5 +1,6 @@
 #include "SpireData.h"
 #include "Structs.h"
+#include "Gem.h"
 #include "Judgement.h"
 
 // Forward declarations

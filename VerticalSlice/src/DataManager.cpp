@@ -191,7 +191,17 @@ void DataManager::loadJudgementTrials() {
                 std::cerr << "Unknown JudgementTrialType: " << typeStr << " in " << filePath << std::endl;
                 continue;
             }
-            trial.boardLayoutFile = data.at("boardLayout").get<std::string>();
+            trial.boardLayout.resize(BOARD_HEIGHT);
+            for (int r = 0; r < BOARD_HEIGHT; ++r) {
+                trial.boardLayout[r].resize(BOARD_WIDTH);
+                for (int c = 0; c < BOARD_WIDTH; ++c) {
+                    // Assuming 'boardLayout' in JSON is a 2D array of ints, where each int represents GemSubType
+                    // Need to convert int to GemSubType and create a Gem object
+                    // For simplicity, let's assume 0 for Empty, and other values map directly to GemSubType
+                    int gemSubTypeInt = data.at("boardLayout")[r][c].get<int>();
+                    trial.boardLayout[r][c] = Gem(static_cast<GemSubType>(gemSubTypeInt), 1); // Default level to 1
+                }
+            }
             trial.turnLimit = data.at("turnLimit").get<int>();
             trial.scoreGoal = data.at("scoreGoal").get<int>();
             m_judgementTrials.push_back(trial);

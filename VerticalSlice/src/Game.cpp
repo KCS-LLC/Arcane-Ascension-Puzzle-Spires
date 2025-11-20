@@ -1042,6 +1042,4 @@ void Game::moveToRoom(int destinationRoomId) {
 
             currentState = GameState::Judgement_TacticalTrial;
 
-            std::cout << "Starting Judgement Trial: " << m_currentJudgementTrial.boardLayoutFile << std::endl;
-
         }
