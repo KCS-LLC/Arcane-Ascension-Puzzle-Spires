@@ -52,6 +52,8 @@ private:
     std::vector<JudgementTrial> m_pendingJudgementTrials;
     JudgementTrial m_currentJudgementTrial;
     int m_currentTrialTurn = 0;
+    int m_currentScore = 0;
+    std::vector<Gem> m_matchedGemsInTurn;
 
     bool isAnimatingSwap;
     bool isAnimatingDestruction;

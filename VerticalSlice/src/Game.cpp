@@ -384,7 +384,14 @@ void Game::applyMatchConsequences(const std::vector<Gem>& matchedGems) {
 
     int totalDamage = 0;
 
+    m_matchedGemsInTurn.clear(); // Clear previous turn's matched gems
     for (const auto& gem : matchedGems) {
+        m_matchedGemsInTurn.push_back(gem);
+
+        if (currentState == GameState::Judgement_TacticalTrial) {
+            m_currentScore += 10; // Example scoring: 10 points per gem matched in a trial
+            std::cout << "Judgement Trial Score: " << m_currentScore << " / " << m_currentJudgementTrial.scoreGoal << std::endl;
+        }
 
         switch (gem.primaryType) {
 
@@ -616,11 +623,17 @@ void Game::update() {
 
         } else if (currentState == GameState::Judgement_TacticalTrial) {
 
-            if (m_currentTrialTurn >= m_currentJudgementTrial.turnLimit) {
+            if (m_currentTrialTurn >= m_currentJudgementTrial.turnLimit || m_currentScore >= m_currentJudgementTrial.scoreGoal) {
 
-                // TODO: Record score
+                std::cout << "Trial Objective Met or Turn Limit Reached! Recording score." << std::endl;
 
-                startNextJudgementTrial();
+                // Record score
+
+                                m_judgementResults.trialScores[m_currentJudgementTrial.type] = m_currentScore; // Record the score for this trial type
+
+                                m_matchedGemsInTurn.clear();
+
+                                startNextJudgementTrial();
 
             }
 
@@ -1029,6 +1042,7 @@ void Game::moveToRoom(int destinationRoomId) {
         
 
             m_currentTrialTurn = 0;
+            m_currentScore = 0;
 
         
 
