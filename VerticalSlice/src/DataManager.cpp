@@ -7,7 +7,9 @@
 
 using json = nlohmann::json;
 
-DataManager::DataManager() : monsterHP(0), monsterSpeed(0), monsterAttackDamage(0) {}
+DataManager::DataManager() : monsterHP(0), monsterSpeed(0), monsterAttackDamage(0) {
+    loadJudgementTrials();
+}
 
 bool DataManager::loadAttunements(const std::string& path) {
     std::ifstream f(path);
@@ -159,4 +161,49 @@ const Room* DataManager::getRoomById(int roomId) const {
         }
     }
     return nullptr;
+}
+
+void DataManager::loadJudgementTrials() {
+    std::vector<std::string> trialFiles = {
+        "data/trial_power.json",
+        "data/trial_haste.json",
+        "data/trial_control.json"
+    };
+
+    for (const auto& filePath : trialFiles) {
+        std::ifstream f(filePath);
+        if (!f.is_open()) {
+            std::cerr << "Could not open judgement trial file: " << filePath << std::endl;
+            continue;
+        }
+
+        try {
+            json data = json::parse(f);
+            JudgementTrial trial;
+            std::string typeStr = data.at("type").get<std::string>();
+            if (typeStr == "Power") {
+                trial.type = JudgementTrialType::Power;
+            } else if (typeStr == "Haste") {
+                trial.type = JudgementTrialType::Haste;
+            } else if (typeStr == "Control") {
+                trial.type = JudgementTrialType::Control;
+            } else {
+                std::cerr << "Unknown JudgementTrialType: " << typeStr << " in " << filePath << std::endl;
+                continue;
+            }
+            trial.boardLayoutFile = data.at("boardLayout").get<std::string>();
+            trial.turnLimit = data.at("turnLimit").get<int>();
+            trial.scoreGoal = data.at("scoreGoal").get<int>();
+            m_judgementTrials.push_back(trial);
+
+        } catch (json::parse_error& e) {
+            std::cerr << "JSON parse error in judgement trial file " << filePath << ": " << e.what() << std::endl;
+        } catch (json::exception& e) {
+            std::cerr << "JSON data error in judgement trial file " << filePath << ": " << e.what() << std::endl;
+        }
+    }
+}
+
+const std::vector<JudgementTrial>& DataManager::getJudgementTrials() const {
+    return m_judgementTrials;
 }

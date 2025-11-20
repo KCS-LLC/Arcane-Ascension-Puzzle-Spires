@@ -1,8 +1,6 @@
-#ifndef DATAMANAGER_H
-#define DATAMANAGER_H
-
 #include "SpireData.h"
 #include "Structs.h"
+#include "Judgement.h"
 
 // Forward declarations
 
@@ -24,6 +22,7 @@ public:
     std::string getMonsterName() const;
     const Floor& getFloor() const;
     const Room* getRoomById(int roomId) const;
+    const std::vector<JudgementTrial>& getJudgementTrials() const;
 
 private:
     std::vector<Attunement> attunements;
@@ -33,6 +32,6 @@ private:
     int monsterAttackDamage;
     std::string monsterName;
     Floor currentFloor;
+    std::vector<JudgementTrial> m_judgementTrials;
+    void loadJudgementTrials();
 };
-
-#endif // DATAMANAGER_H
