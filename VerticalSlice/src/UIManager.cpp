@@ -80,7 +80,7 @@ void UIManager::setupTrial(const JudgementTrial& trial) {
 }
 
 void UIManager::update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const JudgementResults& results) {
-    if (currentState == GameState::Judgement_Trial) {
+    if (currentState == GameState::Trial) {
         currentTrialScoreText.setString("Score: " + std::to_string(currentScore));
         turnLimitText.setString("Turns Left: " + std::to_string(currentTrial.turnLimit - currentTrialTurn));
     }
@@ -88,24 +88,21 @@ void UIManager::update(const Player& player, const Monster& monster, GameState c
     // ... other update logic ...
 }
 
-void UIManager::render(sf::RenderWindow& window, GameState currentState, GameState preAnimationState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const JudgementResults& results) {
+void UIManager::render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const JudgementResults& results) {
     // Simplified rendering for now, based on current GameState
     switch (currentState) {
-        case GameState::Judgement_Intro:
-        case GameState::Judgement_Trial:
-        case GameState::Judgement_Summary:
-        case GameState::Judgement_AttunementReveal:
+        case GameState::Intro:
+        case GameState::Trial:
+        case GameState::Summary:
+        case GameState::AttunementReveal:
             window.draw(trialTypeText);
             window.draw(trialObjectiveText);
             window.draw(turnLimitText);
             window.draw(scoreGoalText);
             window.draw(currentTrialScoreText);
             break;
-        case GameState::Exploration:
-            // Render exploration UI elements
-            break;
-        case GameState::Combat:
-            // Render combat UI elements
+        case GameState::Playing: // Represents Exploration, Combat, etc.
+            // Render exploration or combat UI elements
             break;
         case GameState::GameOver:
             window.draw(gameOverText);

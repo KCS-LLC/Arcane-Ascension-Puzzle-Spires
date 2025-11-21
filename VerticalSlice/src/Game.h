@@ -35,6 +35,7 @@ private:
     GemFactory m_gemFactory;
     Board m_board;
 
+    GameMode m_gameMode;
     GameState m_gameState;
     
     // Judgement trial state
@@ -46,4 +47,17 @@ private:
 
     // Gem selection
     sf::Vector2i m_selectedGem = sf::Vector2i(-1, -1);
+
+    // Animation state
+    bool m_isAnimating = false;
+    bool m_isAnimatingSwap = false;
+    bool m_isAnimatingDestruction = false;
+    bool m_isAnimatingRefill = false;
+    sf::Clock m_animationClock;
+    std::pair<sf::Vector2i, sf::Vector2i> m_animatingGems;
+    std::set<std::pair<int, int>> m_destroyingGems;
+    std::vector<Board::FallInfo> m_fallInfo;
+
+    // Board positioning
+    sf::Vector2f m_boardOrigin;
 };

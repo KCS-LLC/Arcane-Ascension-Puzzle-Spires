@@ -20,11 +20,23 @@ Game::Game()
       m_uiManager(dataManager.getFont()),
       m_gemFactory(dataManager),
       m_board(BOARD_WIDTH, BOARD_HEIGHT, m_gemFactory),
-      m_gameState(GameState::Judgement_Intro),
-      m_currentTrialIndex(0)
+      m_gameMode(GameMode::Judgement),
+      m_gameState(GameState::Intro),
+      m_currentTrialIndex(0),
+      m_isAnimating(false),
+      m_isAnimatingSwap(false),
+      m_isAnimatingDestruction(false),
+      m_isAnimatingRefill(false)
 {
     m_window.setFramerateLimit(60);
     loadTextures();
+
+    const int boardPixelWidth = BOARD_WIDTH * TILE_SIZE;
+    const int boardPixelHeight = BOARD_HEIGHT * TILE_SIZE;
+    m_boardOrigin.x = (WINDOW_WIDTH - boardPixelWidth) / 2.0f;
+    m_boardOrigin.y = WINDOW_HEIGHT - boardPixelHeight - 20.0f;
+
+    m_uiManager.setup(m_player, m_window.getSize(), m_boardOrigin, {}); // Passing empty attunements for now
 
     m_judgementTrials = dataManager.getJudgementTrials();
     if (!m_judgementTrials.empty()) {
@@ -33,28 +45,16 @@ Game::Game()
 }
 
 void Game::loadTextures() {
-    // Load textures based on the GemCatalogEntry in DataManager
-    // This will require an iterator over the m_gemCatalog map
-    // For now, let's just load a few known textures to get it compiling
-    // We'll need a way to get the GemCatalog from DataManager. This will be added later.
-
-    // Placeholder: Need to get actual texture paths from DataManager's gem catalog
-    gemTextures[GemSubType::Fire].loadFromFile("assets/gem_fire.png");
-    gemTextures[GemSubType::Water].loadFromFile("assets/gem_water.png");
-    gemTextures[GemSubType::Earth].loadFromFile("assets/gem_earth.png");
-    gemTextures[GemSubType::Air].loadFromFile("assets/gem_air.png");
-    gemTextures[GemSubType::Light].loadFromFile("assets/gem_light.png");
-    gemTextures[GemSubType::Life].loadFromFile("assets/gem_life.png");
-    gemTextures[GemSubType::Enhancement].loadFromFile("assets/gem_enhancement.png");
-    gemTextures[GemSubType::Transference].loadFromFile("assets/gem_transference.png");
-    gemTextures[GemSubType::Death].loadFromFile("assets/gem_death.png");
-    gemTextures[GemSubType::Umbral].loadFromFile("assets/gem_umbral.png");
-    gemTextures[GemSubType::Mental].loadFromFile("assets/gem_mental.png");
-    gemTextures[GemSubType::Perception].loadFromFile("assets/gem_perception.png");
-    gemTextures[GemSubType::Coin].loadFromFile("assets/gem_coin.png");
-    gemTextures[GemSubType::Skull].loadFromFile("assets/gem_skull.png");
-    gemTextures[GemSubType::Raw].loadFromFile("assets/gem_raw.png");
-    gemTextures[GemSubType::Grey].loadFromFile("assets/gem_raw.png"); // Placeholder for Grey
+    const auto& catalog = dataManager.getGemCatalog();
+    for (const auto& pair : catalog) {
+        const GemCatalogEntry& entry = pair.second;
+        if (!entry.texturePath.empty()) {
+            if (!gemTextures[pair.first].loadFromFile(entry.texturePath)) {
+                std::cerr << "Failed to load texture for " << entry.name 
+                          << " from " << entry.texturePath << std::endl;
+            }
+        }
+    }
 }
 
 void Game::setupJudgementTrial(const JudgementTrial& trial) {
@@ -81,6 +81,7 @@ void Game::run() {
 
 void Game::processEvents() {
     for (auto event = m_window.pollEvent(); event; event = m_window.pollEvent()) {
+        if (m_isAnimating) continue; // Ignore input during animations
         handleInput(*event);
     }
 }
@@ -91,21 +92,17 @@ void Game::handleInput(sf::Event event) {
     }
     if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>()) {
         if (mb->button == sf::Mouse::Button::Left) {
-            int col = mb->position.x / TILE_SIZE;
-            int row = mb->position.y / TILE_SIZE;
+            int col = (mb->position.x - static_cast<int>(m_boardOrigin.x)) / TILE_SIZE;
+            int row = (mb->position.y - static_cast<int>(m_boardOrigin.y)) / TILE_SIZE;
 
             if (m_selectedGem.x == -1) {
                 m_selectedGem = sf::Vector2i(col, row);
             } else {
                 if (m_board.canSwap(m_selectedGem.y, m_selectedGem.x, row, col)) {
-                    m_board.swapGems(m_selectedGem.y, m_selectedGem.x, row, col);
-                    auto matches = m_board.findMatches();
-                    if (!matches.empty()) {
-                        resolveMatches(matches);
-                    } else {
-                        // Invalid swap, swap back
-                        m_board.swapGems(m_selectedGem.y, m_selectedGem.x, row, col);
-                    }
+                    m_isAnimating = true;
+                    m_isAnimatingSwap = true;
+                    m_animatingGems = { m_selectedGem, sf::Vector2i(col, row) };
+                    m_animationClock.restart();
                 }
                 m_selectedGem = sf::Vector2i(-1, -1);
             }
@@ -120,43 +117,156 @@ void Game::resolveMatches(const std::set<std::pair<int, int>>& matches) {
             gem->onMatch(m_board, m_player, m_monster);
         }
     }
-    m_board.removeGems(matches);
-    m_board.applyGravity();
-    // Default gems for refill, as trial.gems is removed
-    m_board.refill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air});
 }
 
 void Game::update(sf::Time deltaTime) {
-    if (m_gameState == GameState::Judgement_Trial) {
-        float elapsed = m_trialClock.getElapsedTime().asSeconds();
+    const float swapAnimationDuration = 0.2f;
+    const float destructionAnimationDuration = 0.3f;
+    const float refillAnimationDuration = 0.3f;
 
-        JudgementResults results; // Placeholder for now
-        std::set<int> visitedRoomIds; // Placeholder
+    if (m_isAnimating) {
+        if (m_isAnimatingSwap) {
+            if (m_animationClock.getElapsedTime().asSeconds() >= swapAnimationDuration) {
+                sf::Vector2i p1 = {m_animatingGems.first.y, m_animatingGems.first.x};
+                sf::Vector2i p2 = {m_animatingGems.second.y, m_animatingGems.second.x};
 
-        // m_uiManager.update(m_player, m_monster, m_gameState, nullptr, visitedRoomIds, dataManager, m_currentJudgementTrial, 0, 0, std::nullopt, results); // Re-enable later
+                m_board.swapGems(p1.x, p1.y, p2.x, p2.y);
+                auto matches = m_board.findMatches();
+                if (!matches.empty()) { // Swap resulted in a match
+                    resolveMatches(matches);
+                    m_isAnimatingSwap = false;
+                    m_isAnimatingDestruction = true;
+                    m_destroyingGems = matches;
+                    m_animationClock.restart();
+                } else { // Invalid swap, animate back
+                    m_animatingGems = { m_animatingGems.second, m_animatingGems.first };
+                    m_animationClock.restart();
+                    m_board.swapGems(p1.x, p1.y, p2.x, p2.y); // Swap back immediately data-wise
+                    // Reset to a non-animating state after the swap-back animation finishes
+                    if (m_animationClock.getElapsedTime().asSeconds() >= swapAnimationDuration) {
+                       m_isAnimating = false;
+                       m_isAnimatingSwap = false;
+                    }
+                }
+            }
+        } else if (m_isAnimatingDestruction) {
+            if (m_animationClock.getElapsedTime().asSeconds() >= destructionAnimationDuration) {
+                m_isAnimatingDestruction = false;
+                m_board.removeGems(m_destroyingGems);
+                m_fallInfo = m_board.applyGravity();
+                m_board.refill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air});
+                m_isAnimatingRefill = true;
+                m_animationClock.restart();
+            }
+        } else if (m_isAnimatingRefill) {
+             if (m_animationClock.getElapsedTime().asSeconds() >= refillAnimationDuration) {
+                auto newMatches = m_board.findMatches(); // Check for cascades
+                if (!newMatches.empty()) {
+                    resolveMatches(newMatches);
+                    m_isAnimatingRefill = false;
+                    m_isAnimatingDestruction = true; // Chain into another destruction
+                    m_destroyingGems = newMatches;
+                    m_animationClock.restart();
+                } else {
+                    m_isAnimating = false;
+                    m_isAnimatingRefill = false;
+                }
+            }
+        }
+        return; 
+    }
+
+    // Main game logic updates
+    switch (m_gameMode) {
+        case GameMode::Judgement:
+        {
+            JudgementResults results; // Placeholder for now
+            std::set<int> visitedRoomIds; // Placeholder
+            m_uiManager.update(m_player, m_monster, m_gameState, nullptr, visitedRoomIds, dataManager, m_currentJudgementTrial, 0, 0, std::nullopt, results);
+            break;
+        }
+        case GameMode::Exploration:
+            // Exploration-specific update logic here
+            break;
+        case GameMode::Combat:
+            // Combat-specific update logic here
+            break;
     }
 }
 
 void Game::render() {
     m_window.clear(sf::Color(30, 30, 30));
-    
-    m_board.render(m_window);
 
-    JudgementResults results; // Placeholder for now
-    
-    // m_uiManager.render(m_window, m_gameState, m_gameState, false, m_currentJudgementTrial, 0, 0, std::nullopt, results); // Re-enable later
+    // Render the static board, hiding animating gems
+    m_board.render(m_window, m_boardOrigin, m_isAnimatingSwap, m_animatingGems, m_isAnimatingDestruction, m_destroyingGems, m_isAnimatingRefill, m_fallInfo);
 
-    if (m_currentJudgementTrial.type == JudgementTrialType::Control) {
-         float alpha = 128 + 127 * std::sin(m_pulseClock.getElapsedTime().asSeconds() * 5);
-         for (int r = 0; r < BOARD_HEIGHT; ++r) {
-            for (int c = 0; c < BOARD_WIDTH; ++c) {
-                BaseGem* gem = m_board.getGemAt(r, c);
-                if (gem && gem->getSubType() == GemSubType::Transference) {
-                    sf::Sprite& sprite = gem->getSprite();
-                    sprite.setColor(sf::Color(255, 255, 255, static_cast<std::uint8_t>(alpha)));
-                }
+    const float swapAnimationDuration = 0.2f;
+    const float destructionAnimationDuration = 0.3f;
+    const float refillAnimationDuration = 0.3f;
+    float p = 0.0f; 
+
+    // Render swap animation
+    if (m_isAnimatingSwap) {
+        p = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / swapAnimationDuration);
+        sf::Vector2f p1_local((float)m_animatingGems.first.x * TILE_SIZE, (float)m_animatingGems.first.y * TILE_SIZE);
+        sf::Vector2f p2_local((float)m_animatingGems.second.x * TILE_SIZE, (float)m_animatingGems.second.y * TILE_SIZE);
+
+        BaseGem* g1 = m_board.getGemAt(m_animatingGems.first.y, m_animatingGems.first.x);
+        if (g1) {
+            sf::Sprite s1 = g1->getSprite();
+            s1.setPosition(p1_local + (p2_local - p1_local) * p + m_boardOrigin);
+            m_window.draw(s1);
+        }
+
+        BaseGem* g2 = m_board.getGemAt(m_animatingGems.second.y, m_animatingGems.second.x);
+        if (g2) {
+            sf::Sprite s2 = g2->getSprite();
+            s2.setPosition(p2_local + (p1_local - p2_local) * p + m_boardOrigin);
+            m_window.draw(s2);
+        }
+    }
+
+    // Render destruction animation
+    if (m_isAnimatingDestruction) {
+        float animProgress = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / destructionAnimationDuration);
+        float scale = 1.f - animProgress;
+        for (const auto& pos : m_destroyingGems) {
+            BaseGem* gem = m_board.getGemAt(pos.first, pos.second);
+            if (gem) {
+                sf::Sprite sprite = gem->getSprite();
+                const sf::Texture* tex = &sprite.getTexture();
+                sf::Vector2u texSize = tex->getSize();
+                sprite.setOrigin({texSize.x / 2.f, texSize.y / 2.f});
+                
+                float baseScaleX = static_cast<float>(TILE_SIZE) / texSize.x;
+                float baseScaleY = static_cast<float>(TILE_SIZE) / texSize.y;
+                sprite.setScale({baseScaleX * scale, baseScaleY * scale});
+                
+                sprite.setPosition({pos.second * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.x, pos.first * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.y});
+                m_window.draw(sprite);
             }
         }
     }
+
+    // Render refill animation (falling gems)
+    if (m_isAnimatingRefill) {
+        p = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / refillAnimationDuration);
+        for (const auto& info : m_fallInfo) {
+            BaseGem* gem = m_board.getGemAt(info.fallToRow, info.col);
+            if (gem) {
+                sf::Vector2f start_local((float)info.col * TILE_SIZE, (float)info.row * TILE_SIZE);
+                sf::Vector2f end_local((float)info.col * TILE_SIZE, (float)info.fallToRow * TILE_SIZE);
+                
+                sf::Sprite sprite = gem->getSprite();
+                sprite.setPosition(start_local + (end_local - start_local) * p + m_boardOrigin);
+                m_window.draw(sprite);
+            }
+        }
+    }
+
+    // UI Rendering
+    JudgementResults results; // Placeholder
+    m_uiManager.render(m_window, m_gameState, false, m_currentJudgementTrial, 0, 0, std::nullopt, results);
+
     m_window.display();
 }

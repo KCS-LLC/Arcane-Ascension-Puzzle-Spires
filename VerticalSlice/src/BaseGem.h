@@ -29,7 +29,7 @@ public:
     void setPosition(float x, float y);
     const sf::Vector2f& getPosition() const;
     sf::Sprite& getSprite();
-    void render(sf::RenderWindow& window);
+    void render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin);
 
 protected:
     const GemCatalogEntry* m_catalogEntry;

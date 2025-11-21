@@ -3,27 +3,20 @@
 constexpr int TILE_SIZE = 64;
 constexpr int BOARD_WIDTH = 8;
 constexpr int BOARD_HEIGHT = 8;
-constexpr int WINDOW_WIDTH = 800;
-constexpr int WINDOW_HEIGHT = 600;
+constexpr int WINDOW_WIDTH = 1280;
+constexpr int WINDOW_HEIGHT = 720;
+
+enum class GameMode {
+    Judgement,
+    Exploration,
+    Combat
+};
 
 enum class GameState {
-    Loading,
-    Animating,
+    Intro,
+    Trial,
+    Summary,
+    AttunementReveal,
     Playing,
-    GameOver,
-    Judgement_Intro,
-    Judgement_Trial,
-    Judgement_Summary,
-    Judgement_AttunementReveal,
-    Exploration,
-    Combat,
-    Treasure,
-    Special,
-    Puzzle,
-    Trap,
-    Sanctuary,
-    AgilityChallenge,
-    EnduranceChallenge,
-    MagicChallenge,
-    Exit
+    GameOver
 };

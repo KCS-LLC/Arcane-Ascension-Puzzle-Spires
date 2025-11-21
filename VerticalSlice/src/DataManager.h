@@ -24,6 +24,7 @@ public:
 
     // Getters
     const GemCatalogEntry* getGemCatalogEntry(GemSubType subType) const;
+    const std::map<GemSubType, GemCatalogEntry>& getGemCatalog() const;
     const SecondaryGemTypeData* getSecondaryGemTypeData(int secondaryTypeId) const;
     PrimaryGemType getPrimaryGemType(GemSubType subType) const;
     const std::vector<Attunement>& getAttunements() const;

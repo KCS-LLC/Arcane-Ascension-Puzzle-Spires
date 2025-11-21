@@ -25,7 +25,7 @@ void Board::initialize(const std::vector<GemSubType>& possibleGems) {
                 m_grid[r][c] = m_gemFactory.createGem(type, gemTextures.at(type));
             } while (findMatches().count({r, c})); // Ensure no matches on creation
              if (m_grid[r][c]) {
-                m_grid[r][c]->setPosition(c * 64, r * 64); // Assuming 64x64 gems
+                m_grid[r][c]->setPosition(c * TILE_SIZE, r * TILE_SIZE);
             }
         }
     }
@@ -43,17 +43,33 @@ void Board::initializeForPowerTrial() {
             GemSubType type = trialGems[(r + c) % 2]; // Checkerboard for now
             m_grid[r][c] = m_gemFactory.createGem(type, gemTextures.at(type));
             if (m_grid[r][c]) {
-                m_grid[r][c]->setPosition(c * 64, r * 64);
+                m_grid[r][c]->setPosition(c * TILE_SIZE, r * TILE_SIZE);
             }
         }
     }
 }
 
-void Board::render(sf::RenderWindow& window) {
+void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<std::pair<int, int>>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo) {
     for (int r = 0; r < m_height; ++r) {
         for (int c = 0; c < m_width; ++c) {
-            if (m_grid[r][c]) {
-                m_grid[r][c]->render(window);
+            bool shouldDraw = true;
+            if (isAnimatingSwap && ((r == animatingGems.first.y && c == animatingGems.first.x) || (r == animatingGems.second.y && c == animatingGems.second.x))) {
+                shouldDraw = false;
+            }
+            if (isAnimatingDestruction && destroyingGems.count({r, c})) {
+                shouldDraw = false;
+            }
+            if (isAnimatingRefill) {
+                for (const auto& info : fallInfo) {
+                    if (info.col == c && info.fallToRow == r) {
+                        shouldDraw = false;
+                        break;
+                    }
+                }
+            }
+
+            if (shouldDraw && m_grid[r][c]) {
+                m_grid[r][c]->render(window, boardOrigin);
             }
         }
     }
@@ -74,10 +90,10 @@ bool Board::canSwap(int r1, int c1, int r2, int c2) {
 void Board::swapGems(int r1, int c1, int r2, int c2) {
     m_grid[r1][c1].swap(m_grid[r2][c2]);
     if (m_grid[r1][c1]) {
-        m_grid[r1][c1]->setPosition(c1 * 64, r1 * 64);
+        m_grid[r1][c1]->setPosition(c1 * TILE_SIZE, r1 * TILE_SIZE);
     }
     if (m_grid[r2][c2]) {
-        m_grid[r2][c2]->setPosition(c2 * 64, r2 * 64);
+        m_grid[r2][c2]->setPosition(c2 * TILE_SIZE, r2 * TILE_SIZE);
     }
 }
 
@@ -129,7 +145,7 @@ std::vector<Board::FallInfo> Board::applyGravity() {
             if (m_grid[r][c] && emptyRow != -1) {
                 m_grid[emptyRow][c] = std::move(m_grid[r][c]);
                 fallInfo.push_back({r, c, emptyRow});
-                m_grid[emptyRow][c]->setPosition(c * 64, emptyRow * 64);
+                m_grid[emptyRow][c]->setPosition(c * TILE_SIZE, emptyRow * TILE_SIZE);
                 emptyRow--;
             }
         }
@@ -148,7 +164,7 @@ void Board::refill(const std::vector<GemSubType>& possibleGems) {
                 GemSubType type = possibleGems[distrib(gen)];
                 m_grid[r][c] = m_gemFactory.createGem(type, gemTextures.at(type));
                  if (m_grid[r][c]) {
-                    m_grid[r][c]->setPosition(c * 64, r * 64);
+                    m_grid[r][c]->setPosition(c * TILE_SIZE, r * TILE_SIZE);
                 }
             }
         }

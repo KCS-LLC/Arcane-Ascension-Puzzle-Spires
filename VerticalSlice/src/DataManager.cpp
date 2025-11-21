@@ -49,6 +49,17 @@ void from_json(const json& j, Room& r) {
     j.at("connections").get_to(r.connections);
 }
 
+void from_json(const json& j, JudgementTrial& trial) {
+    j.at("trialId").get_to(trial.trialId);
+    j.at("objective").get_to(trial.objective);
+    trial.type = static_cast<JudgementTrialType>(j.at("type").get<int>());
+    j.at("turnLimit").get_to(trial.turnLimit);
+    if (j.contains("timeLimit")) {
+        j.at("timeLimit").get_to(trial.timeLimit);
+    }
+    j.at("scoreGoal").get_to(trial.scoreGoal);
+}
+
 void from_json(const json& j, Floor& f) {
     j.at("floorNumber").get_to(f.floorNumber);
     j.at("startRoomId").get_to(f.startRoomId);
@@ -151,13 +162,36 @@ bool DataManager::loadFloor(const std::string& path) {
     return true;
 }
 bool DataManager::loadJudgementTrials() {
-    // Implementation needed
+    const std::vector<std::string> trialFiles = {
+        "data/trial_power.json",
+        "data/trial_haste.json",
+        "data/trial_control.json"
+    };
+
+    for (const auto& filePath : trialFiles) {
+        std::ifstream f(filePath);
+        if (!f.is_open()) {
+            std::cerr << "Failed to open trial file: " << filePath << std::endl;
+            return false;
+        }
+        try {
+            json data = json::parse(f);
+            m_judgementTrials.push_back(data.get<JudgementTrial>());
+        } catch (const json::exception& e) {
+            std::cerr << "JSON error in " << filePath << ": " << e.what() << std::endl;
+            return false;
+        }
+    }
     return true;
 }
 
 const GemCatalogEntry* DataManager::getGemCatalogEntry(GemSubType subType) const {
     auto it = m_gemCatalog.find(subType);
     return (it != m_gemCatalog.end()) ? &it->second : nullptr;
+}
+
+const std::map<GemSubType, GemCatalogEntry>& DataManager::getGemCatalog() const {
+    return m_gemCatalog;
 }
 
 const SecondaryGemTypeData* DataManager::getSecondaryGemTypeData(int secondaryTypeId) const {

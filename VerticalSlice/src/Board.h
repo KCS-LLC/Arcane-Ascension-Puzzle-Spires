@@ -12,12 +12,18 @@ class Monster;
 
 class Board {
 public:
+    struct FallInfo {
+        int row;
+        int col;
+        int fallToRow;
+    };
+
     Board(int width, int height, GemFactory& factory);
 
     void initialize(const std::vector<GemSubType>& possibleGems);
     void initializeForPowerTrial();
 
-    void render(sf::RenderWindow& window);
+    void render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<std::pair<int, int>>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo);
     BaseGem* getGemAt(int r, int c);
 
     // Gameplay logic
@@ -26,11 +32,6 @@ public:
     std::set<std::pair<int, int>> findMatches();
     void removeGems(const std::set<std::pair<int, int>>& matches);
     
-    struct FallInfo {
-        int row;
-        int col;
-        int fallToRow;
-    };
     std::vector<FallInfo> applyGravity();
     void refill(const std::vector<GemSubType>& possibleGems);
 
