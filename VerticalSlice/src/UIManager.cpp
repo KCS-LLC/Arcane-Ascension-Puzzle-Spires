@@ -38,11 +38,20 @@ UIManager::UIManager(const sf::Font& font)
     // Positions and colors can be set here
     trialTypeText.setFillColor(sf::Color::White);
     trialObjectiveText.setFillColor(sf::Color::White);
+    turnLimitText.setFillColor(sf::Color::White);
+    scoreGoalText.setFillColor(sf::Color::White);
     currentTrialScoreText.setFillColor(sf::Color::White);
     
     trialTypeText.setPosition(sf::Vector2f{ 10, 10 });
     trialObjectiveText.setPosition(sf::Vector2f{ 10, 40 });
+    turnLimitText.setPosition(sf::Vector2f{ 10, 70 });
+    scoreGoalText.setPosition(sf::Vector2f{ 10, 100 });
     currentTrialScoreText.setPosition(sf::Vector2f{ 650, 10 });
+
+    judgementSummaryTitle.setFillColor(sf::Color::White);
+    judgementResultsText.setFillColor(sf::Color::White);
+    judgementSummaryTitle.setPosition(sf::Vector2f{ 450, 200 });
+    judgementResultsText.setPosition(sf::Vector2f{ 450, 250 });
 
     // ... other initializations ...
 }
@@ -80,36 +89,73 @@ void UIManager::setupTrial(const JudgementTrial& trial) {
 }
 
 void UIManager::update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const JudgementResults& results) {
-    if (currentState == GameState::Trial) {
+    // Update Trial UI text
+    if (currentState == GameState::Trial || currentState == GameState::AttunementReveal) {
+        trialTypeText.setString(trialTypeToString(currentTrial.type));
+        trialObjectiveText.setString(currentTrial.objective);
+        scoreGoalText.setString("Goal: " + std::to_string(currentTrial.scoreGoal));
+        turnLimitText.setString("Turns: " + std::to_string(currentTrialTurn) + "/" + std::to_string(currentTrial.turnLimit));
         currentTrialScoreText.setString("Score: " + std::to_string(currentScore));
-        turnLimitText.setString("Turns Left: " + std::to_string(currentTrial.turnLimit - currentTrialTurn));
     }
-
-    // ... other update logic ...
 }
 
 void UIManager::render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const JudgementResults& results) {
-    // Simplified rendering for now, based on current GameState
+
+
+
     switch (currentState) {
+
         case GameState::Intro:
+
+            // Draw specific Intro UI elements here if any
+
+            break;
+
         case GameState::Trial:
-        case GameState::Summary:
-        case GameState::AttunementReveal:
+
             window.draw(trialTypeText);
+
             window.draw(trialObjectiveText);
+
             window.draw(turnLimitText);
+
             window.draw(scoreGoalText);
+
             window.draw(currentTrialScoreText);
+
+            // Add other trial-specific UI elements here
+
             break;
-        case GameState::Playing: // Represents Exploration, Combat, etc.
+
+        case GameState::Summary:
+            judgementSummaryTitle.setString("Trial Complete");
+            judgementResultsText.setString("Final Score: " + std::to_string(currentScore));
+            window.draw(judgementSummaryTitle);
+            window.draw(judgementResultsText);
+            break;
+
+        case GameState::AttunementReveal:
+
+            // Draw Attunement Reveal UI elements here
+
+            break;
+
+        case GameState::Playing:
+
             // Render exploration or combat UI elements
+
             break;
+
         case GameState::GameOver:
+
             window.draw(gameOverText);
+
             break;
+
         default:
-            // Render general UI elements or nothing
+
             break;
+
     }
 
     // ... other rendering logic ...

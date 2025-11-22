@@ -13,9 +13,10 @@ class Monster;
 class Board {
 public:
     struct FallInfo {
-        int row;
+        int startRow;
         int col;
         int fallToRow;
+        GemSubType type; // Needed for rendering gems that don't exist in the grid yet
     };
 
     Board(int width, int height, GemFactory& factory);

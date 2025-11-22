@@ -1,6 +1,7 @@
 #include "PCH.h"
 #include "StringUtils.h"
 #include "Structs.h"
+#include "Judgement.h" // Include Judgement.h for JudgementTrialType
 #include <algorithm>
 #include <sstream>
 
@@ -151,4 +152,15 @@ RoomType stringToRoomType(const std::string& s) {
     if (s == "EnduranceChallenge") return RoomType::EnduranceChallenge;
     if (s == "MagicChallenge") return RoomType::MagicChallenge;
     return RoomType::Unknown;
+}
+
+std::string trialTypeToString(JudgementTrialType type) {
+    switch (type) {
+        case JudgementTrialType::Tactical: return "Tactical";
+        case JudgementTrialType::ManaAffinity: return "Mana Affinity";
+        case JudgementTrialType::Power: return "Power";
+        case JudgementTrialType::Haste: return "Haste";
+        case JudgementTrialType::Control: return "Control";
+        default: return "Unknown";
+    }
 }

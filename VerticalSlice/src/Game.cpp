@@ -26,7 +26,9 @@ Game::Game()
       m_isAnimating(false),
       m_isAnimatingSwap(false),
       m_isAnimatingDestruction(false),
-      m_isAnimatingRefill(false)
+      m_isAnimatingRefill(false),
+      m_currentTurn(0),
+      m_currentScore(0)
 {
     m_window.setFramerateLimit(60);
     loadTextures();
@@ -59,6 +61,9 @@ void Game::loadTextures() {
 
 void Game::setupJudgementTrial(const JudgementTrial& trial) {
     m_currentJudgementTrial = trial;
+    m_gameState = GameState::Trial;
+    m_currentScore = 0;
+    m_currentTurn = 0;
     // m_uiManager.setupTrial(trial); // Will need to re-enable after UIManager is updated
     if (trial.type == JudgementTrialType::Power) {
         m_board.initializeForPowerTrial();
@@ -92,6 +97,16 @@ void Game::handleInput(sf::Event event) {
     }
     if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>()) {
         if (mb->button == sf::Mouse::Button::Left) {
+            if (m_gameState == GameState::Summary) {
+                m_currentTrialIndex++;
+                if (m_currentTrialIndex < m_judgementTrials.size()) {
+                    setupJudgementTrial(m_judgementTrials[m_currentTrialIndex]);
+                } else {
+                    m_gameState = GameState::GameOver; // All trials finished
+                }
+                return; // Consume the click
+            }
+
             int col = (mb->position.x - static_cast<int>(m_boardOrigin.x)) / TILE_SIZE;
             int row = (mb->position.y - static_cast<int>(m_boardOrigin.y)) / TILE_SIZE;
 
@@ -134,6 +149,8 @@ void Game::update(sf::Time deltaTime) {
                 auto matches = m_board.findMatches();
                 if (!matches.empty()) { // Swap resulted in a match
                     resolveMatches(matches);
+                    m_currentTurn++; // Increment turn after a valid move
+                    m_currentScore += (matches.size() * 100); // Add score for destroyed gems
                     m_isAnimatingSwap = false;
                     m_isAnimatingDestruction = true;
                     m_destroyingGems = matches;
@@ -176,13 +193,22 @@ void Game::update(sf::Time deltaTime) {
         return; 
     }
 
+    // Check for Judgement trial win/loss conditions only if not animating
+    if (m_gameMode == GameMode::Judgement && m_gameState == GameState::Trial) {
+        if (m_currentScore >= m_currentJudgementTrial.scoreGoal) {
+            m_gameState = GameState::Summary; // Win condition
+        } else if (m_currentTurn >= m_currentJudgementTrial.turnLimit) {
+            m_gameState = GameState::Summary; // Loss condition
+        }
+    }
+
     // Main game logic updates
     switch (m_gameMode) {
         case GameMode::Judgement:
         {
             JudgementResults results; // Placeholder for now
             std::set<int> visitedRoomIds; // Placeholder
-            m_uiManager.update(m_player, m_monster, m_gameState, nullptr, visitedRoomIds, dataManager, m_currentJudgementTrial, 0, 0, std::nullopt, results);
+            m_uiManager.update(m_player, m_monster, m_gameState, nullptr, visitedRoomIds, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, results);
             break;
         }
         case GameMode::Exploration:
@@ -197,76 +223,79 @@ void Game::update(sf::Time deltaTime) {
 void Game::render() {
     m_window.clear(sf::Color(30, 30, 30));
 
-    // Render the static board, hiding animating gems
-    m_board.render(m_window, m_boardOrigin, m_isAnimatingSwap, m_animatingGems, m_isAnimatingDestruction, m_destroyingGems, m_isAnimatingRefill, m_fallInfo);
+    // Do not render the board or animations if the trial is over
+    if (m_gameState != GameState::Summary) {
+        // Render the static board, hiding animating gems
+        m_board.render(m_window, m_boardOrigin, m_isAnimatingSwap, m_animatingGems, m_isAnimatingDestruction, m_destroyingGems, m_isAnimatingRefill, m_fallInfo);
 
-    const float swapAnimationDuration = 0.2f;
-    const float destructionAnimationDuration = 0.3f;
-    const float refillAnimationDuration = 0.3f;
-    float p = 0.0f; 
+        const float swapAnimationDuration = 0.2f;
+        const float destructionAnimationDuration = 0.3f;
+        const float refillAnimationDuration = 0.3f;
+        float p = 0.0f; 
 
-    // Render swap animation
-    if (m_isAnimatingSwap) {
-        p = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / swapAnimationDuration);
-        sf::Vector2f p1_local((float)m_animatingGems.first.x * TILE_SIZE, (float)m_animatingGems.first.y * TILE_SIZE);
-        sf::Vector2f p2_local((float)m_animatingGems.second.x * TILE_SIZE, (float)m_animatingGems.second.y * TILE_SIZE);
+        // Render swap animation
+        if (m_isAnimatingSwap) {
+            p = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / swapAnimationDuration);
+            sf::Vector2f p1_local((float)m_animatingGems.first.x * TILE_SIZE, (float)m_animatingGems.first.y * TILE_SIZE);
+            sf::Vector2f p2_local((float)m_animatingGems.second.x * TILE_SIZE, (float)m_animatingGems.second.y * TILE_SIZE);
 
-        BaseGem* g1 = m_board.getGemAt(m_animatingGems.first.y, m_animatingGems.first.x);
-        if (g1) {
-            sf::Sprite s1 = g1->getSprite();
-            s1.setPosition(p1_local + (p2_local - p1_local) * p + m_boardOrigin);
-            m_window.draw(s1);
-        }
+            BaseGem* g1 = m_board.getGemAt(m_animatingGems.first.y, m_animatingGems.first.x);
+            if (g1) {
+                sf::Sprite s1 = g1->getSprite();
+                s1.setPosition(p1_local + (p2_local - p1_local) * p + m_boardOrigin);
+                m_window.draw(s1);
+            }
 
-        BaseGem* g2 = m_board.getGemAt(m_animatingGems.second.y, m_animatingGems.second.x);
-        if (g2) {
-            sf::Sprite s2 = g2->getSprite();
-            s2.setPosition(p2_local + (p1_local - p2_local) * p + m_boardOrigin);
-            m_window.draw(s2);
-        }
-    }
-
-    // Render destruction animation
-    if (m_isAnimatingDestruction) {
-        float animProgress = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / destructionAnimationDuration);
-        float scale = 1.f - animProgress;
-        for (const auto& pos : m_destroyingGems) {
-            BaseGem* gem = m_board.getGemAt(pos.first, pos.second);
-            if (gem) {
-                sf::Sprite sprite = gem->getSprite();
-                const sf::Texture* tex = &sprite.getTexture();
-                sf::Vector2u texSize = tex->getSize();
-                sprite.setOrigin({texSize.x / 2.f, texSize.y / 2.f});
-                
-                float baseScaleX = static_cast<float>(TILE_SIZE) / texSize.x;
-                float baseScaleY = static_cast<float>(TILE_SIZE) / texSize.y;
-                sprite.setScale({baseScaleX * scale, baseScaleY * scale});
-                
-                sprite.setPosition({pos.second * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.x, pos.first * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.y});
-                m_window.draw(sprite);
+            BaseGem* g2 = m_board.getGemAt(m_animatingGems.second.y, m_animatingGems.second.x);
+            if (g2) {
+                sf::Sprite s2 = g2->getSprite();
+                s2.setPosition(p2_local + (p1_local - p2_local) * p + m_boardOrigin);
+                m_window.draw(s2);
             }
         }
-    }
 
-    // Render refill animation (falling gems)
-    if (m_isAnimatingRefill) {
-        p = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / refillAnimationDuration);
-        for (const auto& info : m_fallInfo) {
-            BaseGem* gem = m_board.getGemAt(info.fallToRow, info.col);
-            if (gem) {
-                sf::Vector2f start_local((float)info.col * TILE_SIZE, (float)info.row * TILE_SIZE);
-                sf::Vector2f end_local((float)info.col * TILE_SIZE, (float)info.fallToRow * TILE_SIZE);
-                
-                sf::Sprite sprite = gem->getSprite();
-                sprite.setPosition(start_local + (end_local - start_local) * p + m_boardOrigin);
-                m_window.draw(sprite);
+        // Render destruction animation
+        if (m_isAnimatingDestruction) {
+            float animProgress = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / destructionAnimationDuration);
+            float scale = 1.f - animProgress;
+            for (const auto& pos : m_destroyingGems) {
+                BaseGem* gem = m_board.getGemAt(pos.first, pos.second);
+                if (gem) {
+                    sf::Sprite sprite = gem->getSprite();
+                    const sf::Texture* tex = &sprite.getTexture();
+                    sf::Vector2u texSize = tex->getSize();
+                    sprite.setOrigin({texSize.x / 2.f, texSize.y / 2.f});
+                    
+                    float baseScaleX = static_cast<float>(TILE_SIZE) / texSize.x;
+                    float baseScaleY = static_cast<float>(TILE_SIZE) / texSize.y;
+                    sprite.setScale({baseScaleX * scale, baseScaleY * scale});
+                    
+                    sprite.setPosition({pos.second * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.x, pos.first * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.y});
+                    m_window.draw(sprite);
+                }
+            }
+        }
+
+        // Render refill animation (falling gems)
+        if (m_isAnimatingRefill) {
+            p = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / refillAnimationDuration);
+            for (const auto& info : m_fallInfo) {
+                BaseGem* gem = m_board.getGemAt(info.fallToRow, info.col);
+                if (gem) {
+                    sf::Vector2f start_local((float)info.col * TILE_SIZE, (float)info.startRow * TILE_SIZE);
+                    sf::Vector2f end_local((float)info.col * TILE_SIZE, (float)info.fallToRow * TILE_SIZE);
+                    
+                    sf::Sprite sprite = gem->getSprite();
+                    sprite.setPosition(start_local + (end_local - start_local) * p + m_boardOrigin);
+                    m_window.draw(sprite);
+                }
             }
         }
     }
 
     // UI Rendering
     JudgementResults results; // Placeholder
-    m_uiManager.render(m_window, m_gameState, false, m_currentJudgementTrial, 0, 0, std::nullopt, results);
+    m_uiManager.render(m_window, m_gameState, false, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, results);
 
     m_window.display();
 }

@@ -15,16 +15,16 @@ This document tracks the step-by-step process of refactoring the gem system and 
 
 - **Target:** Address visual and logical bugs discovered during the first playable test.
 - **Bugs Identified:**
-  - **[BUG-1] Blank Spaces / Invisible Gems:** Only some gems are visible on the board (e.g., "sword" tiles), creating a checkerboard of blank spaces.
-  - **[BUG-2] Incorrect Positioning:** The game board and all UI elements are rendered at the top-left of the screen instead of being centered or properly positioned.
-  - **[BUG-3] Missing UI Elements:** The main HUD (player/monster HP, mana bars, etc.) is not being rendered, even though the `UIManager`'s render function is being called.
-  - **[BUG-4] No Cascade Matches:** The game loop does not check for new matches after gems fall, preventing cascading combos.
+  - [x] **[BUG-1] Blank Spaces / Invisible Gems:** Only some gems are visible on the board (e.g., "sword" tiles), creating a checkerboard of blank spaces.
+  - [x] **[BUG-2] Incorrect Positioning:** The game board and all UI elements are rendered at the top-left of the screen instead of being centered or properly positioned.
+  - [x] **[BUG-3] Missing UI Elements:** The main HUD (player/monster HP, mana bars, etc.) is not being rendered, even though the `UIManager`'s render function is being called.
+  - [x] **[BUG-4] No Cascade Matches:** The game loop does not check for new matches after gems fall, preventing cascading combos.
 
 - **Next Steps:**
-  - [ ] **[DIAGNOSE]** Add detailed logging to `Game.cpp`, `Board.cpp`, and `UIManager.cpp` to trace the flow of data at runtime.
-  - [ ] **[FIX]** Address the root causes of the identified bugs based on the diagnostic output.
-  - [ ] **[VERIFY]** Compile and run the game to confirm fixes.
-  - [ ] **[CLEANUP]** Remove diagnostic logging once all bugs are resolved.
+  - [x] **Diagnose and fix UI regression:** UI elements (score, turns) are no longer displaying after the state management refactor. (Resolved by fixing `UIManager::render` fall-through and `Game::setupJudgementTrial` state update).
+  - [x] **Implement Judgement Trial Logic (Turns & Score):** Add `m_currentTurn` and `m_currentScore` to `Game`, increment `m_currentTurn` after valid swaps, implement basic scoring, and update `UIManager` calls.
+  - [ ] Implement Judgement Win/Loss Condition: Add checks in `Game::update` to transition to `Judgement_Summary` on win/loss.
+  - [ ] Fix Cascade Animation: Implement smooth refill animation for new gems falling from the top, referencing `Game.cpp.old`.
 
 **Phase 4: Final Cleanup (PENDING)**
 

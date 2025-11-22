@@ -144,7 +144,7 @@ std::vector<Board::FallInfo> Board::applyGravity() {
             }
             if (m_grid[r][c] && emptyRow != -1) {
                 m_grid[emptyRow][c] = std::move(m_grid[r][c]);
-                fallInfo.push_back({r, c, emptyRow});
+                fallInfo.push_back({r, c, emptyRow, m_grid[emptyRow][c]->getSubType()});
                 m_grid[emptyRow][c]->setPosition(c * TILE_SIZE, emptyRow * TILE_SIZE);
                 emptyRow--;
             }

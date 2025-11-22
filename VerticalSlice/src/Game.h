@@ -44,6 +44,9 @@ private:
     JudgementTrial m_currentJudgementTrial;
     sf::Clock m_trialClock;
     sf::Clock m_pulseClock;
+    // Game Stats
+    int m_currentTurn;
+    int m_currentScore;
 
     // Gem selection
     sf::Vector2i m_selectedGem = sf::Vector2i(-1, -1);
