@@ -60,6 +60,25 @@ void from_json(const json& j, JudgementTrial& trial) {
     j.at("scoreGoal").get_to(trial.scoreGoal);
 }
 
+void from_json(const json& j, Attunement& a) {
+    j.at("id").get_to(a.id);
+    j.at("name").get_to(a.name);
+    j.at("description").get_to(a.description);
+    j.at("starting_spells").get_to(a.starting_spell_ids);
+    
+    a.mana_types.clear();
+    for (int type_id : j.at("mana_types")) {
+        a.mana_types.push_back(static_cast<GemSubType>(type_id));
+    }
+}
+
+void from_json(const json& j, Spell& s) {
+    j.at("id").get_to(s.id);
+    j.at("name").get_to(s.name);
+    j.at("cost").get_to(s.costAmount);
+    s.costType = static_cast<GemSubType>(j.at("cost_type_id").get<int>());
+}
+
 void from_json(const json& j, Floor& f) {
     j.at("floorNumber").get_to(f.floorNumber);
     j.at("startRoomId").get_to(f.startRoomId);
@@ -146,11 +165,27 @@ bool DataManager::loadGemCatalog(const std::string& path) {
 }
 
 bool DataManager::loadAttunements(const std::string& path) {
-    // Implementation needed
+    std::ifstream f(path);
+    if (!f.is_open()) return false;
+    try {
+        json data = json::parse(f);
+        attunements = data.get<std::vector<Attunement>>();
+    } catch (const json::exception& e) {
+        std::cerr << "JSON error in attunements: " << e.what() << std::endl;
+        return false;
+    }
     return true;
 }
 bool DataManager::loadSpells(const std::string& path) {
-    // Implementation needed
+    std::ifstream f(path);
+    if (!f.is_open()) return false;
+    try {
+        json data = json::parse(f);
+        spells = data.get<std::vector<Spell>>();
+    } catch (const json::exception& e) {
+        std::cerr << "JSON error in spells: " << e.what() << std::endl;
+        return false;
+    }
     return true;
 }
 bool DataManager::loadMonsterData(const std::string& path) {

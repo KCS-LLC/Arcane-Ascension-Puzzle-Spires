@@ -33,8 +33,9 @@ public:
     std::set<std::pair<int, int>> findMatches();
     void removeGems(const std::set<std::pair<int, int>>& matches);
     
-    std::vector<FallInfo> applyGravity();
-    void refill(const std::vector<GemSubType>& possibleGems);
+    std::vector<FallInfo> applyGravityAndRefill(const std::vector<GemSubType>& possibleGems);
+    // std::vector<FallInfo> applyGravity();
+    // void refill(const std::vector<GemSubType>& possibleGems);
 
 
 private:

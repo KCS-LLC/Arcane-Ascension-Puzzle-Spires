@@ -7,9 +7,9 @@ constexpr int WINDOW_WIDTH = 1280;
 constexpr int WINDOW_HEIGHT = 720;
 
 enum class GameMode {
-    Judgement,
-    Exploration,
-    Combat
+    JUDGEMENT,
+    TOWER_CLIMB,
+    GAME_OVER
 };
 
 enum class GameState {

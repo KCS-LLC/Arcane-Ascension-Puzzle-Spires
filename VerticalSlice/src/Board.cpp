@@ -147,8 +147,50 @@ void Board::removeGems(const std::set<std::pair<int, int>>& matches) {
     }
 }
 
-std::vector<Board::FallInfo> Board::applyGravity() {
+// std::vector<Board::FallInfo> Board::applyGravity() {
+//     std::vector<FallInfo> fallInfo;
+//     for (int c = 0; c < m_width; ++c) {
+//         int emptyRow = -1;
+//         for (int r = m_height - 1; r >= 0; --r) {
+//             if (!m_grid[r][c] && emptyRow == -1) {
+//                 emptyRow = r;
+//             }
+//             if (m_grid[r][c] && emptyRow != -1) {
+//                 m_grid[emptyRow][c] = std::move(m_grid[r][c]);
+//                 fallInfo.push_back({r, c, emptyRow, m_grid[emptyRow][c]->getSubType()});
+//                 m_grid[emptyRow][c]->setPosition(c * TILE_SIZE, emptyRow * TILE_SIZE);
+//                 emptyRow--;
+//             }
+//         }
+//     }
+//     return fallInfo;
+// }
+
+// void Board::refill(const std::vector<GemSubType>& possibleGems) {
+//     std::random_device rd;
+//     std::mt19937 gen(rd());
+//     std::uniform_int_distribution<> distrib(0, possibleGems.size() - 1);
+
+//     for (int r = 0; r < m_height; ++r) {
+//         for (int c = 0; c < m_width; ++c) {
+//             if (!m_grid[r][c]) {
+//                 GemSubType type = possibleGems[distrib(gen)];
+//                 m_grid[r][c] = m_gemFactory.createGem(type, gemTextures.at(type));
+//                  if (m_grid[r][c]) {
+//                     m_grid[r][c]->setPosition(c * TILE_SIZE, r * TILE_SIZE);
+//                 }
+//             }
+//         }
+//     }
+// }
+
+std::vector<Board::FallInfo> Board::applyGravityAndRefill(const std::vector<GemSubType>& possibleGems) {
     std::vector<FallInfo> fallInfo;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distrib(0, possibleGems.size() - 1);
+
+    // Gravity for existing gems
     for (int c = 0; c < m_width; ++c) {
         int emptyRow = -1;
         for (int r = m_height - 1; r >= 0; --r) {
@@ -163,23 +205,22 @@ std::vector<Board::FallInfo> Board::applyGravity() {
             }
         }
     }
-    return fallInfo;
-}
 
-void Board::refill(const std::vector<GemSubType>& possibleGems) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(0, possibleGems.size() - 1);
-
-    for (int r = 0; r < m_height; ++r) {
-        for (int c = 0; c < m_width; ++c) {
+    // Refill new gems
+    for (int c = 0; c < m_width; ++c) {
+        int newGems = 0;
+        for (int r = m_height - 1; r >= 0; --r) {
             if (!m_grid[r][c]) {
+                newGems++;
                 GemSubType type = possibleGems[distrib(gen)];
                 m_grid[r][c] = m_gemFactory.createGem(type, gemTextures.at(type));
-                 if (m_grid[r][c]) {
+                if (m_grid[r][c]) {
                     m_grid[r][c]->setPosition(c * TILE_SIZE, r * TILE_SIZE);
+                    fallInfo.push_back({-newGems, c, r, type});
                 }
             }
         }
     }
+
+    return fallInfo;
 }

@@ -23,7 +23,7 @@ Game::Game()
       m_board(BOARD_WIDTH, BOARD_HEIGHT, m_gemFactory),
       m_player(100, {}),
       m_monster(10, 10),
-      m_gameMode(GameMode::Judgement),
+      m_gameMode(GameMode::JUDGEMENT),
       m_gameState(GameState::Intro),
       m_currentTrialOrderIndex(0),
       m_isAnimating(false),
@@ -43,6 +43,7 @@ Game::Game()
 
     m_uiManager.setup(m_player, m_window.getSize(), m_boardOrigin, {}); // Passing empty attunements for now
 
+    dataManager.loadAttunements("data/attunements.json");
     m_judgementTrials = dataManager.getJudgementTrials();
     if (!m_judgementTrials.empty()) {
         m_trialOrder.resize(m_judgementTrials.size());
@@ -107,6 +108,23 @@ void Game::handleInput(sf::Event event) {
     if (event.is<sf::Event::Closed>()) {
         m_window.close();
     }
+
+    UIAction action;
+    if (m_uiManager.handleEvent(event, m_gameMode, m_gameState, nullptr, dataManager.getAttunements(), action)) {
+        if (action.type == UIActionType::SelectAttunement) {
+            const auto& attunements = dataManager.getAttunements();
+            auto it = std::find_if(attunements.begin(), attunements.end(), [&](const Attunement& a) {
+                return a.id == action.attunementId;
+            });
+            if (it != attunements.end()) {
+                m_player.setAttunement(*it, dataManager);
+                m_gameMode = GameMode::TOWER_CLIMB;
+                // TODO: Set up the first combat of the tower climb
+            }
+        }
+        return; // UI handled the event
+    }
+
     if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>()) {
         if (mb->button == sf::Mouse::Button::Left) {
             if (m_gameState == GameState::Summary) {
@@ -128,7 +146,26 @@ void Game::handleInput(sf::Event event) {
                 if (m_currentTrialOrderIndex < m_trialOrder.size()) {
                     setupJudgementTrial(m_judgementTrials[m_trialOrder[m_currentTrialOrderIndex]]);
                 } else {
-                    m_gameState = GameState::AttunementReveal; // All trials finished
+                    // All trials complete, auto-assign attunement and start tower climb
+                    std::cout << "Fetching attunement data..." << std::endl;
+                    const auto& attunements = dataManager.getAttunements();
+                    auto it = std::find_if(attunements.begin(), attunements.end(), [&](const Attunement& a) {
+                        return a.id == "elementalist";
+                    });
+
+                    if (it != attunements.end()) {
+                        std::cout << "Attunement found. Assigning to player..." << std::endl;
+                        m_player.setAttunement(*it, dataManager);
+                        std::cout << "Attunement assigned. Changing game mode..." << std::endl;
+                        m_gameMode = GameMode::TOWER_CLIMB;
+                        m_gameState = GameState::Playing;
+                        std::cout << "Game mode set. Initializing board..." << std::endl;
+                        m_board.initialize({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air, GemSubType::Skull});
+                        std::cout << "Board initialized." << std::endl;
+                    } else {
+                        // Handle error case where elementalist attunement is not found
+                        m_window.close();
+                    }
                 }
                 return; // Consume the click
             }
@@ -196,8 +233,7 @@ void Game::update(sf::Time deltaTime) {
             if (m_animationClock.getElapsedTime().asSeconds() >= destructionAnimationDuration) {
                 m_isAnimatingDestruction = false;
                 m_board.removeGems(m_destroyingGems);
-                m_fallInfo = m_board.applyGravity();
-                m_board.refill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air});
+                m_fallInfo = m_board.applyGravityAndRefill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air});
                 m_isAnimatingRefill = true;
                 m_animationClock.restart();
             }
@@ -220,10 +256,7 @@ void Game::update(sf::Time deltaTime) {
     }
 
     // Check for Judgement trial win/loss conditions only if not animating
-    if (m_gameMode == GameMode::Judgement && m_gameState == GameState::Trial) {
-        std::cout << "Update Check - Score: " << m_currentScore << "/" << m_currentJudgementTrial.scoreGoal
-                  << ", Turn: " << m_currentTurn << "/" << m_currentJudgementTrial.turnLimit << std::endl;
-
+    if (m_gameMode == GameMode::JUDGEMENT && m_gameState == GameState::Trial) {
         if (m_currentScore >= m_currentJudgementTrial.scoreGoal) {
             std::cout << "!!! STATE CHANGE: Win condition met. Changing to Summary." << std::endl;
             m_gameState = GameState::Summary; // Win condition
@@ -235,16 +268,13 @@ void Game::update(sf::Time deltaTime) {
 
     // Main game logic updates
     switch (m_gameMode) {
-        case GameMode::Judgement:
+        case GameMode::JUDGEMENT:
         {
-            m_uiManager.update(m_player, m_monster, m_gameState, nullptr, {}, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance);
+            m_uiManager.update(m_player, m_monster, m_gameMode, m_gameState, nullptr, {}, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance);
             break;
         }
-        case GameMode::Exploration:
-            // Exploration-specific update logic here
-            break;
-        case GameMode::Combat:
-            // Combat-specific update logic here
+        case GameMode::TOWER_CLIMB:
+            // Combined exploration and combat update logic here
             break;
     }
 }
@@ -254,7 +284,6 @@ void Game::render() {
 
     // Do not render the board or animations if the trial is over
     if (m_gameState != GameState::Summary && m_gameState != GameState::AttunementReveal) {
-        std::cout << "Game::render - Calling m_board.render()" << std::endl;
         m_board.render(m_window, m_boardOrigin, m_isAnimatingSwap, m_animatingGems, m_isAnimatingDestruction, m_destroyingGems, m_isAnimatingRefill, m_fallInfo);
 
         const float swapAnimationDuration = 0.2f;
@@ -323,7 +352,7 @@ void Game::render() {
     }
 
     // UI Rendering
-    m_uiManager.render(m_window, m_gameState, false, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance);
+    m_uiManager.render(m_window, m_gameMode, m_gameState, false, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance);
 
     m_window.display();
 }

@@ -16,7 +16,7 @@ struct Attunement;
 enum class GameState;
 
 // A structure to represent a command sent from the UI to the Game
-enum class UIActionType { CastSpell, ChangeRoom, JudgementComplete };
+enum class UIActionType { CastSpell, ChangeRoom, SelectAttunement, JudgementComplete };
 struct UIAction {
     UIActionType type;
     int spellIndex = -1;
@@ -28,11 +28,11 @@ class UIManager {
 public:
     UIManager(const sf::Font& font);
 
-    bool handleEvent(const sf::Event& event, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction);
+    bool handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction);
     void setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin, const std::vector<Attunement>& attunements);
     void setupTrial(const JudgementTrial& trial);
-    void update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance);
-    void render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance);
+    void update(const Player& player, const Monster& monster, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance);
+    void render(sf::RenderWindow& window, GameMode gameMode, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance);
 
     const std::vector<sf::RectangleShape>& getSpellButtons() const;
 
@@ -51,6 +51,9 @@ private:
     sf::RectangleShape manaAffinityHighlight;
     sf::Text judgementSummaryTitle;
     sf::Text judgementResultsText;
+    sf::Text m_attunementSelectionTitle;
+    std::vector<sf::Text> m_attunementChoiceTexts;
+    std::vector<sf::FloatRect> m_attunementChoiceBounds;
     sf::Text attunementTitleText;
     sf::Text attunementNameText;
     sf::Text attunementDescriptionText;

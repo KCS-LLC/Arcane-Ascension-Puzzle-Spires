@@ -20,6 +20,7 @@ UIManager::UIManager(const sf::Font& font)
       attunementTitleText(font, "", 30),
       attunementNameText(font, "", 28),
       attunementDescriptionText(font, "", 18),
+      m_attunementSelectionTitle(font, "Your performance has been judged. Choose your path:", 32),
       playerPanelTitle(font, "Player", 20),
       monsterPanelTitle(font, "Monster", 20),
       monsterNameText(font, "", 22),
@@ -53,11 +54,16 @@ UIManager::UIManager(const sf::Font& font)
     judgementSummaryTitle.setPosition(sf::Vector2f{ 450, 200 });
     judgementResultsText.setPosition(sf::Vector2f{ 450, 250 });
 
+    m_attunementSelectionTitle.setFillColor(sf::Color::White);
+    sf::FloatRect titleBounds = m_attunementSelectionTitle.getLocalBounds();
+    m_attunementSelectionTitle.setOrigin(sf::Vector2f(titleBounds.size.x / 2, 0));
+    m_attunementSelectionTitle.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f, 200));
+
     // ... other initializations ...
 }
 
-bool UIManager::handleEvent(const sf::Event& event, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction) {
-    // Placeholder logic for UI event handling
+bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction) {
+    // Placeholder logic for other UI event handling
     return false;
 }
 
@@ -86,15 +92,19 @@ void UIManager::setupTrial(const JudgementTrial& trial) {
     trialObjectiveText.setString(wordWrap(trial.objective, 40));
 }
 
-void UIManager::update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance) {
+void UIManager::update(const Player& player, const Monster& monster, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance) {
     if (currentState == GameState::Trial) {
         turnLimitText.setString("Turns Left: " + std::to_string(currentTrial.turnLimit - currentTrialTurn));
         scoreGoalText.setString("Score Goal: " + std::to_string(currentTrial.scoreGoal));
         currentTrialScoreText.setString("Score: " + std::to_string(currentScore));
     }
+
+
 }
 
-void UIManager::render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance) {
+void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance) {
+
+
     switch (currentState) {
         case GameState::Intro:
             // Draw specific Intro UI elements here if any

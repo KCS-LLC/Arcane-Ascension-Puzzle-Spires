@@ -1,38 +1,19 @@
-# Refactor Checklist & Bug Fix Log
+# Tower Climb Refactor Checklist
 
-This document tracks the step-by-step process of refactoring the gem system and the subsequent bug-fixing phase.
+This checklist tracks the detailed steps for re-implementing the transition from the Judgement phase to the Tower Climb exploration mode.
 
-**Phase 1: Data Foundation (COMPLETE)**
-- [x] All new JSON data files created and populated.
+## Phase 1: Restore the `Exploration` State
+- [ ] **Constants.h:** Add `Exploration` to the `GameState` enum.
+- [ ] **UIManager.h:** Add member variables for exploration UI elements (room title, description).
+- [ ] **UIManager.cpp:** Add `case GameState::Exploration:` to the `render` function's switch statement to draw the new UI.
+- [ ] **UIManager.cpp:** Add logic to the `update` function to set the text for the exploration UI based on the current room.
 
-**Phase 2: C++ Architecture Refactor (COMPLETE)**
-- [x] All C++ structs, enums, and classes implemented for the new architecture.
-- [x] `DataManager`, `GemFactory`, `Board`, `Game`, and `Player` classes fully refactored.
-- [x] Project compiles cleanly with the new object-oriented architecture.
-- [x] A commit point (`d8d3ee1`) exists for this stable state.
+## Phase 2: Implement the Tower Climb Transition
+- [ ] **Game.h:** Declare the `void startTowerClimb();` private member function.
+- [ ] **Game.cpp:** Implement the `startTowerClimb()` function to set the game mode, state, and load the initial floor/room data.
+- [ ] **Game.cpp:** In `handleInput`, replace the manual state change after attunement assignment with a call to `startTowerClimb()`.
 
-**Phase 3: Bug Fixing (IN PROGRESS)**
-
-- **Target:** Address visual and logical bugs discovered during the first playable test.
-- **Bugs Identified:**
-  - [x] **[BUG-1] Blank Spaces / Invisible Gems:** Only some gems are visible on the board (e.g., "sword" tiles), creating a checkerboard of blank spaces.
-  - [x] **[BUG-2] Incorrect Positioning:** The game board and all UI elements are rendered at the top-left of the screen instead of being centered or properly positioned.
-  - [x] **[BUG-3] Missing UI Elements:** The main HUD (player/monster HP, mana bars, etc.) is not being rendered, even though the `UIManager`'s render function is being called.
-  - [x] **[BUG-4] No Cascade Matches:** The game loop does not check for new matches after gems fall, preventing cascading combos.
-
-- **Next Steps:**
-  - [x] **Diagnose and fix UI regression:** UI elements (score, turns) are no longer displaying after the state management refactor. (Resolved by fixing `UIManager::render` fall-through and `Game::setupJudgementTrial` state update).
-  - [x] **Implement Judgement Trial Logic (Turns & Score):** Add `m_currentTurn` and `m_currentScore` to `Game`, increment `m_currentTurn` after valid swaps, implement basic scoring, and update `UIManager` calls.
-  - [ ] Implement Judgement Win/Loss Condition: Add checks in `Game::update` to transition to `Judgement_Summary` on win/loss.
-  - [ ] Fix Cascade Animation: Implement smooth refill animation for new gems falling from the top, referencing `Game.cpp.old`.
-
-**Phase 4: Final Cleanup (PENDING)**
-
-- [ ] **Step 9: Remove Obsolete String Conversion Functions**
-  - [ ] Delete `stringToGemSubType` (and related `gemSubTypeToString`) from `StringUtils.h` and `StringUtils.cpp`.
-
-- [ ] **Step 10: Restore Full `UIManager` Functionality**
-  - [ ] Implement all detailed rendering logic for HUD elements (HP bars, mana bars, etc.) in `UIManager.cpp`.
-
-- [ ] **Step 11: Final Commit**
-  - [ ] Create a final commit with all cleanup and remaining fixes.
+## Phase 3: Re-implement Room Transitions
+- [ ] **Game.h & Game.cpp:** Add a simplified `moveToRoom(int destinationRoomId)` function.
+- [ ] **UIManager.cpp:** In `handleEvent`, add logic to detect clicks on placeholder doors and return a `ChangeRoom` action.
+- [ ] **Game.cpp:** In `handleInput`, add a check for the `ChangeRoom` UIAction and call `moveToRoom()` accordingly.
