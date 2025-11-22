@@ -20,7 +20,8 @@ UIManager::UIManager(const sf::Font& font)
       attunementTitleText(font, "", 30),
       attunementNameText(font, "", 28),
       attunementDescriptionText(font, "", 18),
-      m_attunementSelectionTitle(font, "Your performance has been judged. Choose your path:", 32),
+      m_roomNameText(font, "", 24),
+      m_roomDescriptionText(font, "", 18),
       playerPanelTitle(font, "Player", 20),
       monsterPanelTitle(font, "Monster", 20),
       monsterNameText(font, "", 22),
@@ -49,24 +50,37 @@ UIManager::UIManager(const sf::Font& font)
     scoreGoalText.setPosition(sf::Vector2f{ 10, 100 });
     currentTrialScoreText.setPosition(sf::Vector2f{ 650, 10 });
 
+    m_roomNameText.setFillColor(sf::Color::White);
+    m_roomNameText.setPosition(sf::Vector2f{ 10, 10 });
+
+    m_roomDescriptionText.setFillColor(sf::Color::White);
+    m_roomDescriptionText.setPosition(sf::Vector2f{ 10, 40 });
+
     judgementSummaryTitle.setFillColor(sf::Color::White);
     judgementResultsText.setFillColor(sf::Color::White);
     judgementSummaryTitle.setPosition(sf::Vector2f{ 450, 200 });
     judgementResultsText.setPosition(sf::Vector2f{ 450, 250 });
-
-    m_attunementSelectionTitle.setFillColor(sf::Color::White);
-    sf::FloatRect titleBounds = m_attunementSelectionTitle.getLocalBounds();
-    m_attunementSelectionTitle.setOrigin(sf::Vector2f(titleBounds.size.x / 2, 0));
-    m_attunementSelectionTitle.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f, 200));
-
-    // ... other initializations ...
 }
-
-bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction) {
+    
+    bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction) {    if (currentState == GameState::Exploration) {
+        if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>()) {
+            if (mb->button == sf::Mouse::Button::Left) {
+                for (size_t i = 0; i < doorButtons.size(); ++i) {
+                    if (doorButtons[i].getGlobalBounds().contains(sf::Vector2f(mb->position))) {
+                        outAction.type = UIActionType::ChangeRoom;
+                        // Hardcode destination IDs for now
+                        if (i == 0) outAction.destinationRoomId = 2; // North -> Room 2
+                        else if (i == 1) outAction.destinationRoomId = 3; // East -> Room 3
+                        return true;
+                    }
+                }
+            }
+        }
+    }
     // Placeholder logic for other UI event handling
     return false;
 }
-
+      
 void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin, const std::vector<Attunement>& attunements) {
     const int boardPixelWidth = BOARD_WIDTH * TILE_SIZE;
     const int boardPixelHeight = BOARD_HEIGHT * TILE_SIZE;
@@ -77,9 +91,36 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     boardFrame.setOutlineColor(sf::Color(100, 100, 100));
     boardFrame.setOutlineThickness(2);
 
-    // ... other setup ...
-}
+    // Clear and re-create placeholder door buttons
+    doorButtons.clear();
+    doorButtonTexts.clear();
 
+    // North Door
+    sf::RectangleShape northDoor({200, 50});
+    northDoor.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f - 100, WINDOW_HEIGHT / 2.0f + 100));
+    northDoor.setFillColor(sf::Color(50, 50, 150, 150));
+    doorButtons.push_back(northDoor);
+    
+    sf::Text northText(font, "North (Room 2)", 20);
+    northText.setFillColor(sf::Color::Cyan);
+    sf::FloatRect northTextBounds = northText.getLocalBounds();
+    northText.setOrigin(sf::Vector2f(northTextBounds.size.x / 2, northTextBounds.size.y / 2));
+    northText.setPosition(northDoor.getPosition() + sf::Vector2f(northDoor.getSize().x / 2, northDoor.getSize().y / 2));
+    doorButtonTexts.push_back(northText);
+
+    // East Door
+    sf::RectangleShape eastDoor({200, 50});
+    eastDoor.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f + 150, WINDOW_HEIGHT / 2.0f + 150));
+    eastDoor.setFillColor(sf::Color(50, 150, 50, 150));
+    doorButtons.push_back(eastDoor);
+
+    sf::Text eastText(font, "East (Room 3)", 20);
+    eastText.setFillColor(sf::Color::Cyan);
+    sf::FloatRect eastTextBounds = eastText.getLocalBounds();
+    eastText.setOrigin(sf::Vector2f(eastTextBounds.size.x / 2, eastTextBounds.size.y / 2));
+    eastText.setPosition(eastDoor.getPosition() + sf::Vector2f(eastDoor.getSize().x / 2, eastDoor.getSize().y / 2));
+    doorButtonTexts.push_back(eastText);
+}
 void UIManager::setupTrial(const JudgementTrial& trial) {
     std::string trialTypeStr;
     switch (trial.type) {
@@ -99,7 +140,12 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
         currentTrialScoreText.setString("Score: " + std::to_string(currentScore));
     }
 
-
+    if (currentState == GameState::Exploration) {
+        if (currentRoom) {
+            m_roomNameText.setString(currentRoom->name);
+            m_roomDescriptionText.setString("Explore the room. Which way will you go?"); // Placeholder for now
+        }
+    }
 }
 
 void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance) {
@@ -131,6 +177,14 @@ void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState cu
             );
             window.draw(attunementTitleText);
             window.draw(judgementResultsText);
+            break;
+        case GameState::Exploration:
+            window.draw(m_roomNameText);
+            window.draw(m_roomDescriptionText);
+            for (size_t i = 0; i < doorButtons.size(); ++i) {
+                window.draw(doorButtons[i]);
+                window.draw(doorButtonTexts[i]);
+            }
             break;
         case GameState::Playing:
             // Render exploration or combat UI elements

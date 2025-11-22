@@ -87,6 +87,40 @@ void Game::setupJudgementTrial(const JudgementTrial& trial) {
     m_trialClock.restart();
 }
 
+void Game::startTowerClimb() {
+    m_gameMode = GameMode::TOWER_CLIMB;
+    m_gameState = GameState::Exploration;
+    m_currentFloor = dataManager.getFloor();
+    m_currentRoom = dataManager.getRoomById(m_currentFloor.startRoomId);
+    if (m_currentRoom) {
+        m_visitedRoomIds.insert(m_currentRoom->id);
+    }
+    // TODO: Potentially load monster data for the first room here if it's a combat room
+}
+
+void Game::moveToRoom(int destinationRoomId) {
+    const Room* destination = dataManager.getRoomById(destinationRoomId);
+    if (destination) {
+        m_currentRoom = destination;
+        m_visitedRoomIds.insert(destinationRoomId);
+
+        switch (m_currentRoom->type) {
+            case RoomType::Combat:
+                // TODO: Load the correct monster for this room
+                m_monster = Monster(dataManager.getMonsterHP(), dataManager.getMonsterSpeed()); // Reset monster for new combat
+                m_board.initialize({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air, GemSubType::Skull}); // Basic board for now
+                m_gameState = GameState::Playing;
+                break;
+            default:
+                // For any other room type, just go back to exploration for now
+                m_gameState = GameState::Exploration;
+                break;
+        }
+    } else {
+        std::cerr << "Error: Tried to move to a non-existent room ID: " << destinationRoomId << std::endl;
+    }
+}
+
 void Game::run() {
     sf::Clock clock;
     while (m_window.isOpen()) {
@@ -110,7 +144,7 @@ void Game::handleInput(sf::Event event) {
     }
 
     UIAction action;
-    if (m_uiManager.handleEvent(event, m_gameMode, m_gameState, nullptr, dataManager.getAttunements(), action)) {
+    if (m_uiManager.handleEvent(event, m_gameMode, m_gameState, m_currentRoom, dataManager.getAttunements(), action)) {
         if (action.type == UIActionType::SelectAttunement) {
             const auto& attunements = dataManager.getAttunements();
             auto it = std::find_if(attunements.begin(), attunements.end(), [&](const Attunement& a) {
@@ -121,6 +155,10 @@ void Game::handleInput(sf::Event event) {
                 m_gameMode = GameMode::TOWER_CLIMB;
                 // TODO: Set up the first combat of the tower climb
             }
+        } else if (action.type == UIActionType::ChangeRoom) {
+            moveToRoom(action.destinationRoomId);
+        } else if (action.type == UIActionType::ChangeRoom) {
+            moveToRoom(action.destinationRoomId);
         }
         return; // UI handled the event
     }
@@ -156,12 +194,9 @@ void Game::handleInput(sf::Event event) {
                     if (it != attunements.end()) {
                         std::cout << "Attunement found. Assigning to player..." << std::endl;
                         m_player.setAttunement(*it, dataManager);
-                        std::cout << "Attunement assigned. Changing game mode..." << std::endl;
-                        m_gameMode = GameMode::TOWER_CLIMB;
-                        m_gameState = GameState::Playing;
-                        std::cout << "Game mode set. Initializing board..." << std::endl;
-                        m_board.initialize({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air, GemSubType::Skull});
-                        std::cout << "Board initialized." << std::endl;
+                        std::cout << "Attunement assigned. Starting tower climb..." << std::endl;
+                        startTowerClimb();
+                        std::cout << "Tower climb started." << std::endl;
                     } else {
                         // Handle error case where elementalist attunement is not found
                         m_window.close();

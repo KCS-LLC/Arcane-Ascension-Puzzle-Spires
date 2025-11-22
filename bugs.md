@@ -36,3 +36,13 @@ This file tracks the known bugs and design discrepancies in the current build.
 *   **Root Cause:** The `stringToGemSubType` function, which converts mana type names from JSON files into game data, is **case-sensitive**. The attunement JSON files (`attunements.json`, `executioner.json`) use lowercase names (e.g., `"fire"`, `"skull"`), while the conversion function expects uppercase names (e.g., `"Fire"`, `"Skull"`). This mismatch causes the player's `mana_types` list to be empty. When the board is generated for combat, it has no valid mana types to choose from, resulting in a mostly empty board with a few 10%-chance Skull gems.
 *   **Proposed Solution:** Modify the `stringToGemSubType` function in `StringUtils.cpp` to be case-insensitive. This will correctly parse the mana types from the JSON files regardless of capitalization and permanently fix this category of bug.
 
+---
+
+### 5. Post-Judgement & Exploration Bugs (Observed 2025-11-22)
+
+*   **Critical Crash on Load:** The game log shows `JSON error in spells: [json.exception.out_of_range.403] key 'cost' not found`. The game still runs but critical spell data fails to load.
+*   **Instant Trial Completion:** All three Judgement trials are completed instantly upon starting the game, with the log showing "Win condition met" three times in a row. This points to a logic error in the win/loss condition check.
+*   **Invalid Room IDs:** Clicking the hardcoded "North" and "East" door buttons in the exploration UI results in "Error: Tried to move to a non-existent room ID" for rooms 2 and 3. The hardcoded UI does not match the actual room IDs in `floor1.json`.
+*   **UI Rendering Glitch:** During the exploration phase, the gem game board is incorrectly rendered overlaid on top of the room information UI.
+*   **Unresponsive Input:** Clicking on the overlaid game board tiles during the exploration phase has no effect; the input seems to be incorrectly handled or disabled in this state.
+

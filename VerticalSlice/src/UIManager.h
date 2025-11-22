@@ -51,12 +51,13 @@ private:
     sf::RectangleShape manaAffinityHighlight;
     sf::Text judgementSummaryTitle;
     sf::Text judgementResultsText;
-    sf::Text m_attunementSelectionTitle;
-    std::vector<sf::Text> m_attunementChoiceTexts;
-    std::vector<sf::FloatRect> m_attunementChoiceBounds;
     sf::Text attunementTitleText;
     sf::Text attunementNameText;
     sf::Text attunementDescriptionText;
+
+    // Exploration UI Elements
+    sf::Text m_roomNameText;
+    sf::Text m_roomDescriptionText;
 
     // Titles
     sf::Text playerPanelTitle;

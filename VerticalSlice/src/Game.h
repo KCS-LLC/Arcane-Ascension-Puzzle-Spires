@@ -27,6 +27,8 @@ private:
     void handleInput(sf::Event event);
     void resolveMatches(const std::set<std::pair<int, int>>& matches);
     void setupJudgementTrial(const JudgementTrial& trial);
+    void startTowerClimb();
+    void moveToRoom(int destinationRoomId);
 
     sf::RenderWindow m_window;
     DataManager dataManager;
@@ -39,7 +41,10 @@ private:
     GameMode m_gameMode;
     GameState m_gameState;
     
-    // Judgement trial state
+    // Tower Climb / Exploration state
+    Floor m_currentFloor;
+    const Room* m_currentRoom = nullptr;
+    std::set<int> m_visitedRoomIds;
     std::vector<JudgementTrial> m_judgementTrials; // Keep as vector of objects for ownership
     std::vector<int> m_trialOrder; // Stores the shuffled indices
     int m_currentTrialOrderIndex; // Tracks which trial we are on in the shuffled order

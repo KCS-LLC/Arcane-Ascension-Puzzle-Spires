@@ -17,6 +17,7 @@ enum class GameState {
     Trial,
     Summary,
     AttunementReveal,
+    Exploration,
     Playing,
     GameOver
 };
