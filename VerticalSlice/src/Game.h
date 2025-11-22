@@ -9,6 +9,7 @@
 #include "Constants.h"
 #include "GemFactory.h"
 #include "Structs.h"
+#include "Judgement.h"
 
 // Forward-declaration of the global texture map
 extern std::map<GemSubType, sf::Texture> gemTextures;
@@ -29,19 +30,21 @@ private:
 
     sf::RenderWindow m_window;
     DataManager dataManager;
-    Player m_player;
-    Monster m_monster;
     UIManager m_uiManager;
     GemFactory m_gemFactory;
     Board m_board;
+    Player m_player;
+    Monster m_monster;
 
     GameMode m_gameMode;
     GameState m_gameState;
     
     // Judgement trial state
-    std::vector<JudgementTrial> m_judgementTrials;
-    int m_currentTrialIndex;
+    std::vector<JudgementTrial> m_judgementTrials; // Keep as vector of objects for ownership
+    std::vector<int> m_trialOrder; // Stores the shuffled indices
+    int m_currentTrialOrderIndex; // Tracks which trial we are on in the shuffled order
     JudgementTrial m_currentJudgementTrial;
+    TrialPerformance m_trialPerformance;
     sf::Clock m_trialClock;
     sf::Clock m_pulseClock;
     // Game Stats

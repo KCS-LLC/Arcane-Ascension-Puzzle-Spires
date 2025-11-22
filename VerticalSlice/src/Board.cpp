@@ -12,39 +12,45 @@ Board::Board(int width, int height, GemFactory& factory)
     }
 }
 
-void Board::initialize(const std::vector<GemSubType>& possibleGems) {
+void Board::initialize(const std::vector<GemSubType>& gemTypes) {
+    if (gemTypes.empty()) {
+        std::cerr << "Board::initialize - Error: gemTypes vector is empty." << std::endl;
+        return;
+    }
+
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(0, possibleGems.size() - 1);
+    std::uniform_int_distribution<> distrib(0, gemTypes.size() - 1);
 
     for (int r = 0; r < m_height; ++r) {
         for (int c = 0; c < m_width; ++c) {
             GemSubType type;
             do {
-                type = possibleGems[distrib(gen)];
-                m_grid[r][c] = m_gemFactory.createGem(type, gemTextures.at(type));
-            } while (findMatches().count({r, c})); // Ensure no matches on creation
-             if (m_grid[r][c]) {
-                m_grid[r][c]->setPosition(c * TILE_SIZE, r * TILE_SIZE);
-            }
+                type = gemTypes[distrib(gen)];
+            } while ((c >= 2 && getGemAt(r, c - 1)->getSubType() == type && getGemAt(r, c - 2)->getSubType() == type) ||
+                     (r >= 2 && getGemAt(r - 1, c)->getSubType() == type && getGemAt(r - 2, c)->getSubType() == type));
+            m_grid[r][c] = m_gemFactory.createGem(type, gemTextures.at(type));
         }
     }
 }
 
 void Board::initializeForPowerTrial() {
-    // Simplified for now - will need the robust logic later
-    std::vector<GemSubType> trialGems = { GemSubType::Fire, GemSubType::Skull };
-     std::random_device rd;
+    std::vector<GemSubType> allowedGems = {
+        GemSubType::Fire, GemSubType::Umbral, GemSubType::Light, GemSubType::Skull
+    };
+    
+    std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(0, trialGems.size() - 1);
+    std::uniform_int_distribution<> distrib(0, allowedGems.size() - 1);
 
     for (int r = 0; r < m_height; ++r) {
         for (int c = 0; c < m_width; ++c) {
-            GemSubType type = trialGems[(r + c) % 2]; // Checkerboard for now
+            GemSubType type;
+            do {
+                type = allowedGems[distrib(gen)];
+            } while ((c >= 2 && getGemAt(r, c - 1)->getSubType() == type && getGemAt(r, c - 2)->getSubType() == type) ||
+                     (r >= 2 && getGemAt(r - 1, c)->getSubType() == type && getGemAt(r - 2, c)->getSubType() == type));
             m_grid[r][c] = m_gemFactory.createGem(type, gemTextures.at(type));
-            if (m_grid[r][c]) {
-                m_grid[r][c]->setPosition(c * TILE_SIZE, r * TILE_SIZE);
-            }
         }
     }
 }
@@ -53,12 +59,17 @@ void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, bo
     for (int r = 0; r < m_height; ++r) {
         for (int c = 0; c < m_width; ++c) {
             bool shouldDraw = true;
+
+            if (isAnimatingDestruction) {
+                if (destroyingGems.count({r, c})) {
+                    shouldDraw = false;
+                }
+            }
+            
             if (isAnimatingSwap && ((r == animatingGems.first.y && c == animatingGems.first.x) || (r == animatingGems.second.y && c == animatingGems.second.x))) {
                 shouldDraw = false;
             }
-            if (isAnimatingDestruction && destroyingGems.count({r, c})) {
-                shouldDraw = false;
-            }
+
             if (isAnimatingRefill) {
                 for (const auto& info : fallInfo) {
                     if (info.col == c && info.fallToRow == r) {
@@ -68,8 +79,10 @@ void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, bo
                 }
             }
 
-            if (shouldDraw && m_grid[r][c]) {
-                m_grid[r][c]->render(window, boardOrigin);
+            if (m_grid[r][c] && shouldDraw) {
+                sf::Sprite sprite = m_grid[r][c]->getSprite();
+                sprite.setPosition(sf::Vector2f(boardOrigin.x + c * TILE_SIZE, boardOrigin.y + r * TILE_SIZE));
+                window.draw(sprite);
             }
         }
     }

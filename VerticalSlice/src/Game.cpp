@@ -8,6 +8,9 @@
 #include "Constants.h"
 #include "Structs.h"
 #include "StringUtils.h"
+#include <numeric>
+#include <algorithm>
+#include <random>
 
 // Global texture map, defined here
 std::map<GemSubType, sf::Texture> gemTextures;
@@ -15,14 +18,14 @@ std::map<GemSubType, sf::Texture> gemTextures;
 Game::Game()
     : m_window(sf::VideoMode(sf::Vector2u(WINDOW_WIDTH, WINDOW_HEIGHT)), "Judgement"),
       dataManager(),
-      m_player(100, {}),
-      m_monster(10, 10),
       m_uiManager(dataManager.getFont()),
       m_gemFactory(dataManager),
       m_board(BOARD_WIDTH, BOARD_HEIGHT, m_gemFactory),
+      m_player(100, {}),
+      m_monster(10, 10),
       m_gameMode(GameMode::Judgement),
       m_gameState(GameState::Intro),
-      m_currentTrialIndex(0),
+      m_currentTrialOrderIndex(0),
       m_isAnimating(false),
       m_isAnimatingSwap(false),
       m_isAnimatingDestruction(false),
@@ -42,7 +45,15 @@ Game::Game()
 
     m_judgementTrials = dataManager.getJudgementTrials();
     if (!m_judgementTrials.empty()) {
-        setupJudgementTrial(m_judgementTrials[0]);
+        m_trialOrder.resize(m_judgementTrials.size());
+        std::iota(m_trialOrder.begin(), m_trialOrder.end(), 0); // Fill with 0, 1, 2...
+        
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(m_trialOrder.begin(), m_trialOrder.end(), g);
+        
+        m_currentTrialOrderIndex = 0;
+        setupJudgementTrial(m_judgementTrials[m_trialOrder[m_currentTrialOrderIndex]]);
     }
 }
 
@@ -64,7 +75,8 @@ void Game::setupJudgementTrial(const JudgementTrial& trial) {
     m_gameState = GameState::Trial;
     m_currentScore = 0;
     m_currentTurn = 0;
-    // m_uiManager.setupTrial(trial); // Will need to re-enable after UIManager is updated
+    m_uiManager.setupTrial(trial); 
+
     if (trial.type == JudgementTrialType::Power) {
         m_board.initializeForPowerTrial();
     } else {
@@ -98,11 +110,25 @@ void Game::handleInput(sf::Event event) {
     if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>()) {
         if (mb->button == sf::Mouse::Button::Left) {
             if (m_gameState == GameState::Summary) {
-                m_currentTrialIndex++;
-                if (m_currentTrialIndex < m_judgementTrials.size()) {
-                    setupJudgementTrial(m_judgementTrials[m_currentTrialIndex]);
+                // Store performance
+                switch (m_currentJudgementTrial.type) {
+                    case JudgementTrialType::Power:
+                        m_trialPerformance.powerScore = m_currentScore;
+                        break;
+                    case JudgementTrialType::Haste:
+                        m_trialPerformance.hasteScore = m_currentScore;
+                        break;
+                    case JudgementTrialType::Control:
+                        m_trialPerformance.controlScore = m_currentScore;
+                        break;
+                    default: break;
+                }
+
+                m_currentTrialOrderIndex++;
+                if (m_currentTrialOrderIndex < m_trialOrder.size()) {
+                    setupJudgementTrial(m_judgementTrials[m_trialOrder[m_currentTrialOrderIndex]]);
                 } else {
-                    m_gameState = GameState::GameOver; // All trials finished
+                    m_gameState = GameState::AttunementReveal; // All trials finished
                 }
                 return; // Consume the click
             }
@@ -195,9 +221,14 @@ void Game::update(sf::Time deltaTime) {
 
     // Check for Judgement trial win/loss conditions only if not animating
     if (m_gameMode == GameMode::Judgement && m_gameState == GameState::Trial) {
+        std::cout << "Update Check - Score: " << m_currentScore << "/" << m_currentJudgementTrial.scoreGoal
+                  << ", Turn: " << m_currentTurn << "/" << m_currentJudgementTrial.turnLimit << std::endl;
+
         if (m_currentScore >= m_currentJudgementTrial.scoreGoal) {
+            std::cout << "!!! STATE CHANGE: Win condition met. Changing to Summary." << std::endl;
             m_gameState = GameState::Summary; // Win condition
         } else if (m_currentTurn >= m_currentJudgementTrial.turnLimit) {
+            std::cout << "!!! STATE CHANGE: Loss condition met. Changing to Summary." << std::endl;
             m_gameState = GameState::Summary; // Loss condition
         }
     }
@@ -206,9 +237,7 @@ void Game::update(sf::Time deltaTime) {
     switch (m_gameMode) {
         case GameMode::Judgement:
         {
-            JudgementResults results; // Placeholder for now
-            std::set<int> visitedRoomIds; // Placeholder
-            m_uiManager.update(m_player, m_monster, m_gameState, nullptr, visitedRoomIds, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, results);
+            m_uiManager.update(m_player, m_monster, m_gameState, nullptr, {}, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance);
             break;
         }
         case GameMode::Exploration:
@@ -224,14 +253,14 @@ void Game::render() {
     m_window.clear(sf::Color(30, 30, 30));
 
     // Do not render the board or animations if the trial is over
-    if (m_gameState != GameState::Summary) {
-        // Render the static board, hiding animating gems
+    if (m_gameState != GameState::Summary && m_gameState != GameState::AttunementReveal) {
+        std::cout << "Game::render - Calling m_board.render()" << std::endl;
         m_board.render(m_window, m_boardOrigin, m_isAnimatingSwap, m_animatingGems, m_isAnimatingDestruction, m_destroyingGems, m_isAnimatingRefill, m_fallInfo);
 
         const float swapAnimationDuration = 0.2f;
         const float destructionAnimationDuration = 0.3f;
         const float refillAnimationDuration = 0.3f;
-        float p = 0.0f; 
+        float p = 0.0f;
 
         // Render swap animation
         if (m_isAnimatingSwap) {
@@ -294,8 +323,7 @@ void Game::render() {
     }
 
     // UI Rendering
-    JudgementResults results; // Placeholder
-    m_uiManager.render(m_window, m_gameState, false, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, results);
+    m_uiManager.render(m_window, m_gameState, false, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance);
 
     m_window.display();
 }

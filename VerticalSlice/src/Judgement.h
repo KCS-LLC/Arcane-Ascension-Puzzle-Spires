@@ -29,3 +29,10 @@ struct JudgementResults {
     int hasteScore = 0;
     int controlScore = 0;
 };
+
+// Struct to hold player's performance across the three tactical trials
+struct TrialPerformance {
+    int powerScore = 0;
+    int hasteScore = 0;
+    int controlScore = 0;
+};

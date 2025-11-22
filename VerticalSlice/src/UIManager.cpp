@@ -84,81 +84,53 @@ void UIManager::setupTrial(const JudgementTrial& trial) {
     }
     trialTypeText.setString(trialTypeStr);
     trialObjectiveText.setString(wordWrap(trial.objective, 40));
-    turnLimitText.setString("Turns Left: " + std::to_string(trial.turnLimit));
-    scoreGoalText.setString("Score Goal: " + std::to_string(trial.scoreGoal));
 }
 
-void UIManager::update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const JudgementResults& results) {
-    // Update Trial UI text
-    if (currentState == GameState::Trial || currentState == GameState::AttunementReveal) {
-        trialTypeText.setString(trialTypeToString(currentTrial.type));
-        trialObjectiveText.setString(currentTrial.objective);
-        scoreGoalText.setString("Goal: " + std::to_string(currentTrial.scoreGoal));
-        turnLimitText.setString("Turns: " + std::to_string(currentTrialTurn) + "/" + std::to_string(currentTrial.turnLimit));
+void UIManager::update(const Player& player, const Monster& monster, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance) {
+    if (currentState == GameState::Trial) {
+        turnLimitText.setString("Turns Left: " + std::to_string(currentTrial.turnLimit - currentTrialTurn));
+        scoreGoalText.setString("Score Goal: " + std::to_string(currentTrial.scoreGoal));
         currentTrialScoreText.setString("Score: " + std::to_string(currentScore));
     }
 }
 
-void UIManager::render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const JudgementResults& results) {
-
-
-
+void UIManager::render(sf::RenderWindow& window, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance) {
     switch (currentState) {
-
         case GameState::Intro:
-
             // Draw specific Intro UI elements here if any
-
             break;
-
         case GameState::Trial:
-
             window.draw(trialTypeText);
-
             window.draw(trialObjectiveText);
-
             window.draw(turnLimitText);
-
             window.draw(scoreGoalText);
-
             window.draw(currentTrialScoreText);
-
-            // Add other trial-specific UI elements here
-
             break;
-
         case GameState::Summary:
             judgementSummaryTitle.setString("Trial Complete");
             judgementResultsText.setString("Final Score: " + std::to_string(currentScore));
             window.draw(judgementSummaryTitle);
             window.draw(judgementResultsText);
             break;
-
         case GameState::AttunementReveal:
-
-            // Draw Attunement Reveal UI elements here
-
+            attunementTitleText.setString("Judgement Complete");
+            judgementResultsText.setString(
+                "Power Score: " + std::to_string(performance.powerScore) + "\n" +
+                "Haste Score: " + std::to_string(performance.hasteScore) + "\n" +
+                "Control Score: " + std::to_string(performance.controlScore)
+            );
+            window.draw(attunementTitleText);
+            window.draw(judgementResultsText);
             break;
-
         case GameState::Playing:
-
             // Render exploration or combat UI elements
-
             break;
-
         case GameState::GameOver:
-
             window.draw(gameOverText);
-
             break;
-
         default:
-
             break;
-
     }
-
-    // ... other rendering logic ...
 }
 
 const std::vector<sf::RectangleShape>& UIManager::getSpellButtons() const {
