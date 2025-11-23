@@ -90,6 +90,34 @@ sf::Color doorColorToSfColor(DoorColor color) {
     }
 }
 
+sf::Color getSfColorForRoomType(RoomType type) {
+    switch (type) {
+        case RoomType::Combat:
+            return sf::Color(139, 0, 0); // Dark Red
+        case RoomType::AgilityChallenge:
+            return sf::Color(255, 140, 0); // Dark Orange
+        case RoomType::Trap:
+            return sf::Color(255, 215, 0); // Gold (Yellow)
+        case RoomType::EnduranceChallenge:
+            return sf::Color(0, 100, 0); // Dark Green
+        case RoomType::Puzzle:
+            return sf::Color(0, 0, 205); // Medium Blue
+        case RoomType::MagicChallenge:
+            return sf::Color(75, 0, 130); // Indigo
+        case RoomType::Special:
+            return sf::Color(148, 0, 211); // Dark Violet
+        case RoomType::Treasure:
+            return sf::Color(184, 115, 51); // Copper
+        case RoomType::Sanctuary:
+        case RoomType::Boss:
+            return sf::Color(245, 245, 245); // White Smoke
+        case RoomType::Entrance:
+            return sf::Color(128, 128, 128); // Grey
+        default:
+            return sf::Color::Black;
+    }
+}
+
 EffectType stringToEffectType(const std::string& s) {
     if (s == "Damage") return EffectType::Damage;
     if (s == "Heal") return EffectType::Heal;

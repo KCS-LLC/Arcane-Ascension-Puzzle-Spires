@@ -75,8 +75,8 @@ void from_json(const json& j, Attunement& a) {
 void from_json(const json& j, Spell& s) {
     j.at("id").get_to(s.id);
     j.at("name").get_to(s.name);
-    j.at("cost").get_to(s.costAmount);
-    s.costType = static_cast<GemSubType>(j.at("cost_type_id").get<int>());
+    j.at("costAmount").get_to(s.costAmount);
+    s.costType = static_cast<GemSubType>(j.at("costType").get<int>());
 }
 
 void from_json(const json& j, Floor& f) {
@@ -193,7 +193,15 @@ bool DataManager::loadMonsterData(const std::string& path) {
     return true;
 }
 bool DataManager::loadFloor(const std::string& path) {
-    // Implementation needed
+    std::ifstream f(path);
+    if (!f.is_open()) return false;
+    try {
+        json data = json::parse(f);
+        currentFloor = data.get<Floor>();
+    } catch (const json::exception& e) {
+        std::cerr << "JSON error in floor data: " << e.what() << std::endl;
+        return false;
+    }
     return true;
 }
 bool DataManager::loadJudgementTrials() {

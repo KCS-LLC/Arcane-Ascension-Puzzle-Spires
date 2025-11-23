@@ -6,6 +6,7 @@
 #include "Judgement.h"
 #include "PrimaryGemType.h"
 #include "GemSubType.h"
+#include "Structs.h"
 
 // Forward declarations
 class Player;
@@ -28,10 +29,10 @@ class UIManager {
 public:
     UIManager(const sf::Font& font);
 
-    bool handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction);
+    bool handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, UIAction& outAction);
     void setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin, const std::vector<Attunement>& attunements);
     void setupTrial(const JudgementTrial& trial);
-    void update(const Player& player, const Monster& monster, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance);
+    void update(const Player& player, const Monster& monster, GameMode gameMode, GameState currentState, const Room* currentRoom, const Floor& currentFloor, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance);
     void render(sf::RenderWindow& window, GameMode gameMode, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance);
 
     const std::vector<sf::RectangleShape>& getSpellButtons() const;
@@ -98,6 +99,7 @@ private:
     // Room Exits
     std::vector<sf::RectangleShape> doorButtons;
     std::vector<sf::Text> doorButtonTexts;
+    std::vector<Teleporter> m_currentConnections;
 };
 
 #endif // UIMANAGER_H

@@ -19,5 +19,13 @@ enum class GameState {
     AttunementReveal,
     Exploration,
     Playing,
-    GameOver
+    GameOver,
+    Treasure,
+    Special,
+    Puzzle,
+    Trap,
+    Sanctuary,
+    AgilityChallenge,
+    EnduranceChallenge,
+    MagicChallenge
 };

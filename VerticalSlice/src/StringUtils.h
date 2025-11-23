@@ -13,6 +13,7 @@ std::string primaryGemTypeToString(PrimaryGemType type);
 std::string gemSubtypeToString(GemSubType type);
 std::string doorColorToString(DoorColor color);
 sf::Color doorColorToSfColor(DoorColor color);
+sf::Color getSfColorForRoomType(RoomType type);
 GemSubType stringToGemSubType(const std::string& s);
 EffectType stringToEffectType(const std::string& s);
 TargetType stringToTargetType(const std::string& s);

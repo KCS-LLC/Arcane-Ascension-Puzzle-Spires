@@ -62,15 +62,14 @@ UIManager::UIManager(const sf::Font& font)
     judgementResultsText.setPosition(sf::Vector2f{ 450, 250 });
 }
     
-    bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction) {    if (currentState == GameState::Exploration) {
+    bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, UIAction& outAction) {
+    if (currentState == GameState::Exploration) {
         if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>()) {
             if (mb->button == sf::Mouse::Button::Left) {
                 for (size_t i = 0; i < doorButtons.size(); ++i) {
                     if (doorButtons[i].getGlobalBounds().contains(sf::Vector2f(mb->position))) {
                         outAction.type = UIActionType::ChangeRoom;
-                        // Hardcode destination IDs for now
-                        if (i == 0) outAction.destinationRoomId = 2; // North -> Room 2
-                        else if (i == 1) outAction.destinationRoomId = 3; // East -> Room 3
+                        outAction.destinationRoomId = m_currentConnections[i].destinationRoomId;
                         return true;
                     }
                 }
@@ -90,36 +89,6 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     boardFrame.setFillColor(sf::Color::Transparent);
     boardFrame.setOutlineColor(sf::Color(100, 100, 100));
     boardFrame.setOutlineThickness(2);
-
-    // Clear and re-create placeholder door buttons
-    doorButtons.clear();
-    doorButtonTexts.clear();
-
-    // North Door
-    sf::RectangleShape northDoor({200, 50});
-    northDoor.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f - 100, WINDOW_HEIGHT / 2.0f + 100));
-    northDoor.setFillColor(sf::Color(50, 50, 150, 150));
-    doorButtons.push_back(northDoor);
-    
-    sf::Text northText(font, "North (Room 2)", 20);
-    northText.setFillColor(sf::Color::Cyan);
-    sf::FloatRect northTextBounds = northText.getLocalBounds();
-    northText.setOrigin(sf::Vector2f(northTextBounds.size.x / 2, northTextBounds.size.y / 2));
-    northText.setPosition(northDoor.getPosition() + sf::Vector2f(northDoor.getSize().x / 2, northDoor.getSize().y / 2));
-    doorButtonTexts.push_back(northText);
-
-    // East Door
-    sf::RectangleShape eastDoor({200, 50});
-    eastDoor.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f + 150, WINDOW_HEIGHT / 2.0f + 150));
-    eastDoor.setFillColor(sf::Color(50, 150, 50, 150));
-    doorButtons.push_back(eastDoor);
-
-    sf::Text eastText(font, "East (Room 3)", 20);
-    eastText.setFillColor(sf::Color::Cyan);
-    sf::FloatRect eastTextBounds = eastText.getLocalBounds();
-    eastText.setOrigin(sf::Vector2f(eastTextBounds.size.x / 2, eastTextBounds.size.y / 2));
-    eastText.setPosition(eastDoor.getPosition() + sf::Vector2f(eastDoor.getSize().x / 2, eastDoor.getSize().y / 2));
-    doorButtonTexts.push_back(eastText);
 }
 void UIManager::setupTrial(const JudgementTrial& trial) {
     std::string trialTypeStr;
@@ -133,7 +102,7 @@ void UIManager::setupTrial(const JudgementTrial& trial) {
     trialObjectiveText.setString(wordWrap(trial.objective, 40));
 }
 
-void UIManager::update(const Player& player, const Monster& monster, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance) {
+void UIManager::update(const Player& player, const Monster& monster, GameMode gameMode, GameState currentState, const Room* currentRoom, const Floor& currentFloor, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance) {
     if (currentState == GameState::Trial) {
         turnLimitText.setString("Turns Left: " + std::to_string(currentTrial.turnLimit - currentTrialTurn));
         scoreGoalText.setString("Score Goal: " + std::to_string(currentTrial.scoreGoal));
@@ -143,7 +112,53 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
     if (currentState == GameState::Exploration) {
         if (currentRoom) {
             m_roomNameText.setString(currentRoom->name);
-            m_roomDescriptionText.setString("Explore the room. Which way will you go?"); // Placeholder for now
+            m_roomDescriptionText.setString("Explore the room. Which way will you go?");
+
+            // --- Dynamic Door Button Generation ---
+            doorButtons.clear();
+            doorButtonTexts.clear();
+            m_currentConnections = currentRoom->connections;
+
+            const float buttonWidth = 220.f;
+            const float buttonHeight = 50.f;
+            const float buttonSpacing = 20.f;
+            const int numButtons = m_currentConnections.size();
+            const float totalHeight = (numButtons * buttonHeight) + ((numButtons - 1) * buttonSpacing);
+            float startY = (WINDOW_HEIGHT - totalHeight) / 2.f;
+
+            for (size_t i = 0; i < m_currentConnections.size(); ++i) {
+                const auto& connection = m_currentConnections[i];
+                const Room* destinationRoom = nullptr;
+                for(const auto& room : currentFloor.rooms) {
+                    if (room.id == connection.destinationRoomId) {
+                        destinationRoom = &room;
+                        break;
+                    }
+                }
+
+                if (destinationRoom) {
+                    sf::RectangleShape button({buttonWidth, buttonHeight});
+                    button.setPosition(sf::Vector2f{(WINDOW_WIDTH - buttonWidth) / 2.f, startY + i * (buttonHeight + buttonSpacing)});
+                    button.setFillColor(getSfColorForRoomType(destinationRoom->type));
+                    button.setOutlineColor(sf::Color(200, 200, 200));
+                    button.setOutlineThickness(1.f);
+                    doorButtons.push_back(button);
+
+                    std::string buttonTextStr;
+                    if (visitedRoomIds.count(destinationRoom->id)) {
+                        buttonTextStr = destinationRoom->name;
+                    } else {
+                        buttonTextStr = roomTypeToString(destinationRoom->type) + " Door";
+                    }
+
+                    sf::Text buttonText(font, buttonTextStr, 20);
+                    buttonText.setFillColor(sf::Color::White);
+                    sf::FloatRect textBounds = buttonText.getLocalBounds();
+                    buttonText.setOrigin(sf::Vector2f{textBounds.position.x + textBounds.size.x / 2.f, textBounds.position.y + textBounds.size.y / 2.f});
+                    buttonText.setPosition(button.getPosition() + sf::Vector2f{button.getSize().x / 2.f, button.getSize().y / 2.f});
+                    doorButtonTexts.push_back(buttonText);
+                }
+            }
         }
     }
 }
