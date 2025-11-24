@@ -18,8 +18,8 @@
   { "id": 16, "name": "Sword Gem", "secondaryTypeId": 1002, "level": 1, "texturePath": null },
   { "id": 17, "name": "Coin Gem", "secondaryTypeId": 3001, "level": 1, "texturePath": "assets/gem_coin.png" },
   { "id": 18, "name": "Grey Gem", "secondaryTypeId": 2014, "level": 1, "texturePath": null },
-  { "id": 19, "name": "CoinPile", "secondaryTypeId": 3002, "level": 2, "texturePath": "assets/gem_coin.png" },
-  { "id": 20, "name": "CoinBag", "secondaryTypeId": 3003, "level": 3, "texturePath": "assets/gem_coin.png" },
-  { "id": 21, "name": "CoinBagBundle", "secondaryTypeId": 3004, "level": 4, "texturePath": "assets/gem_coin.png" },
-  { "id": 22, "name": "TreasureChest", "secondaryTypeId": 3005, "level": 5, "texturePath": "assets/gem_coin.png" }
+  { "id": 19, "name": "CoinPile", "secondaryTypeId": 3002, "level": 2, "texturePath": "assets/gem_coin_pile.png" },
+  { "id": 20, "name": "CoinBag", "secondaryTypeId": 3003, "level": 3, "texturePath": "assets/gem_coin_bag.png" },
+  { "id": 21, "name": "CoinBagBundle", "secondaryTypeId": 3004, "level": 4, "texturePath": "assets/gem_coin_bag_bundle.png" },
+  { "id": 22, "name": "TreasureChest", "secondaryTypeId": 3005, "level": 5, "texturePath": "assets/gem_treasure_chest.png" }
 ]

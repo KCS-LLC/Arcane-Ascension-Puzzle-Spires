@@ -160,10 +160,20 @@ void UIManager::setupTrial(const JudgementTrial& trial) {
     trialObjectiveText.setString(wordWrap(trial.objective, 40));
 }
 
+void UIManager::setupTreasureRound() {
+    trialTypeText.setString("Treasure Round");
+    trialObjectiveText.setString("Maximize your score by merging treasure gems!");
+    scoreGoalText.setString(""); // No score goal, just maximize
+}
+
 void UIManager::update(const Player& player, const Monster& monster, GameMode gameMode, GameState currentState, const Room* currentRoom, const Floor& currentFloor, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance) {
     if (currentState == GameState::Trial) {
         turnLimitText.setString("Turns Left: " + std::to_string(currentTrial.turnLimit - currentTrialTurn));
         scoreGoalText.setString("Score Goal: " + std::to_string(currentTrial.scoreGoal));
+        currentTrialScoreText.setString("Score: " + std::to_string(currentScore));
+    } else if (currentState == GameState::Judgement_TreasureRound) {
+        turnLimitText.setString("Turns Left: " + std::to_string(20 - currentTrialTurn));
+        scoreGoalText.setString(""); // No score goal in treasure round
         currentTrialScoreText.setString("Score: " + std::to_string(currentScore));
     }
 
@@ -287,6 +297,7 @@ void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState cu
             // Draw specific Intro UI elements here if any
             break;
         case GameState::Trial:
+        case GameState::Judgement_TreasureRound:
             window.draw(trialTypeText);
             window.draw(trialObjectiveText);
             window.draw(turnLimitText);
@@ -302,8 +313,8 @@ void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState cu
         case GameState::AttunementReveal:
             attunementTitleText.setString("Judgement Complete");
             judgementResultsText.setString(
-                "Power Score: " + std::to_string(performance.powerScore) + "\n" +
-                "Haste Score: " + std::to_string(performance.hasteScore) + "\n" +
+                "Power Score: " + std::to_string(performance.powerScore) + "\n" + 
+                "Haste Score: " + std::to_string(performance.hasteScore) + "\n" + 
                 "Control Score: " + std::to_string(performance.controlScore)
             );
             window.draw(attunementTitleText);

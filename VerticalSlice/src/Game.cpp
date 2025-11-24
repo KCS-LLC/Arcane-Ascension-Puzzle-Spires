@@ -244,23 +244,9 @@ void Game::handleInput(sf::Event event) {
                 if (m_currentTrialOrderIndex < m_trialOrder.size()) {
                     setupJudgementTrial(m_judgementTrials[m_trialOrder[m_currentTrialOrderIndex]]);
                 } else {
-                    // All trials complete, auto-assign attunement and start tower climb
-                    std::cout << "Fetching attunement data..." << std::endl;
-                    const auto& attunements = dataManager.getAttunements();
-                    auto it = std::find_if(attunements.begin(), attunements.end(), [&](const Attunement& a) {
-                        return a.id == "elementalist";
-                    });
-
-                    if (it != attunements.end()) {
-                        std::cout << "Attunement found. Assigning to player..." << std::endl;
-                        m_player.setAttunement(*it, dataManager);
-                        std::cout << "Attunement assigned. Starting tower climb..." << std::endl;
-                        startTowerClimb();
-                        std::cout << "Tower climb started." << std::endl;
-                    } else {
-                        // Handle error case where elementalist attunement is not found
-                        m_window.close();
-                    }
+                    // All trials complete, transition to the treasure round
+                    m_gameState = GameState::Judgement_TreasureRound;
+                    setupTreasureRound();
                 }
                 return; // Consume the click
             }
@@ -305,27 +291,35 @@ void Game::update(sf::Time deltaTime) {
                     sf::Vector2i p2 = {m_animatingGems.second.y, m_animatingGems.second.x};
 
                     m_board.swapGems(p1.x, p1.y, p2.x, p2.y);
-                    auto matches = m_board.findMatches();
-                    if (!matches.empty()) { // Swap resulted in a match
-                        resolveMatches(matches);
-                        m_currentTurn++; // Increment turn after a valid move
-                        m_currentScore += (matches.size() * 100); // Add score for destroyed gems
-                        
-                        if (m_gameMode == GameMode::TOWER_CLIMB && m_monster.isTurnReady(30)) { // 30 is placeholder for MATCH_SPEED_COST
-                            m_player.takeDamage(dataManager.getMonsterAttackDamage());
-                            showPlayerDamageEffect = true;
-                            playerDamageClock.restart();
+
+                    bool treasureMerged = false;
+                    if (m_gameState == GameState::Judgement_TreasureRound) {
+                        treasureMerged = processTreasureMerges();
+                    }
+
+                    if (!treasureMerged) {
+                        auto matches = m_board.findMatches();
+                        if (!matches.empty()) { // Swap resulted in a match
+                            resolveMatches(matches);
+                            m_currentTurn++; // Increment turn after a valid move
+                            m_currentScore += (matches.size() * 100); // Add score for destroyed gems
+                            
+                            if (m_gameMode == GameMode::TOWER_CLIMB && m_monster.isTurnReady(30)) { // 30 is placeholder for MATCH_SPEED_COST
+                                m_player.takeDamage(dataManager.getMonsterAttackDamage());
+                                showPlayerDamageEffect = true;
+                                playerDamageClock.restart();
+                            }
+                            
+                            m_isAnimatingSwap = false;
+                            m_isAnimatingDestruction = true;
+                            m_destroyingGems = matches;
+                            m_animationClock.restart();
+                        } else { // Invalid swap, animate back
+                            m_isSwappingBack = true;
+                            m_animatingGems = { sf::Vector2i(p2.y, p2.x), sf::Vector2i(p1.y, p1.x) }; // Correctly reverse the original coordinates
+                            m_animationClock.restart();
+                            m_board.swapGems(p1.x, p1.y, p2.x, p2.y); // Swap back immediately data-wise
                         }
-                        
-                        m_isAnimatingSwap = false;
-                        m_isAnimatingDestruction = true;
-                        m_destroyingGems = matches;
-                        m_animationClock.restart();
-                    } else { // Invalid swap, animate back
-                        m_isSwappingBack = true;
-                        m_animatingGems = { sf::Vector2i(p2.y, p2.x), sf::Vector2i(p1.y, p1.x) }; // Correctly reverse the original coordinates
-                        m_animationClock.restart();
-                        m_board.swapGems(p1.x, p1.y, p2.x, p2.y); // Swap back immediately data-wise
                     }
                 } else {
                     // This block executes after the swap-back animation has played
@@ -339,7 +333,9 @@ void Game::update(sf::Time deltaTime) {
             if (m_animationClock.getElapsedTime().asSeconds() >= destructionAnimationDuration) {
                 m_isAnimatingDestruction = false;
                 m_board.removeGems(m_destroyingGems);
-                if (m_gameMode == GameMode::TOWER_CLIMB) {
+                if (m_gameState == GameState::Judgement_TreasureRound) {
+                    m_fallInfo = m_board.applyGravityAndRefill(m_treasureRoundGems);
+                } else if (m_gameMode == GameMode::TOWER_CLIMB) {
                     m_fallInfo = m_board.applyGravityAndRefill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air, GemSubType::Skull});
                 } else {
                     m_fallInfo = m_board.applyGravityAndRefill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air});
@@ -378,6 +374,45 @@ void Game::update(sf::Time deltaTime) {
         }
     }
 
+    // Check for Treasure Round end condition
+    if (m_gameState == GameState::Judgement_TreasureRound && m_currentTurn >= 20) {
+        int finalTreasureValue = 0;
+        for (int r = 0; r < BOARD_HEIGHT; ++r) {
+            for (int c = 0; c < BOARD_WIDTH; ++c) {
+                BaseGem* gem = m_board.getGemAt(r, c);
+                if (gem) {
+                    // This is a simplified scoring logic. A more robust solution
+                    // would involve checking the gem's catalog entry for its value.
+                    switch (gem->getSubType()) {
+                        case GemSubType::Coin: finalTreasureValue += 1; break;
+                        case GemSubType::CoinPile: finalTreasureValue += 5; break;
+                        case GemSubType::CoinBag: finalTreasureValue += 25; break;
+                        case GemSubType::CoinBagBundle: finalTreasureValue += 100; break;
+                        case GemSubType::TreasureChest: finalTreasureValue += 500; break;
+                        default: break;
+                    }
+                }
+            }
+        }
+        std::cout << "Final Treasure Value: " << finalTreasureValue << std::endl;
+
+        // Assign attunement before starting the tower climb
+        const auto& attunements = dataManager.getAttunements();
+        auto it = std::find_if(attunements.begin(), attunements.end(), [&](const Attunement& a) {
+            return a.id == "elementalist";
+        });
+
+        if (it != attunements.end()) {
+            m_player.setAttunement(*it, dataManager);
+        } else {
+            // Handle error case where elementalist attunement is not found
+            std::cerr << "CRITICAL: Elementalist attunement not found!" << std::endl;
+            m_window.close();
+        }
+
+        startTowerClimb();
+    }
+
     if (m_gameMode == GameMode::TOWER_CLIMB && m_gameState == GameState::Playing) {
         if (m_player.getHp() <= 0) {
             m_gameState = GameState::GameOver;
@@ -404,7 +439,7 @@ void Game::render() {
     m_window.clear(sf::Color(30, 30, 30));
 
     // Only render the board and animations during combat-related states
-    if (m_gameState == GameState::Playing || m_gameState == GameState::Trial || m_isAnimating || m_gameState == GameState::GameOver) {
+    if (m_gameState == GameState::Playing || m_gameState == GameState::Trial || m_isAnimating || m_gameState == GameState::GameOver || m_gameState == GameState::Judgement_TreasureRound) {
         // Do not render the board or animations if the trial is over
         if (m_gameState != GameState::Summary && m_gameState != GameState::AttunementReveal) {
             m_board.render(m_window, m_boardOrigin, m_isAnimatingSwap, m_animatingGems, m_isAnimatingDestruction, m_destroyingGems, m_isAnimatingRefill, m_fallInfo);
@@ -479,4 +514,36 @@ void Game::render() {
     m_uiManager.render(m_window, m_gameMode, m_gameState, showPlayerDamageEffect, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance);
 
     m_window.display();
+}
+
+void Game::setupTreasureRound() {
+    m_gameState = GameState::Judgement_TreasureRound;
+    m_currentTurn = 0;
+    m_currentScore = 0; // Reset score for the treasure round
+    m_uiManager.setupTreasureRound();
+
+    // Define the pool of possible gems for the treasure round
+    std::vector<GemSubType> manaGems = {
+        GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air,
+        GemSubType::Light, GemSubType::Umbral, GemSubType::Enhancement, GemSubType::Perception,
+        GemSubType::Transference, GemSubType::Life, GemSubType::Death, GemSubType::Mental
+    };
+
+    // Shuffle and pick 4 random mana gems
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(manaGems.begin(), manaGems.end(), g);
+    
+    m_treasureRoundGems.clear();
+    m_treasureRoundGems.push_back(GemSubType::Coin); // Always include the base coin
+    for (int i = 0; i < 4; ++i) {
+        m_treasureRoundGems.push_back(manaGems[i]);
+    }
+
+    m_board.initialize(m_treasureRoundGems);
+}
+
+bool Game::processTreasureMerges() {
+    // TODO: Implement the treasure merge logic here.
+    return false;
 }

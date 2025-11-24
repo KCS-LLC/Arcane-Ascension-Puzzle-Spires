@@ -28,6 +28,8 @@ private:
     void resolveMatches(const std::set<std::pair<int, int>>& matches);
     void setupJudgementTrial(const JudgementTrial& trial);
     void startTowerClimb();
+    void setupTreasureRound();
+    bool processTreasureMerges();
     void moveToRoom(int destinationRoomId);
 
     sf::RenderWindow m_window;
@@ -50,6 +52,7 @@ private:
     int m_currentTrialOrderIndex; // Tracks which trial we are on in the shuffled order
     JudgementTrial m_currentJudgementTrial;
     TrialPerformance m_trialPerformance;
+    std::vector<GemSubType> m_treasureRoundGems; // Gems used in the treasure round
     sf::Clock m_trialClock;
     sf::Clock m_pulseClock;
     // Game Stats
