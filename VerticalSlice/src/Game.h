@@ -62,12 +62,17 @@ private:
     // Animation state
     bool m_isAnimating = false;
     bool m_isAnimatingSwap = false;
+    bool m_isSwappingBack = false; // Flag for the reverse animation
     bool m_isAnimatingDestruction = false;
     bool m_isAnimatingRefill = false;
     sf::Clock m_animationClock;
     std::pair<sf::Vector2i, sf::Vector2i> m_animatingGems;
     std::set<std::pair<int, int>> m_destroyingGems;
     std::vector<Board::FallInfo> m_fallInfo;
+
+    // Combat UI state
+    bool showPlayerDamageEffect = false;
+    sf::Clock playerDamageClock;
 
     // Board positioning
     sf::Vector2f m_boardOrigin;

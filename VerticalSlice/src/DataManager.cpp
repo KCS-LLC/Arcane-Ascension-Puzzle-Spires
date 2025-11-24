@@ -189,7 +189,21 @@ bool DataManager::loadSpells(const std::string& path) {
     return true;
 }
 bool DataManager::loadMonsterData(const std::string& path) {
-    // Implementation needed
+    std::ifstream f(path);
+    if (!f.is_open()) {
+        std::cerr << "Could not open monster file: " << path << std::endl;
+        return false;
+    }
+    try {
+        json data = json::parse(f);
+        monsterHP = data.at("hp").get<int>();
+        monsterSpeed = data.at("speed").get<int>();
+        monsterAttackDamage = data.at("attackDamage").get<int>();
+        monsterName = data.at("name").get<std::string>();
+    } catch (const json::exception& e) {
+        std::cerr << "JSON error in monster data: " << e.what() << std::endl;
+        return false;
+    }
     return true;
 }
 bool DataManager::loadFloor(const std::string& path) {
@@ -256,7 +270,15 @@ PrimaryGemType DataManager::getPrimaryGemType(GemSubType subType) const {
 const std::vector<Attunement>& DataManager::getAttunements() const { return attunements; }
 const Attunement* DataManager::getAttunementById(const std::string& id) const { return nullptr; }
 const std::vector<Spell>& DataManager::getAllSpells() const { return spells; }
-const Spell* DataManager::getSpellById(int id) const { return nullptr; }
+const Spell* DataManager::getSpellById(int id) const {
+    auto it = std::find_if(spells.begin(), spells.end(), [id](const Spell& spell) {
+        return spell.id == id;
+    });
+    if (it != spells.end()) {
+        return &(*it);
+    }
+    return nullptr;
+}
 int DataManager::getMonsterHP() const { return monsterHP; }
 int DataManager::getMonsterSpeed() const { return monsterSpeed; }
 int DataManager::getMonsterAttackDamage() const { return monsterAttackDamage; }

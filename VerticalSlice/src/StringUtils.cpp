@@ -118,6 +118,24 @@ sf::Color getSfColorForRoomType(RoomType type) {
     }
 }
 
+sf::Color getSfColorForGemType(GemSubType type) {
+    switch (type) {
+        case GemSubType::Fire: return sf::Color(255, 50, 50);
+        case GemSubType::Water: return sf::Color(50, 50, 255);
+        case GemSubType::Earth: return sf::Color(139, 69, 19);
+        case GemSubType::Air: return sf::Color(173, 216, 230);
+        case GemSubType::Light: return sf::Color(255, 255, 150);
+        case GemSubType::Umbral: return sf::Color(100, 100, 100);
+        case GemSubType::Life: return sf::Color(50, 205, 50);
+        case GemSubType::Death: return sf::Color(138, 43, 226);
+        case GemSubType::Mental: return sf::Color(218, 112, 214);
+        case GemSubType::Perception: return sf::Color(0, 191, 255);
+        case GemSubType::Enhancement: return sf::Color(255, 165, 0);
+        case GemSubType::Transference: return sf::Color(64, 224, 208);
+        default: return sf::Color(128, 128, 128);
+    }
+}
+
 EffectType stringToEffectType(const std::string& s) {
     if (s == "Damage") return EffectType::Damage;
     if (s == "Heal") return EffectType::Heal;

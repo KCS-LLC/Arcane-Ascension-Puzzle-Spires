@@ -184,7 +184,7 @@ void Game::handleInput(sf::Event event) {
     }
 
     UIAction action;
-    if (m_uiManager.handleEvent(event, m_gameMode, m_gameState, action)) {
+    if (m_uiManager.handleEvent(event, m_gameMode, m_gameState, m_currentRoom, dataManager.getAttunements(), action)) {
         if (action.type == UIActionType::SelectAttunement) {
             const auto& attunements = dataManager.getAttunements();
             auto it = std::find_if(attunements.begin(), attunements.end(), [&](const Attunement& a) {
@@ -199,6 +199,16 @@ void Game::handleInput(sf::Event event) {
             moveToRoom(action.destinationRoomId);
         } else if (action.type == UIActionType::ChangeRoom) {
             moveToRoom(action.destinationRoomId);
+        } else if (action.type == UIActionType::CastSpell) {
+            int damage = m_player.castSpell(action.spellIndex);
+            if (damage > 0) {
+                m_monster.takeDamage(damage);
+                if (m_monster.isTurnReady(70)) { // 70 is placeholder for SPELL_SPEED_COST
+                    m_player.takeDamage(dataManager.getMonsterAttackDamage());
+                    showPlayerDamageEffect = true;
+                    playerDamageClock.restart();
+                }
+            }
         }
         return; // UI handled the event
     }
@@ -290,35 +300,50 @@ void Game::update(sf::Time deltaTime) {
     if (m_isAnimating) {
         if (m_isAnimatingSwap) {
             if (m_animationClock.getElapsedTime().asSeconds() >= swapAnimationDuration) {
-                sf::Vector2i p1 = {m_animatingGems.first.y, m_animatingGems.first.x};
-                sf::Vector2i p2 = {m_animatingGems.second.y, m_animatingGems.second.x};
+                if (!m_isSwappingBack) {
+                    sf::Vector2i p1 = {m_animatingGems.first.y, m_animatingGems.first.x};
+                    sf::Vector2i p2 = {m_animatingGems.second.y, m_animatingGems.second.x};
 
-                m_board.swapGems(p1.x, p1.y, p2.x, p2.y);
-                auto matches = m_board.findMatches();
-                if (!matches.empty()) { // Swap resulted in a match
-                    resolveMatches(matches);
-                    m_currentTurn++; // Increment turn after a valid move
-                    m_currentScore += (matches.size() * 100); // Add score for destroyed gems
-                    m_isAnimatingSwap = false;
-                    m_isAnimatingDestruction = true;
-                    m_destroyingGems = matches;
-                    m_animationClock.restart();
-                } else { // Invalid swap, animate back
-                    m_animatingGems = { m_animatingGems.second, m_animatingGems.first };
-                    m_animationClock.restart();
-                    m_board.swapGems(p1.x, p1.y, p2.x, p2.y); // Swap back immediately data-wise
-                    // Reset to a non-animating state after the swap-back animation finishes
-                    if (m_animationClock.getElapsedTime().asSeconds() >= swapAnimationDuration) {
-                       m_isAnimating = false;
-                       m_isAnimatingSwap = false;
+                    m_board.swapGems(p1.x, p1.y, p2.x, p2.y);
+                    auto matches = m_board.findMatches();
+                    if (!matches.empty()) { // Swap resulted in a match
+                        resolveMatches(matches);
+                        m_currentTurn++; // Increment turn after a valid move
+                        m_currentScore += (matches.size() * 100); // Add score for destroyed gems
+                        
+                        if (m_gameMode == GameMode::TOWER_CLIMB && m_monster.isTurnReady(30)) { // 30 is placeholder for MATCH_SPEED_COST
+                            m_player.takeDamage(dataManager.getMonsterAttackDamage());
+                            showPlayerDamageEffect = true;
+                            playerDamageClock.restart();
+                        }
+                        
+                        m_isAnimatingSwap = false;
+                        m_isAnimatingDestruction = true;
+                        m_destroyingGems = matches;
+                        m_animationClock.restart();
+                    } else { // Invalid swap, animate back
+                        m_isSwappingBack = true;
+                        m_animatingGems = { sf::Vector2i(p2.y, p2.x), sf::Vector2i(p1.y, p1.x) }; // Correctly reverse the original coordinates
+                        m_animationClock.restart();
+                        m_board.swapGems(p1.x, p1.y, p2.x, p2.y); // Swap back immediately data-wise
                     }
+                } else {
+                    // This block executes after the swap-back animation has played
+                    m_isAnimating = false;
+                    m_isAnimatingSwap = false;
+                    m_isSwappingBack = false;
                 }
             }
         } else if (m_isAnimatingDestruction) {
+
             if (m_animationClock.getElapsedTime().asSeconds() >= destructionAnimationDuration) {
                 m_isAnimatingDestruction = false;
                 m_board.removeGems(m_destroyingGems);
-                m_fallInfo = m_board.applyGravityAndRefill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air});
+                if (m_gameMode == GameMode::TOWER_CLIMB) {
+                    m_fallInfo = m_board.applyGravityAndRefill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air, GemSubType::Skull});
+                } else {
+                    m_fallInfo = m_board.applyGravityAndRefill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air});
+                }
                 m_isAnimatingRefill = true;
                 m_animationClock.restart();
             }
@@ -340,14 +365,25 @@ void Game::update(sf::Time deltaTime) {
         return; 
     }
 
+    if (showPlayerDamageEffect && playerDamageClock.getElapsedTime().asMilliseconds() > 200) {
+        showPlayerDamageEffect = false;
+    }
+
     // Check for Judgement trial win/loss conditions only if not animating
     if (m_gameMode == GameMode::JUDGEMENT && m_gameState == GameState::Trial) {
         if (m_currentScore >= m_currentJudgementTrial.scoreGoal) {
-            std::cout << "!!! STATE CHANGE: Win condition met. Changing to Summary." << std::endl;
             m_gameState = GameState::Summary; // Win condition
         } else if (m_currentTurn >= m_currentJudgementTrial.turnLimit) {
-            std::cout << "!!! STATE CHANGE: Loss condition met. Changing to Summary." << std::endl;
             m_gameState = GameState::Summary; // Loss condition
+        }
+    }
+
+    if (m_gameMode == GameMode::TOWER_CLIMB && m_gameState == GameState::Playing) {
+        if (m_player.getHp() <= 0) {
+            m_gameState = GameState::GameOver;
+        } else if (m_monster.getCurrentHp() <= 0) {
+            // clearedRoomIds.insert(m_currentRoom->id); // Mark room as cleared
+            m_gameState = GameState::Exploration; // Player wins, go back to exploring
         }
     }
 
@@ -440,7 +476,7 @@ void Game::render() {
     }
 
     // UI Rendering
-    m_uiManager.render(m_window, m_gameMode, m_gameState, false, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance);
+    m_uiManager.render(m_window, m_gameMode, m_gameState, showPlayerDamageEffect, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance);
 
     m_window.display();
 }

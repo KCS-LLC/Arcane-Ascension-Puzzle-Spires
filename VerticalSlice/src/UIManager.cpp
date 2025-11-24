@@ -62,7 +62,7 @@ UIManager::UIManager(const sf::Font& font)
     judgementResultsText.setPosition(sf::Vector2f{ 450, 250 });
 }
     
-    bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, UIAction& outAction) {
+    bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction) {
     if (currentState == GameState::Exploration) {
         if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>()) {
             if (mb->button == sf::Mouse::Button::Left) {
@@ -76,6 +76,25 @@ UIManager::UIManager(const sf::Font& font)
             }
         }
     }
+    if (currentState == GameState::Playing || currentState == GameState::Trial) {
+        if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>()) {
+            if (mb->button == sf::Mouse::Button::Left) {
+                if (leftPanel.getGlobalBounds().contains(sf::Vector2f(mb->position)) ||
+                    rightPanel.getGlobalBounds().contains(sf::Vector2f(mb->position))) {
+                    // If the click is on a panel, we consume it immediately to prevent fall-through to board logic
+                    for (size_t i = 0; i < spellButtons.size(); ++i) {
+                        if (spellButtons[i].getGlobalBounds().contains(sf::Vector2f(mb->position))) {
+                            outAction.type = UIActionType::CastSpell;
+                            outAction.spellIndex = i;
+                            return true;
+                        }
+                    }
+                    return true; // Click on panel, but not on a spell button, still consume it
+                }
+            }
+        }
+    }
+
     // Placeholder logic for other UI event handling
     return false;
 }
@@ -89,6 +108,45 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     boardFrame.setFillColor(sf::Color::Transparent);
     boardFrame.setOutlineColor(sf::Color(100, 100, 100));
     boardFrame.setOutlineThickness(2);
+    // --- Combat UI Panels ---
+    leftPanel.setSize(sf::Vector2f{250, (float)windowSize.y});
+    leftPanel.setPosition(sf::Vector2f{0, 0});
+    leftPanel.setFillColor(sf::Color(50, 50, 50, 200));
+
+    rightPanel.setSize(sf::Vector2f{250, (float)windowSize.y});
+    rightPanel.setPosition(sf::Vector2f{(float)windowSize.x - 250, 0});
+    rightPanel.setFillColor(sf::Color(50, 50, 50, 200));
+
+    playerPanelTitle.setPosition(sf::Vector2f{20, 20});
+    monsterPanelTitle.setPosition(sf::Vector2f{windowSize.x - rightPanel.getSize().x + 20, 20});
+
+    // --- HP Bars ---
+    playerHpBarBack.setSize(sf::Vector2f{210, 20});
+    playerHpBarBack.setPosition(sf::Vector2f{20, 60});
+    playerHpBarBack.setFillColor(sf::Color(100, 0, 0));
+    playerHpBarFront = playerHpBarBack; // Copy size and position
+    playerHpBarFront.setFillColor(sf::Color(220, 0, 0));
+
+    monsterHpBarBack.setSize(sf::Vector2f{210, 20});
+    monsterHpBarBack.setPosition(sf::Vector2f{windowSize.x - rightPanel.getSize().x + 20, 90});
+    monsterHpBarBack.setFillColor(sf::Color(100, 0, 0));
+    monsterHpBarFront = monsterHpBarBack; // Copy size and position
+    monsterHpBarFront.setFillColor(sf::Color(220, 0, 0));
+
+    // --- Mana Bars Title ---
+    manaTitle.setPosition(sf::Vector2f{20, 120});
+
+    monsterSpeedGaugeBackground.setSize(sf::Vector2f{210, 10});
+    monsterSpeedGaugeBackground.setPosition(sf::Vector2f{windowSize.x - rightPanel.getSize().x + 20, 120});
+    monsterSpeedGaugeBackground.setFillColor(sf::Color(40, 40, 40));
+    monsterSpeedGaugeForeground = monsterSpeedGaugeBackground;
+    monsterSpeedGaugeForeground.setFillColor(sf::Color(200, 200, 0));
+
+    // --- Game Over Text ---
+    gameOverText.setFillColor(sf::Color::Red);
+    sf::FloatRect textRect = gameOverText.getLocalBounds();
+    gameOverText.setOrigin(sf::Vector2f{textRect.position.x + textRect.size.x / 2.f, textRect.position.y + textRect.size.y / 2.f});
+    gameOverText.setPosition(sf::Vector2f{windowSize.x / 2.f, windowSize.y / 2.f});
 }
 void UIManager::setupTrial(const JudgementTrial& trial) {
     std::string trialTypeStr;
@@ -107,6 +165,64 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
         turnLimitText.setString("Turns Left: " + std::to_string(currentTrial.turnLimit - currentTrialTurn));
         scoreGoalText.setString("Score Goal: " + std::to_string(currentTrial.scoreGoal));
         currentTrialScoreText.setString("Score: " + std::to_string(currentScore));
+    }
+
+    if (currentState == GameState::Playing || currentState == GameState::Trial) {
+        // Update HP Bars
+        float playerHpPercent = static_cast<float>(player.getHp()) / player.getMaxHp();
+        playerHpBarFront.setSize(sf::Vector2f{playerHpBarBack.getSize().x * playerHpPercent, playerHpBarBack.getSize().y});
+
+        float monsterHpPercent = static_cast<float>(monster.getCurrentHp()) / monster.getMaxHp();
+        monsterHpBarFront.setSize(sf::Vector2f{monsterHpBarBack.getSize().x * monsterHpPercent, monsterHpBarBack.getSize().y});
+
+        // Update Monster Speed Gauge
+        float speedPercent = static_cast<float>(monster.getActionCounter()) / monster.getSpeed();
+        monsterSpeedGaugeForeground.setSize(sf::Vector2f{monsterSpeedGaugeBackground.getSize().x * speedPercent, monsterSpeedGaugeBackground.getSize().y});
+
+        // Update Mana Bars
+        manaBarBacks.clear();
+        manaBarFronts.clear();
+        const auto& manaTypes = player.getManaTypes();
+        float yOffset = 150.f;
+        for (const auto& type : manaTypes) {
+            int currentMana = player.getMana(type);
+            int maxMana = 100; // Placeholder: Player class needs a getMaxMana(type) method
+
+            sf::RectangleShape back({150, 15});
+            back.setPosition(sf::Vector2f{20, yOffset});
+            back.setFillColor(sf::Color(50, 50, 50));
+            manaBarBacks[type] = back;
+
+            float manaPercent = (maxMana > 0) ? static_cast<float>(currentMana) / maxMana : 0.f;
+            sf::RectangleShape front({150 * manaPercent, 15});
+            front.setPosition(sf::Vector2f{20, yOffset});
+            front.setFillColor(getSfColorForGemType(type));
+            manaBarFronts[type] = front;
+
+            yOffset += 25.f;
+        }
+
+        // Update Spell Buttons
+        spellButtons.clear();
+        spellButtonTexts.clear();
+        const auto& spells = player.getSpells();
+        float ySpellOffset = 300.f; // Starting Y position for spell buttons
+        for (const auto& spell : spells) {
+            sf::RectangleShape button({210, 40});
+            button.setPosition(sf::Vector2f{20, ySpellOffset});
+            if (player.getMana(spell.costType) >= spell.costAmount) {
+                button.setFillColor(sf::Color(100, 100, 180)); // Ready color
+            } else {
+                button.setFillColor(sf::Color(50, 50, 80));  // Not enough mana color
+            }
+            spellButtons.push_back(button);
+
+            sf::Text text(font, spell.name, 18);
+            text.setPosition(sf::Vector2f{30, ySpellOffset + 10});
+            spellButtonTexts.push_back(text);
+
+            ySpellOffset += 50.f;
+        }
     }
 
     if (currentState == GameState::Exploration) {
@@ -202,7 +318,29 @@ void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState cu
             }
             break;
         case GameState::Playing:
-            // Render exploration or combat UI elements
+            window.draw(leftPanel);
+            window.draw(rightPanel);
+            window.draw(playerPanelTitle);
+            window.draw(monsterPanelTitle);
+            window.draw(playerHpBarBack);
+            window.draw(playerHpBarFront);
+            window.draw(monsterHpBarBack);
+            window.draw(monsterHpBarFront);
+            window.draw(monsterSpeedGaugeBackground);
+            window.draw(monsterSpeedGaugeForeground);
+            window.draw(manaTitle);
+            for (const auto& pair : manaBarBacks) {
+                window.draw(pair.second);
+            }
+            for (const auto& pair : manaBarFronts) {
+                window.draw(pair.second);
+            }
+            for (const auto& button : spellButtons) {
+                window.draw(button);
+            }
+            for (const auto& text : spellButtonTexts) {
+                window.draw(text);
+            }
             break;
         case GameState::GameOver:
             window.draw(gameOverText);

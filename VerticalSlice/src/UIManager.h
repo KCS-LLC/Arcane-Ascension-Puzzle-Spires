@@ -29,7 +29,7 @@ class UIManager {
 public:
     UIManager(const sf::Font& font);
 
-    bool handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, UIAction& outAction);
+    bool handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction);
     void setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin, const std::vector<Attunement>& attunements);
     void setupTrial(const JudgementTrial& trial);
     void update(const Player& player, const Monster& monster, GameMode gameMode, GameState currentState, const Room* currentRoom, const Floor& currentFloor, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance);
