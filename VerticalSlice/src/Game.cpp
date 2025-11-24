@@ -184,7 +184,8 @@ void Game::handleInput(sf::Event event) {
     }
 
     UIAction action;
-    if (m_uiManager.handleEvent(event, m_gameMode, m_gameState, m_currentRoom, dataManager.getAttunements(), action)) {
+    bool uiHandled = m_uiManager.handleEvent(event, m_gameMode, m_gameState, m_currentRoom, dataManager.getAttunements(), action);
+    if (uiHandled) {
         if (action.type == UIActionType::SelectAttunement) {
             const auto& attunements = dataManager.getAttunements();
             auto it = std::find_if(attunements.begin(), attunements.end(), [&](const Attunement& a) {
@@ -269,13 +270,62 @@ void Game::handleInput(sf::Event event) {
     }
 }
 
-void Game::resolveMatches(const std::set<std::pair<int, int>>& matches) {
+void Game::resolveMatches(const std::vector<sf::Vector2i>& matches) {
     for (const auto& pos : matches) {
-        BaseGem* gem = m_board.getGemAt(pos.first, pos.second);
+        BaseGem* gem = m_board.getGemAt(pos.x, pos.y);
         if (gem) {
             gem->onMatch(m_board, m_player, m_monster);
         }
     }
+}
+
+void Game::handleMatches(bool isPlayerMove) {
+    auto matchGroups = m_matchDetector.findAllMatches(m_board);
+
+    if (matchGroups.empty()) {
+        if (isPlayerMove && !m_isSwappingBack) {
+            m_isSwappingBack = true;
+            m_animatingGems = { m_animatingGems.second, m_animatingGems.first };
+            m_animationClock.restart();
+            m_board.swapGems(m_animatingGems.first.y, m_animatingGems.first.x, m_animatingGems.second.y, m_animatingGems.second.x);
+        }
+        return;
+    }
+
+    if (isPlayerMove) {
+        m_currentTurn++;
+    }
+
+    std::set<sf::Vector2i, Vector2iCompare> allRemovedGems;
+    for (const auto& match : matchGroups) {
+        resolveMatches(match); 
+
+        auto resolutionOpt = m_matchProcessor.process(match, m_board, m_gemFactory, dataManager, gemTextures);
+        if (resolutionOpt && *resolutionOpt) {
+            for (const auto& pos : (*resolutionOpt)->gemsToRemove) {
+                allRemovedGems.insert(pos);
+            }
+            for (auto& placement : (*resolutionOpt)->gemsToPlace) {
+                m_board.setGemAt(placement.first.x, placement.first.y, std::move(placement.second));
+                allRemovedGems.erase(placement.first);
+            }
+        }
+    }
+
+    if (allRemovedGems.empty()) return;
+
+    m_currentScore += (allRemovedGems.size() * 100);
+
+    if (m_gameMode == GameMode::TOWER_CLIMB && m_monster.isTurnReady(30)) { // Placeholder speed cost
+        m_player.takeDamage(dataManager.getMonsterAttackDamage());
+        showPlayerDamageEffect = true;
+        playerDamageClock.restart();
+    }
+
+    m_isAnimatingSwap = false;
+    m_isAnimatingDestruction = true;
+    m_destroyingGems = allRemovedGems;
+    m_animationClock.restart();
 }
 
 void Game::update(sf::Time deltaTime) {
@@ -291,70 +341,42 @@ void Game::update(sf::Time deltaTime) {
                     sf::Vector2i p2 = {m_animatingGems.second.y, m_animatingGems.second.x};
 
                     m_board.swapGems(p1.x, p1.y, p2.x, p2.y);
-
-                    bool treasureMerged = false;
-                    if (m_gameState == GameState::Judgement_TreasureRound) {
-                        treasureMerged = processTreasureMerges();
-                    }
-
-                    if (!treasureMerged) {
-                        auto matches = m_board.findMatches();
-                        if (!matches.empty()) { // Swap resulted in a match
-                            resolveMatches(matches);
-                            m_currentTurn++; // Increment turn after a valid move
-                            m_currentScore += (matches.size() * 100); // Add score for destroyed gems
-                            
-                            if (m_gameMode == GameMode::TOWER_CLIMB && m_monster.isTurnReady(30)) { // 30 is placeholder for MATCH_SPEED_COST
-                                m_player.takeDamage(dataManager.getMonsterAttackDamage());
-                                showPlayerDamageEffect = true;
-                                playerDamageClock.restart();
-                            }
-                            
-                            m_isAnimatingSwap = false;
-                            m_isAnimatingDestruction = true;
-                            m_destroyingGems = matches;
-                            m_animationClock.restart();
-                        } else { // Invalid swap, animate back
-                            m_isSwappingBack = true;
-                            m_animatingGems = { sf::Vector2i(p2.y, p2.x), sf::Vector2i(p1.y, p1.x) }; // Correctly reverse the original coordinates
-                            m_animationClock.restart();
-                            m_board.swapGems(p1.x, p1.y, p2.x, p2.y); // Swap back immediately data-wise
-                        }
-                    }
+                    handleMatches(true); // Player-initiated move
                 } else {
-                    // This block executes after the swap-back animation has played
+                    // Swap-back animation finished
                     m_isAnimating = false;
                     m_isAnimatingSwap = false;
                     m_isSwappingBack = false;
                 }
             }
         } else if (m_isAnimatingDestruction) {
-
             if (m_animationClock.getElapsedTime().asSeconds() >= destructionAnimationDuration) {
                 m_isAnimatingDestruction = false;
+                
                 m_board.removeGems(m_destroyingGems);
+
+                // Corrected Refill Logic
                 if (m_gameState == GameState::Judgement_TreasureRound) {
                     m_fallInfo = m_board.applyGravityAndRefill(m_treasureRoundGems);
                 } else if (m_gameMode == GameMode::TOWER_CLIMB) {
+                    // This will be used for standard combat once implemented
                     m_fallInfo = m_board.applyGravityAndRefill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air, GemSubType::Skull});
-                } else {
+                } else if (m_gameState == GameState::Trial) {
+                    // This is the default for the initial Judgement trials (Power, Haste, etc.)
                     m_fallInfo = m_board.applyGravityAndRefill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air});
                 }
+
                 m_isAnimatingRefill = true;
                 m_animationClock.restart();
             }
         } else if (m_isAnimatingRefill) {
              if (m_animationClock.getElapsedTime().asSeconds() >= refillAnimationDuration) {
-                auto newMatches = m_board.findMatches(); // Check for cascades
-                if (!newMatches.empty()) {
-                    resolveMatches(newMatches);
-                    m_isAnimatingRefill = false;
-                    m_isAnimatingDestruction = true; // Chain into another destruction
-                    m_destroyingGems = newMatches;
-                    m_animationClock.restart();
-                } else {
+                m_isAnimatingRefill = false;
+                handleMatches(false); // Cascade-initiated move
+                
+                // If no new matches were found, end animation cycle
+                if (!m_isAnimatingDestruction) {
                     m_isAnimating = false;
-                    m_isAnimatingRefill = false;
                 }
             }
         }
@@ -365,7 +387,7 @@ void Game::update(sf::Time deltaTime) {
         showPlayerDamageEffect = false;
     }
 
-    // Check for Judgement trial win/loss conditions only if not animating
+    // Check for Judgement trial win/loss conditions only if not animating AND in a trial
     if (m_gameMode == GameMode::JUDGEMENT && m_gameState == GameState::Trial) {
         if (m_currentScore >= m_currentJudgementTrial.scoreGoal) {
             m_gameState = GameState::Summary; // Win condition
@@ -475,7 +497,7 @@ void Game::render() {
                 float animProgress = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / destructionAnimationDuration);
                 float scale = 1.f - animProgress;
                 for (const auto& pos : m_destroyingGems) {
-                    BaseGem* gem = m_board.getGemAt(pos.first, pos.second);
+                    BaseGem* gem = m_board.getGemAt(pos.x, pos.y);
                     if (gem) {
                         sf::Sprite sprite = gem->getSprite();
                         const sf::Texture* tex = &sprite.getTexture();
@@ -486,7 +508,7 @@ void Game::render() {
                         float baseScaleY = static_cast<float>(TILE_SIZE) / texSize.y;
                         sprite.setScale({baseScaleX * scale, baseScaleY * scale});
                         
-                        sprite.setPosition({pos.second * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.x, pos.first * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.y});
+                        sprite.setPosition({pos.y * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.x, pos.x * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.y});
                         m_window.draw(sprite);
                     }
                 }

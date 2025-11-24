@@ -10,6 +10,8 @@
 #include "GemFactory.h"
 #include "Structs.h"
 #include "Judgement.h"
+#include "MatchDetector.h"
+#include "MatchProcessor.h"
 
 // Forward-declaration of the global texture map
 extern std::map<GemSubType, sf::Texture> gemTextures;
@@ -25,7 +27,8 @@ private:
     void render();
     void loadTextures();
     void handleInput(sf::Event event);
-    void resolveMatches(const std::set<std::pair<int, int>>& matches);
+    void resolveMatches(const std::vector<sf::Vector2i>& matches);
+    void handleMatches(bool isPlayerMove);
     void setupJudgementTrial(const JudgementTrial& trial);
     void startTowerClimb();
     void setupTreasureRound();
@@ -36,9 +39,11 @@ private:
     DataManager dataManager;
     UIManager m_uiManager;
     GemFactory m_gemFactory;
-    Board m_board;
+        Board m_board;
     Player m_player;
     Monster m_monster;
+    MatchDetector m_matchDetector;
+    MatchProcessor m_matchProcessor;
 
     GameMode m_gameMode;
     GameState m_gameState;
@@ -70,7 +75,7 @@ private:
     bool m_isAnimatingRefill = false;
     sf::Clock m_animationClock;
     std::pair<sf::Vector2i, sf::Vector2i> m_animatingGems;
-    std::set<std::pair<int, int>> m_destroyingGems;
+    std::set<sf::Vector2i, Vector2iCompare> m_destroyingGems;
     std::vector<Board::FallInfo> m_fallInfo;
 
     // Combat UI state

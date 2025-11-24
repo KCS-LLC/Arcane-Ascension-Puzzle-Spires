@@ -53,6 +53,10 @@ set(SOURCE_FILES
     src/ManaGem.cpp
     src/AttackGem.cpp
     src/TreasureGem.cpp
+    src/MatchDetector.cpp
+    src/MatchProcessor.cpp
+    src/DefaultMatchRule.cpp
+    src/TreasureMergeRule.cpp
 )
 target_sources(game PRIVATE ${SOURCE_FILES})
 

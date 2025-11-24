@@ -41,8 +41,5 @@ This file tracks the known bugs and design discrepancies in the current build.
 ### 5. Post-Judgement & Exploration Bugs (Observed 2025-11-22)
 
 *   **Critical Crash on Load:** The game log shows `JSON error in spells: [json.exception.out_of_range.403] key 'cost' not found`. The game still runs but critical spell data fails to load.
-*   **Instant Trial Completion:** All three Judgement trials are completed instantly upon starting the game, with the log showing "Win condition met" three times in a row. This points to a logic error in the win/loss condition check.
-*   **Invalid Room IDs:** Clicking the hardcoded "North" and "East" door buttons in the exploration UI results in "Error: Tried to move to a non-existent room ID" for rooms 2 and 3. The hardcoded UI does not match the actual room IDs in `floor1.json`.
-*   **UI Rendering Glitch:** During the exploration phase, the gem game board is incorrectly rendered overlaid on top of the room information UI.
 *   **Unresponsive Input:** Clicking on the overlaid game board tiles during the exploration phase has no effect; the input seems to be incorrectly handled or disabled in this state.
 

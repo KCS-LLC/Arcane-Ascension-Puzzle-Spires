@@ -24,14 +24,18 @@ public:
     void initialize(const std::vector<GemSubType>& possibleGems);
     void initializeForPowerTrial();
 
-    void render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<std::pair<int, int>>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo);
-    BaseGem* getGemAt(int r, int c);
+    void render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo);
+    BaseGem* getGemAt(int r, int c) const;
+    int getWidth() const;
+    int getHeight() const;
+    bool isInBounds(int r, int c) const;
 
     // Gameplay logic
     bool canSwap(int r1, int c1, int r2, int c2);
     void swapGems(int r1, int c1, int r2, int c2);
     std::set<std::pair<int, int>> findMatches();
-    void removeGems(const std::set<std::pair<int, int>>& matches);
+    void removeGems(const std::set<sf::Vector2i, Vector2iCompare>& matches);
+    void setGemAt(int r, int c, std::unique_ptr<BaseGem> gem);
     
     std::vector<FallInfo> applyGravityAndRefill(const std::vector<GemSubType>& possibleGems);
     // std::vector<FallInfo> applyGravity();

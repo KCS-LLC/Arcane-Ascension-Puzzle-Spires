@@ -24,4 +24,13 @@
 // Project-specific, but very stable headers
 #include "Constants.h"
 
+// Custom comparator for sf::Vector2i to be used in std::set
+struct Vector2iCompare {
+    bool operator() (const sf::Vector2i& a, const sf::Vector2i& b) const {
+        if (a.x < b.x) return true;
+        if (a.x > b.x) return false;
+        return a.y < b.y;
+    }
+};
+
 #endif // PCH_H

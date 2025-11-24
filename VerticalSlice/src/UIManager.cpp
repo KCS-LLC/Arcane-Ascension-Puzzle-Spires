@@ -76,6 +76,17 @@ UIManager::UIManager(const sf::Font& font)
             }
         }
     }
+    if (currentState == GameState::Judgement_TreasureRound) {
+        if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>()) {
+            if (mb->button == sf::Mouse::Button::Left) {
+                if (leftPanel.getGlobalBounds().contains(sf::Vector2f(mb->position)) ||
+                    rightPanel.getGlobalBounds().contains(sf::Vector2f(mb->position))) {
+                    // If the click is on a panel, consume it
+                    return true;
+                }
+            }
+        }
+    }
     if (currentState == GameState::Playing || currentState == GameState::Trial) {
         if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>()) {
             if (mb->button == sf::Mouse::Button::Left) {

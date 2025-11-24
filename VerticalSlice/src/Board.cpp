@@ -59,7 +59,7 @@ void Board::initializeForPowerTrial() {
 
 
 
-void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<std::pair<int, int>>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo) {
+void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo) {
     for (int r = 0; r < m_height; ++r) {
         for (int c = 0; c < m_width; ++c) {
             bool shouldDraw = true;
@@ -92,7 +92,7 @@ void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, bo
     }
 }
 
-BaseGem* Board::getGemAt(int r, int c) {
+BaseGem* Board::getGemAt(int r, int c) const {
     if (r >= 0 && r < m_height && c >= 0 && c < m_width) {
         return m_grid[r][c].get();
     }
@@ -145,9 +145,9 @@ std::set<std::pair<int, int>> Board::findMatches() {
     return matches;
 }
 
-void Board::removeGems(const std::set<std::pair<int, int>>& matches) {
+void Board::removeGems(const std::set<sf::Vector2i, Vector2iCompare>& matches) {
     for (const auto& pos : matches) {
-        m_grid[pos.first][pos.second].reset(); // unique_ptr reset() deletes the object
+        m_grid[pos.x][pos.y].reset(); // unique_ptr reset() deletes the object
     }
 }
 
@@ -190,4 +190,22 @@ std::vector<Board::FallInfo> Board::applyGravityAndRefill(const std::vector<GemS
     }
 
     return fallInfo;
+}
+
+void Board::setGemAt(int r, int c, std::unique_ptr<BaseGem> gem) {
+    if (isInBounds(r, c)) {
+        m_grid[r][c] = std::move(gem);
+    }
+}
+
+bool Board::isInBounds(int r, int c) const {
+    return r >= 0 && r < m_height && c >= 0 && c < m_width;
+}
+
+int Board::getWidth() const {
+    return m_width;
+}
+
+int Board::getHeight() const {
+    return m_height;
 }
