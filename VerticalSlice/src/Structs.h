@@ -60,6 +60,7 @@ struct MonsterData {
     int hp;
     int speed;
     int attack;
+    std::vector<GemSubType> manaAffinities;
 };
 
 struct Teleporter {

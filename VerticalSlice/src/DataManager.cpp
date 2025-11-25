@@ -90,6 +90,19 @@ void from_json(const json& j, Spell& s) {
     }
 }
 
+void from_json(const json& j, MonsterData& md) {
+    j.at("name").get_to(md.name);
+    j.at("hp").get_to(md.hp);
+    j.at("speed").get_to(md.speed);
+    j.at("attackDamage").get_to(md.attack);
+    if (j.contains("manaAffinities")) {
+        md.manaAffinities.clear();
+        for (int type_id : j.at("manaAffinities")) {
+            md.manaAffinities.push_back(static_cast<GemSubType>(type_id));
+        }
+    }
+}
+
 void from_json(const json& j, Floor& f) {
     j.at("floorNumber").get_to(f.floorNumber);
     j.at("startRoomId").get_to(f.startRoomId);
@@ -100,7 +113,7 @@ void from_json(const json& j, Floor& f) {
 // DataManager Implementation
 // =================================================================================
 
-DataManager::DataManager() : monsterHP(0), monsterSpeed(0), monsterAttackDamage(0) {
+DataManager::DataManager() {
     if (!m_font.openFromFile("assets/OpenSans-Regular.ttf")) {
         std::cerr << "Failed to load font." << std::endl;
     }
@@ -207,10 +220,7 @@ bool DataManager::loadMonsterData(const std::string& path) {
     }
     try {
         json data = json::parse(f);
-        monsterHP = data.at("hp").get<int>();
-        monsterSpeed = data.at("speed").get<int>();
-        monsterAttackDamage = data.at("attackDamage").get<int>();
-        monsterName = data.at("name").get<std::string>();
+        m_monsterData = data.get<MonsterData>();
     } catch (const json::exception& e) {
         std::cerr << "JSON error in monster data: " << e.what() << std::endl;
         return false;
@@ -300,10 +310,12 @@ const Spell* DataManager::getSpellById(const std::string& id) const {
     }
     return nullptr;
 }
-int DataManager::getMonsterHP() const { return monsterHP; }
-int DataManager::getMonsterSpeed() const { return monsterSpeed; }
-int DataManager::getMonsterAttackDamage() const { return monsterAttackDamage; }
-std::string DataManager::getMonsterName() const { return monsterName; }
+const MonsterData& DataManager::getMonsterData() const { return m_monsterData; }
+int DataManager::getMonsterHP() const { return m_monsterData.hp; }
+int DataManager::getMonsterSpeed() const { return m_monsterData.speed; }
+int DataManager::getMonsterAttackDamage() const { return m_monsterData.attack; }
+std::string DataManager::getMonsterName() const { return m_monsterData.name; }
+const std::vector<GemSubType>& DataManager::getMonsterManaAffinities() const { return m_monsterData.manaAffinities; }
 const Floor& DataManager::getFloor() const { return currentFloor; }
 const Room* DataManager::getRoomById(int roomId) const { return nullptr; }
 const std::vector<JudgementTrial>& DataManager::getJudgementTrials() const { return m_judgementTrials; }

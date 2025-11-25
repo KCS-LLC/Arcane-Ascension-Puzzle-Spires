@@ -63,7 +63,9 @@ UIManager::UIManager(const sf::Font& font)
     judgementResultsText.setPosition(sf::Vector2f{ 450, 250 });
 
     m_attunementSelectionTitle.setFillColor(sf::Color::White);
-    m_attunementSelectionTitle.setPosition(sf::Vector2f{ 450, 100 });
+    sf::FloatRect titleBounds = m_attunementSelectionTitle.getLocalBounds();
+    m_attunementSelectionTitle.setOrigin(sf::Vector2f(titleBounds.position.x + titleBounds.size.x / 2.0f, titleBounds.position.y + titleBounds.size.y / 2.0f));
+    m_attunementSelectionTitle.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f, 150));
 }
     
     bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction) {
@@ -174,8 +176,8 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     // --- Game Over Text ---
     gameOverText.setFillColor(sf::Color::Red);
     sf::FloatRect textRect = gameOverText.getLocalBounds();
-    gameOverText.setOrigin(sf::Vector2f{textRect.position.x + textRect.size.x / 2.f, textRect.position.y + textRect.size.y / 2.f});
-    gameOverText.setPosition(sf::Vector2f{windowSize.x / 2.f, windowSize.y / 2.f});
+    gameOverText.setOrigin(sf::Vector2f(textRect.position.x + textRect.size.x / 2.f, textRect.position.y + textRect.size.y / 2.f));
+    gameOverText.setPosition(sf::Vector2f(windowSize.x / 2.f, windowSize.y / 2.f));
 }
 void UIManager::setupTrial(const JudgementTrial& trial) {
     std::string trialTypeStr;
@@ -265,8 +267,8 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
             std::string costStr = std::to_string(spell.manaCost) + " / " + std::to_string(spell.speedCost);
             sf::Text costText(font, costStr, 16);
             sf::FloatRect textBounds = costText.getLocalBounds();
-            costText.setOrigin(sf::Vector2f{textBounds.position.x + textBounds.size.x, 0});
-            costText.setPosition(sf::Vector2f{20 + 200, ySpellOffset + 10});
+            costText.setOrigin(sf::Vector2f(textBounds.position.x + textBounds.size.x, 0));
+            costText.setPosition(sf::Vector2f(20 + 200, ySpellOffset + 10));
             spellButtonTexts.push_back(costText);
 
             ySpellOffset += 50.f;
@@ -302,7 +304,7 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
 
                 if (destinationRoom) {
                     sf::RectangleShape button({buttonWidth, buttonHeight});
-                    button.setPosition(sf::Vector2f{(WINDOW_WIDTH - buttonWidth) / 2.f, startY + i * (buttonHeight + buttonSpacing)});
+                    button.setPosition(sf::Vector2f((WINDOW_WIDTH - buttonWidth) / 2.f, startY + i * (buttonHeight + buttonSpacing)));
                     button.setFillColor(getSfColorForRoomType(destinationRoom->type));
                     button.setOutlineColor(sf::Color(200, 200, 200));
                     button.setOutlineThickness(1.f);
@@ -318,8 +320,8 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
                     sf::Text buttonText(font, buttonTextStr, 20);
                     buttonText.setFillColor(sf::Color::White);
                     sf::FloatRect textBounds = buttonText.getLocalBounds();
-                    buttonText.setOrigin(sf::Vector2f{textBounds.position.x + textBounds.size.x / 2.f, textBounds.position.y + textBounds.size.y / 2.f});
-                    buttonText.setPosition(button.getPosition() + sf::Vector2f{button.getSize().x / 2.f, button.getSize().y / 2.f});
+                    buttonText.setOrigin(sf::Vector2f(textBounds.position.x + textBounds.size.x / 2.f, textBounds.position.y + textBounds.size.y / 2.f));
+                    buttonText.setPosition(button.getPosition() + sf::Vector2f(button.getSize().x / 2.f, button.getSize().y / 2.f));
                     doorButtonTexts.push_back(buttonText);
                 }
             }
@@ -333,25 +335,34 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
         m_attunementButtonTexts.clear();
 
         const auto& allAttunements = dataManager.getAttunements();
+        const int buttonsPerRow = 4;
         const float buttonWidth = 220.f;
         const float buttonHeight = 50.f;
-        const float buttonSpacing = 20.f;
-        const int numButtons = allAttunements.size();
-        const float totalHeight = (numButtons * buttonHeight) + ((numButtons - 1) * buttonSpacing);
-        float startY = (WINDOW_HEIGHT - totalHeight) / 2.f;
+        const float horizontalSpacing = 20.f;
+        const float verticalSpacing = 20.f;
+        
+        const float totalWidth = (buttonsPerRow * buttonWidth) + ((buttonsPerRow - 1) * horizontalSpacing);
+        const float startX = (WINDOW_WIDTH - totalWidth) / 2.f;
+        const float startY = 200.f; // Position below the title
 
         for (size_t i = 0; i < allAttunements.size(); ++i) {
             const auto& attunement = allAttunements[i];
             
+            int row = i / buttonsPerRow;
+            int col = i % buttonsPerRow;
+
+            float posX = startX + col * (buttonWidth + horizontalSpacing);
+            float posY = startY + row * (buttonHeight + verticalSpacing);
+
             sf::RectangleShape button({buttonWidth, buttonHeight});
-            button.setPosition(sf::Vector2f{(WINDOW_WIDTH - buttonWidth) / 2.f, startY + i * (buttonHeight + buttonSpacing)});
+            button.setPosition(sf::Vector2f(posX, posY));
             button.setFillColor(sf::Color(80, 80, 120));
             m_attunementButtons.push_back(button);
 
             sf::Text text(font, attunement.name, 20);
             sf::FloatRect textBounds = text.getLocalBounds();
-            text.setOrigin(sf::Vector2f{textBounds.position.x + textBounds.size.x / 2.f, textBounds.position.y + textBounds.size.y / 2.f});
-            text.setPosition(button.getPosition() + sf::Vector2f{button.getSize().x / 2.f, button.getSize().y / 2.f});
+            text.setOrigin(sf::Vector2f(textBounds.position.x + textBounds.size.x / 2.f, textBounds.position.y + textBounds.size.y / 2.f));
+            text.setPosition(button.getPosition() + sf::Vector2f(button.getSize().x / 2.f, button.getSize().y / 2.f));
             m_attunementButtonTexts.push_back(text);
         }
     }

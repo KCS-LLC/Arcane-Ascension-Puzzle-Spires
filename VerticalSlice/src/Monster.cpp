@@ -1,8 +1,15 @@
 #include "PCH.h"
 #include "Monster.h"
+#include "Structs.h"
 
-Monster::Monster(int maxHp, int speed) 
-    : maxHp(maxHp), currentHp(maxHp), speed(speed), actionCounter(0) {}
+Monster::Monster(const MonsterData& data) 
+    : maxHp(data.hp), 
+      currentHp(data.hp), 
+      speed(data.speed), 
+      actionCounter(0),
+      name(data.name),
+      manaAffinities(data.manaAffinities)
+{}
 
 void Monster::takeDamage(int damage) {
     currentHp -= damage;
@@ -39,4 +46,8 @@ int Monster::getSpeed() const {
 
 int Monster::getActionCounter() const { 
     return actionCounter; 
+}
+
+const std::vector<GemSubType>& Monster::getManaAffinities() const {
+    return manaAffinities;
 }

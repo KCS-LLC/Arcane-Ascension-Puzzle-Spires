@@ -31,10 +31,12 @@ public:
     const Attunement* getAttunementById(const std::string& id) const;
     const std::vector<Spell>& getAllSpells() const;
     const Spell* getSpellById(const std::string& id) const;
+    const MonsterData& getMonsterData() const;
     int getMonsterHP() const;
     int getMonsterSpeed() const;
     int getMonsterAttackDamage() const;
     std::string getMonsterName() const;
+    const std::vector<GemSubType>& getMonsterManaAffinities() const;
     const Floor& getFloor() const;
     const Room* getRoomById(int roomId) const;
     const std::vector<JudgementTrial>& getJudgementTrials() const;
@@ -51,10 +53,7 @@ private:
     // Other Data Members
     std::vector<Attunement> attunements;
     std::vector<Spell> spells;
-    int monsterHP;
-    int monsterSpeed;
-    int monsterAttackDamage;
-    std::string monsterName;
+    MonsterData m_monsterData;
     Floor currentFloor;
     std::vector<JudgementTrial> m_judgementTrials;
     sf::Font m_font;

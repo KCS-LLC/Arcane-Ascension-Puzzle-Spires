@@ -22,7 +22,7 @@ Game::Game()
       m_gemFactory(dataManager),
       m_board(BOARD_WIDTH, BOARD_HEIGHT, m_gemFactory),
       m_player(100, {}),
-      m_monster(10, 10),
+      m_monster(dataManager.getMonsterData()),
       m_gameMode(GameMode::JUDGEMENT),
       m_gameState(GameState::Intro),
       m_currentTrialOrderIndex(0),
@@ -123,8 +123,22 @@ void Game::moveToRoom(int destinationRoomId) {
             case RoomType::Combat:
             case RoomType::Boss:
                 // TODO: Load the correct monster for this room
-                m_monster = Monster(dataManager.getMonsterHP(), dataManager.getMonsterSpeed()); // Reset monster for new combat
-                m_board.initialize({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air, GemSubType::Skull}); // Basic board for now
+                m_monster = Monster(dataManager.getMonsterData());
+
+                // Create the dynamic gem pool for combat
+                {
+                    std::set<GemSubType> gemPoolSet;
+                    for (GemSubType type : m_player.getManaTypes()) {
+                        gemPoolSet.insert(type);
+                    }
+                    for (GemSubType type : m_monster.getManaAffinities()) {
+                        gemPoolSet.insert(type);
+                    }
+                    gemPoolSet.insert(GemSubType::Skull); // Always include skulls
+                    
+                    std::vector<GemSubType> gemPool(gemPoolSet.begin(), gemPoolSet.end());
+                    m_board.initialize(gemPool);
+                }
                 m_gameState = GameState::Playing;
                 break;
             case RoomType::Treasure:
@@ -408,7 +422,8 @@ void Game::update(sf::Time deltaTime) {
     }
 
     // Check for Treasure Round end condition
-    if (m_gameState == GameState::Judgement_TreasureRound && m_currentTurn >= 20) {
+    // TODO: Restore this to a higher value (e.g., 20) for the final game.
+    if (m_gameState == GameState::Judgement_TreasureRound && m_currentTurn >= 5) {
         int finalTreasureValue = 0;
         for (int r = 0; r < BOARD_HEIGHT; ++r) {
             for (int c = 0; c < BOARD_WIDTH; ++c) {

@@ -2,5 +2,6 @@
     "name": "Goblin Grunt",
     "hp": 150,
     "speed": 100,
-    "attackDamage": 10
+    "attackDamage": 10,
+    "manaAffinities": [4, 2] 
 }
