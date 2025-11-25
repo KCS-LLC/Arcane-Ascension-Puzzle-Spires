@@ -227,13 +227,13 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
 
         const auto& manaTypes = player.getManaTypes();
         // Diagnostic logging (only in combat/trial modes)
-        if (currentState == GameState::Playing || currentState == GameState::Trial) {
-            std::cout << "Updating UI for mana types: ";
-            for(const auto& type : manaTypes) {
-                std::cout << static_cast<int>(type) << " ";
-            }
-            std::cout << std::endl;
-        }
+        // if (currentState == GameState::Playing || currentState == GameState::Trial) {
+        //     std::cout << "Updating UI for mana types: ";
+        //     for(const auto& type : manaTypes) {
+        //         std::cout << static_cast<int>(type) << " ";
+        //     }
+        //     std::cout << std::endl;
+        // }
 
         float yOffset = 150.f;
         for (const auto& type : manaTypes) {

@@ -17,5 +17,5 @@ class GemFactory;
 
 class EffectProcessor {
 public:
-    void processEffect(const Effect& effect, Player& player, Monster& monster, Board& board, GemFactory& gemFactory, const std::map<GemSubType, sf::Texture>& gemTextures);
+    bool processEffect(const Effect& effect, Player& player, Monster& monster, Board& board, GemFactory& gemFactory, const std::map<GemSubType, sf::Texture>& gemTextures);
 };

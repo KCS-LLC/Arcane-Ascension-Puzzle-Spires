@@ -44,6 +44,12 @@ Game::Game()
     m_uiManager.setup(m_player, m_window.getSize(), m_boardOrigin, {}); // Passing empty attunements for now
 
     dataManager.loadAttunements("data/attunements.json");
+    const Attunement* defaultAttunement = dataManager.getAttunementById("diviner");
+    if (defaultAttunement) {
+        m_player.setAttunement(*defaultAttunement, dataManager);
+    } else {
+        std::cerr << "Error: Could not find default attunement 'adept'." << std::endl;
+    }
     m_judgementTrials = dataManager.getJudgementTrials();
     if (!m_judgementTrials.empty()) {
         m_trialOrder.resize(m_judgementTrials.size());
@@ -216,9 +222,16 @@ void Game::handleInput(sf::Event event) {
         } else if (action.type == UIActionType::CastSpell) {
             const Spell* spell = m_player.castSpell(action.spellIndex);
             if (spell) {
+                bool boardAltered = false;
                 // The spell was successfully cast. Process its effects.
                 for (const auto& effect : spell->effects) {
-                    m_effectProcessor.processEffect(effect, m_player, m_monster, m_board, m_gemFactory, gemTextures);
+                    if (m_effectProcessor.processEffect(effect, m_player, m_monster, m_board, m_gemFactory, gemTextures)) {
+                        boardAltered = true;
+                    }
+                }
+
+                if (boardAltered) {
+                    handleMatches(false); // Trigger cascade for effects like gem removal
                 }
 
                 // Now check if the monster gets a turn.

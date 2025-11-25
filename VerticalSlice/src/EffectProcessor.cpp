@@ -7,7 +7,7 @@
 #include "GemFactory.h" // Include for GemFactory
 #include "Game.h"       // Include for gemTextures global
 
-void EffectProcessor::processEffect(const Effect& effect, Player& player, Monster& monster, Board& board, GemFactory& gemFactory, const std::map<GemSubType, sf::Texture>& gemTextures) {
+bool EffectProcessor::processEffect(const Effect& effect, Player& player, Monster& monster, Board& board, GemFactory& gemFactory, const std::map<GemSubType, sf::Texture>& gemTextures) {
     if (effect.type == "DEAL_DAMAGE") {
         if (effect.params.count("amount")) {
             monster.takeDamage(effect.params.at("amount").get<int>());
@@ -19,27 +19,32 @@ void EffectProcessor::processEffect(const Effect& effect, Player& player, Monste
     } else if (effect.type == "ROTATE_ROW_COLUMN") {
         // Placeholder for UI interaction
         board.rotateRow(0, 1);
+        return true; // Board was altered
     } else if (effect.type == "REMOVE_RANDOM_GEMS") {
         if (effect.params.count("amount")) {
             int amount = effect.params.at("amount").get<int>();
             std::vector<sf::Vector2i> coords = board.getRandomGemCoords(amount);
             std::set<sf::Vector2i, Vector2iCompare> gemsToRemove(coords.begin(), coords.end());
             board.removeGems(gemsToRemove);
-            // Note: This does not trigger a cascade. A more robust implementation would.
+            return true; // Board was altered
         }
     } else if (effect.type == "TRANSFORM_RANDOM_GEMS") {
         if (effect.params.count("amount") && effect.params.count("to_type")) {
             int amount = effect.params.at("amount").get<int>();
             std::string toTypeStr = effect.params.at("to_type").get<std::string>();
-            GemSubType toType = stringToGemSubType(toTypeStr); // Assumes "Attack" maps to a valid GemSubType
+            GemSubType toType = stringToGemSubType(toTypeStr);
             
-            std::vector<sf::Vector2i> coords = board.getRandomGemCoords(amount, true); // Get non-attack gems
+            std::vector<sf::Vector2i> coords = board.getRandomGemCoords(amount, true);
             for (const auto& coord : coords) {
                 if (gemTextures.count(toType)) {
                     board.setGemAt(coord.x, coord.y, gemFactory.createGem(toType, gemTextures.at(toType)));
                 }
             }
+            return true; // Board was altered
         }
     }
+    
     // Other effects will be added here
+
+    return false; // No board alteration by default
 }
