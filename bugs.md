@@ -8,7 +8,7 @@ This file tracks the known bugs and design discrepancies in the current build.
 
 ---
 ## High Priority (as of 2025-11-26)
-*   **Treasure Chests Do Not Merge (Bug #3.2):** Three or more `TreasureChest` gems do not merge or add to the Treasure Score during the Treasure Round.
+*   **Treasure Chests Do Not Merge (Bug #3.2):** Currently untestable due to the temporary reduction of treasure round moves. To be re-evaluated when the move count is restored.
 
 ### Ability & Data Bugs
 *   **Summoner Has Incorrect Ability (Bug #V.Summoner):** The Summoner's second ability is currently `Convert Mana`. According to the design, it should be `Quick Swap`, the same as the Enchanter's ability.
