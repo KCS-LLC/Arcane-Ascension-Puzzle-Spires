@@ -76,7 +76,9 @@ This section details the various mana types, their categories, and their opposin
 | Grey (18)                 | Gray     | None                    |
 
 ### 2.1. Diviner
-*   **Primary Mana Types:** Mental, Perception
+*   **Primary Mana:** Mental
+*   **Secondary Mana:** Enhancement
+*   **Tertiary Mana:** Water
 *   **Focus:** Board manipulation, enemy debuffs, information gathering.
 *   **Example Abilities:**
     *   **Foresight (Quartz):** Passively reveals the next 3 gems that will fall in each column.
@@ -84,7 +86,9 @@ This section details the various mana types, their categories, and their opposin
     *   **Precognition (Sunstone):** A spell that, for 3 turns, gives the player a small chance to evade incoming damage entirely.
 
 ### 2.2. Elementalist
-*   **Primary Mana Types:** Fire, Water, Air, Earth
+*   **Primary Mana:** Fire
+*   **Secondary Mana:** Air
+*   **Tertiary Mana:** Water
 *   **Focus:** Direct damage via Static Effect Tiles.
 *   **Example Abilities:**
     *   **Create Burning Tile (Quartz):** Creates a Static Effect Tile that deals a small amount of Fire damage to the enemy each turn for 3 turns.
@@ -92,7 +96,9 @@ This section details the various mana types, their categories, and their opposin
     *   **Create Lightning Tile (Sunstone):** Creates a Static Effect Tile. When matched, it explodes, dealing damage to all enemies in its row and column.
 
 ### 2.3. Enchanter
-*   **Primary Mana Types:** Enhancement, Transference
+*   **Primary Mana:** Transference
+*   **Secondary Mana:** Mental
+*   **Tertiary Mana:** Light
 *   **Focus:** Buffing self and transforming existing gems into more powerful ones.
 *   **Example Abilities:**
     *   **Empower Weapon (Quartz):** A buff that temporarily increases Skull damage.
@@ -100,7 +106,9 @@ This section details the various mana types, their categories, and their opposin
     *   **Aura Amplification (Sunstone):** A spell that temporarily increases the Aura rank of all gems on the board by one level (e.g., Quartz -> Carnelian).
 
 ### 2.4. Guardian
-*   **Primary Mana Types:** Earth, Enhancement
+*   **Primary Mana:** Enhancement
+*   **Secondary Mana:** Life
+*   **Tertiary Mana:** Earth
 *   **Focus:** Defense, damage mitigation, and board control through resilient tiles.
 *   **Example Abilities:**
     *   **Stone Skin (Quartz):** A buff that temporarily increases Vigor.
@@ -108,7 +116,9 @@ This section details the various mana types, their categories, and their opposin
     *   **Taunting Presence (Sunstone):** A passive ability that makes enemies more likely to target the Guardian with their attacks.
 
 ### 2.5. Mender
-*   **Primary Mana Types:** Life, Water
+*   **Primary Mana:** Life
+*   **Secondary Mana:** Earth
+*   **Tertiary Mana:** Water
 *   **Focus:** Healing and board cleansing through restorative tiles.
 *   **Example Abilities:**
     *   **Minor Heal (Quartz):** A standard healing spell.
@@ -116,7 +126,9 @@ This section details the various mana types, their categories, and their opposin
     *   **Cleanse Board (Sunstone):** A spell that removes all negative Static Effect Tiles (e.g., Burning, Poison) from the board.
 
 ### 2.6. Shadow
-*   **Primary Mana Types:** Umbral, Perception
+*   **Primary Mana:** Umbral
+*   **Secondary Mana:** Enhancement
+*   **Tertiary Mana:** Death
 *   **Focus:** Debuffing enemies and dealing damage over time with harmful tiles.
 *   **Example Abilities:**
     *   **Shadow Strike (Quartz):** A standard Umbral damage spell.
@@ -124,7 +136,9 @@ This section details the various mana types, their categories, and their opposin
     *   **Mana Drain (Sunstone):** A spell that steals a small amount of mana from the enemy.
 
 ### 2.7. Shaper
-*   **Primary Mana Types:** Earth, Transference
+*   **Primary Mana:** Earth
+*   **Secondary Mana:** Enhancement
+*   **Tertiary Mana:** Perception
 *   **Focus:** Direct creation of special tiles and defensive constructs.
 *   **Example Abilities:**
     *   **Create Stone Block (Quartz):** Creates an unmatchable "Stone Block" Static Effect Tile to help set up combos.
@@ -132,7 +146,9 @@ This section details the various mana types, their categories, and their opposin
     *   **Forge Wall (Sunstone):** Creates a full row of temporary "Stone Block" tiles, providing a powerful defensive barrier.
 
 ### 2.8. Summoner
-*   **Primary Mana Types:** Life, Umbral
+*   **Primary Mana:** Air
+*   **Secondary Mana:** Transference
+*   **Tertiary Mana:** Life
 *   **Focus:** Overwhelming the board with allied "Minion" tiles.
 *   **Example Abilities:**
     *   **Create Imp Tile (Quartz):** Creates a "Minion Tile" on the board. At the end of the player's turn, all Minion Tiles deal a small amount of damage to the enemy.
