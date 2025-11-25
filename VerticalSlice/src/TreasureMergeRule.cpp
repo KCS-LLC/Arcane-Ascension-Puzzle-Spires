@@ -7,7 +7,6 @@
 #include "GemFactory.h"
 #include "DataManager.h"
 #include <algorithm> // For std::sort
-#include <iostream>
 
 // Custom comparator for sorting gem coordinates (bottom-most, then left-most)
 bool compareCoords(const sf::Vector2i& a, const sf::Vector2i& b) {
@@ -21,25 +20,32 @@ bool TreasureMergeRule::appliesTo(const std::vector<sf::Vector2i>& match, const 
         return false;
     }
 
+    // First, get the subtype of the first gem to use as the reference for the whole match.
     const BaseGem* firstGem = board.getGemAt(match[0].x, match[0].y);
     if (!firstGem) return false;
+    GemSubType referenceSubType = firstGem->getSubType();
 
-    const GemCatalogEntry* firstCatalogEntry = firstGem->getCatalogEntry();
-    if (!firstCatalogEntry) return false;
+    // Now, iterate through ALL gems in the match, including the first one.
+    for (const auto& coord : match) {
+        const BaseGem* gem = board.getGemAt(coord.x, coord.y);
+        if (!gem) return false; // A gem in the match group must exist.
 
-    const SecondaryGemTypeData* firstSecondaryData = dataManager.getSecondaryGemTypeData(firstCatalogEntry->secondaryTypeId);
-    if (!firstSecondaryData || firstSecondaryData->primaryType != PrimaryGemType::Treasure) {
-        return false;
-    }
+        // Check 1: Ensure all gems in the match have the same subtype.
+        if (gem->getSubType() != referenceSubType) {
+            return false;
+        }
 
-    // Check that all other gems in the match are of the same subtype.
-    for (size_t i = 1; i < match.size(); ++i) {
-        const BaseGem* gem = board.getGemAt(match[i].x, match[i].y);
-        if (!gem || gem->getSubType() != firstGem->getSubType()) {
+        // Check 2: Ensure the gem is actually a Treasure gem.
+        const GemCatalogEntry* catalogEntry = gem->getCatalogEntry();
+        if (!catalogEntry) return false;
+        
+        const SecondaryGemTypeData* secondaryData = dataManager.getSecondaryGemTypeData(catalogEntry->secondaryTypeId);
+        if (!secondaryData || secondaryData->primaryType != PrimaryGemType::Treasure) {
             return false;
         }
     }
 
+    // If we get here, all gems in the match are treasure gems of the same subtype.
     return true;
 }
 
@@ -47,35 +53,51 @@ std::unique_ptr<MatchResolution> TreasureMergeRule::execute(const std::vector<sf
     auto resolution = std::make_unique<MatchResolution>();
     if (match.empty()) return resolution;
 
-    // Sort the matched coordinates to handle placement consistently
+    // Sort coordinates to get a predictable gem to upgrade (bottom-most, then left-most)
     std::vector<sf::Vector2i> sortedMatch = match;
     std::sort(sortedMatch.begin(), sortedMatch.end(), compareCoords);
 
     const BaseGem* firstGem = board.getGemAt(sortedMatch[0].x, sortedMatch[0].y);
+    if (!firstGem) return resolution;
+
     GemSubType currentSubType = firstGem->getSubType();
     GemSubType nextSubType;
 
+    // Determine the next tier of treasure
     switch (currentSubType) {
         case GemSubType::Coin:          nextSubType = GemSubType::CoinPile;       break;
         case GemSubType::CoinPile:      nextSubType = GemSubType::CoinBag;        break;
         case GemSubType::CoinBag:       nextSubType = GemSubType::CoinBagBundle;  break;
         case GemSubType::CoinBagBundle: nextSubType = GemSubType::TreasureChest;  break;
-        case GemSubType::TreasureChest: nextSubType = GemSubType::TreasureChest;  break; // Max tier
-        default: return resolution;
+        case GemSubType::TreasureChest: nextSubType = GemSubType::TreasureChest;  break; // Already max tier
+        default: return resolution; // Not a treasure type we can upgrade
+    }
+    
+    // If we're already at the max tier, don't do anything special. Let the default rule handle it.
+    if (currentSubType == nextSubType) {
+        resolution->gemsToRemove = sortedMatch;
+        return resolution;
     }
 
-    resolution->gemsToRemove = sortedMatch;
-    
-    // --- Precise Match Size Logic ---
+    // Determine how many gems to transform based on match size
+    int gemsToTransformCount = 0;
     if (sortedMatch.size() >= 5) {
-        resolution->gemsToPlace.emplace_back(sortedMatch[0], gemFactory.createGem(nextSubType, gemTextures.at(nextSubType)));
-        resolution->gemsToPlace.emplace_back(sortedMatch[1], gemFactory.createGem(nextSubType, gemTextures.at(nextSubType)));
-        resolution->gemsToPlace.emplace_back(sortedMatch[2], gemFactory.createGem(nextSubType, gemTextures.at(nextSubType)));
+        gemsToTransformCount = 3;
     } else if (sortedMatch.size() == 4) {
-        resolution->gemsToPlace.emplace_back(sortedMatch[0], gemFactory.createGem(nextSubType, gemTextures.at(nextSubType)));
-        resolution->gemsToPlace.emplace_back(sortedMatch[1], gemFactory.createGem(nextSubType, gemTextures.at(nextSubType)));
+        gemsToTransformCount = 2;
     } else {
-        resolution->gemsToPlace.emplace_back(sortedMatch[0], gemFactory.createGem(nextSubType, gemTextures.at(nextSubType)));
+        gemsToTransformCount = 1;
+    }
+
+    // Populate the resolution struct
+    for (int i = 0; i < sortedMatch.size(); ++i) {
+        if (i < gemsToTransformCount) {
+            // These gems will be transformed
+            resolution->gemsToTransform.push_back({sortedMatch[i], nextSubType});
+        } else {
+            // The rest will be removed
+            resolution->gemsToRemove.push_back(sortedMatch[i]);
+        }
     }
 
     return resolution;

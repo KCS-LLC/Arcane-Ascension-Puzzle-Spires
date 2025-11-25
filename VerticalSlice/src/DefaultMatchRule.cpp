@@ -10,6 +10,5 @@ bool DefaultMatchRule::appliesTo(const std::vector<sf::Vector2i>& match, const B
 std::unique_ptr<MatchResolution> DefaultMatchRule::execute(const std::vector<sf::Vector2i>& match, Board& board, GemFactory& gemFactory, const DataManager& dataManager, const std::map<GemSubType, sf::Texture>& gemTextures) const {
     auto resolution = std::make_unique<MatchResolution>();
     resolution->gemsToRemove = match; // Mark all matched gems for removal
-    resolution->gemsToPlace.clear(); // No new gems are created by this default rule
     return resolution;
 }

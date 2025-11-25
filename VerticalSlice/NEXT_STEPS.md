@@ -61,7 +61,11 @@ Each step will be followed by a compilation to verify correctness before proceed
 ## Phase 5: Core Gameplay Refinements
 - **Objective:** Refine fundamental gameplay mechanics for accuracy and depth.
 - **Key Tasks:**
-    - **[TODO]** **Implement Merge and Upgrade Treasure System:** Integrate the new treasure mechanics as defined in `Treasure.md`. This involves:
+    - **[DONE]** **Implement Merge and Upgrade Treasure System:** Integrate the new treasure mechanics as defined in `Treasure.md`. 
+        - **Update (2025-11-25):** This is now fully functional. The fix involved two parts: 
+            1. Refactoring the match resolution logic to a "remove and transform" pattern instead of "remove and place".
+            2. Correcting a data error where upgraded treasure types were missing their `primaryTypeId` in `secondary_gem_types.json`, which caused them to be misidentified.
+        - The original sub-tasks below are now complete as part of this fix.
         1.  Updating `GemSubType.h` with new Treasure Tiers (`Coin Pile`, `Coin Bag`, `Coin Bag Bundle`, `Treasure Chest`).
         2.  Updating `Game::loadTextures` to include sprites for new Treasure Tiers.
         3.  Refactoring `Board::findMatches` to detect Treasure merges (3, 4, or 5 of a kind) and identify pieces for upgrade/removal based on placement rules (swapped tile, then left-bottom most).

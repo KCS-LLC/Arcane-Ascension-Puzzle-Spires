@@ -32,6 +32,17 @@ sf::Sprite& BaseGem::getSprite() {
     return m_sprite;
 }
 
+void BaseGem::transform(const GemCatalogEntry* newCatalogEntry, const sf::Texture& newTexture) {
+    m_catalogEntry = newCatalogEntry;
+    m_sprite.setTexture(newTexture);
+
+    // Rescale the sprite to fit the tile size, in case the new texture has different dimensions
+    sf::Vector2u textureSize = newTexture.getSize();
+    float scaleX = static_cast<float>(TILE_SIZE) / textureSize.x;
+    float scaleY = static_cast<float>(TILE_SIZE) / textureSize.y;
+    m_sprite.setScale(sf::Vector2f(scaleX, scaleY));
+}
+
 void BaseGem::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin) {
     m_sprite.setPosition(m_position + boardOrigin);
     window.draw(m_sprite);

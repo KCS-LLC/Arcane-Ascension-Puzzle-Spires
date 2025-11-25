@@ -14,7 +14,7 @@ class DataManager;
 
 struct MatchResolution {
     std::vector<sf::Vector2i> gemsToRemove;
-    std::vector<std::pair<sf::Vector2i, std::unique_ptr<BaseGem>>> gemsToPlace;
+    std::vector<std::pair<sf::Vector2i, GemSubType>> gemsToTransform;
 };
 
 class IMatchRule {

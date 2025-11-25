@@ -23,6 +23,7 @@
 
 // Project-specific, but very stable headers
 #include "Constants.h"
+#include "DataManager.h"
 
 // Custom comparator for sf::Vector2i to be used in std::set
 struct Vector2iCompare {

@@ -117,5 +117,33 @@
     "primaryTypeId": 3,
     "category": "Currency",
     "oppositeId": null
+  },
+  {
+    "id": 3002,
+    "name": "CoinPile",
+    "primaryTypeId": 3,
+    "category": "Currency",
+    "oppositeId": null
+  },
+  {
+    "id": 3003,
+    "name": "CoinBag",
+    "primaryTypeId": 3,
+    "category": "Currency",
+    "oppositeId": null
+  },
+  {
+    "id": 3004,
+    "name": "CoinBagBundle",
+    "primaryTypeId": 3,
+    "category": "Currency",
+    "oppositeId": null
+  },
+  {
+    "id": 3005,
+    "name": "TreasureChest",
+    "primaryTypeId": 3,
+    "category": "Currency",
+    "oppositeId": null
   }
 ]

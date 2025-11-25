@@ -25,6 +25,9 @@ public:
     GemSubType getSubType() const;
     const GemCatalogEntry* getCatalogEntry() const;
 
+    // Transformation
+    virtual void transform(const GemCatalogEntry* newCatalogEntry, const sf::Texture& newTexture);
+
     // Common data and rendering
     void setPosition(float x, float y);
     const sf::Vector2f& getPosition() const;

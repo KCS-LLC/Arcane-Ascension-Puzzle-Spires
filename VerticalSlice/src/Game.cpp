@@ -302,12 +302,20 @@ void Game::handleMatches(bool isPlayerMove) {
 
         auto resolutionOpt = m_matchProcessor.process(match, m_board, m_gemFactory, dataManager, gemTextures);
         if (resolutionOpt && *resolutionOpt) {
+            // Handle transformations first
+            for (const auto& transform : (*resolutionOpt)->gemsToTransform) {
+                BaseGem* gem = m_board.getGemAt(transform.first.x, transform.first.y);
+                if (gem) {
+                    const GemCatalogEntry* newCatalogEntry = dataManager.getGemCatalogEntry(transform.second);
+                    if (newCatalogEntry && gemTextures.count(transform.second)) {
+                        gem->transform(newCatalogEntry, gemTextures.at(transform.second));
+                    }
+                }
+            }
+
+            // Handle removals
             for (const auto& pos : (*resolutionOpt)->gemsToRemove) {
                 allRemovedGems.insert(pos);
-            }
-            for (auto& placement : (*resolutionOpt)->gemsToPlace) {
-                m_board.setGemAt(placement.first.x, placement.first.y, std::move(placement.second));
-                allRemovedGems.erase(placement.first);
             }
         }
     }
@@ -544,23 +552,9 @@ void Game::setupTreasureRound() {
     m_currentScore = 0; // Reset score for the treasure round
     m_uiManager.setupTreasureRound();
 
-    // Define the pool of possible gems for the treasure round
-    std::vector<GemSubType> manaGems = {
-        GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air,
-        GemSubType::Light, GemSubType::Umbral, GemSubType::Enhancement, GemSubType::Perception,
-        GemSubType::Transference, GemSubType::Life, GemSubType::Death, GemSubType::Mental
-    };
-
-    // Shuffle and pick 4 random mana gems
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(manaGems.begin(), manaGems.end(), g);
-    
-    m_treasureRoundGems.clear();
-    m_treasureRoundGems.push_back(GemSubType::Coin); // Always include the base coin
-    for (int i = 0; i < 4; ++i) {
-        m_treasureRoundGems.push_back(manaGems[i]);
-    }
+    // The treasure round board needs a few extra gem types to prevent
+    // the board initializer from getting stuck in an infinite loop.
+    m_treasureRoundGems = { GemSubType::Coin, GemSubType::Coin, GemSubType::Coin, GemSubType::Fire, GemSubType::Water };
 
     m_board.initialize(m_treasureRoundGems);
 }

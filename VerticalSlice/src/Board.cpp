@@ -59,6 +59,8 @@ void Board::initializeForPowerTrial() {
 
 
 
+
+
 void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo) {
     for (int r = 0; r < m_height; ++r) {
         for (int c = 0; c < m_width; ++c) {
