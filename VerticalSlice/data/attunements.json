@@ -52,7 +52,7 @@
     "id": "summoner",
     "name": "Summoner",
     "description": "Focuses on calling and binding creatures.",
-    "spellIds": ["gust_of_wind_air", "convert_mana_transference"],
+    "spellIds": ["gust_of_wind_air", "quick_swap_transference"],
     "mana_types": [5, 10, 11]
   }
 ]

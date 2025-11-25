@@ -25,7 +25,7 @@ public:
 private:
     void processEvents();
     void update(sf::Time deltaTime);
-    void render();
+    void render(const sf::Font& font, sf::Clock& pulseClock);
     void loadTextures();
     void handleInput(sf::Event event);
     void resolveMatches(const std::vector<sf::Vector2i>& matches);

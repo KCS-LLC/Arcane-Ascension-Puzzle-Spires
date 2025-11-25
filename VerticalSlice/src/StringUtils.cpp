@@ -136,6 +136,21 @@ sf::Color getSfColorForGemType(GemSubType type) {
     }
 }
 
+sf::Color gemLevelToColor(int level) {
+    switch (level) {
+        case 1: return sf::Color::Transparent; // Level 1: Transparent/Black
+        case 2: return sf::Color::White;     // Level 2: White/Clear
+        case 3: return sf::Color::Red;
+        case 4: return sf::Color(255, 165, 0); // Orange
+        case 5: return sf::Color::Yellow;
+        case 6: return sf::Color::Green;
+        case 7: return sf::Color::Blue;
+        case 8: return sf::Color(75, 0, 130);  // Indigo
+        case 9: return sf::Color(148, 0, 211); // Violet
+        default: return sf::Color(148, 0, 211); // Default to Violet for levels beyond 9
+    }
+}
+
 std::string wordWrap(const std::string& text, unsigned int lineLength) {
     std::stringstream ss(text);
     std::string line;

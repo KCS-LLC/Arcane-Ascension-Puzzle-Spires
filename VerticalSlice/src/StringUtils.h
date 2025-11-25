@@ -15,6 +15,7 @@ std::string doorColorToString(DoorColor color);
 sf::Color doorColorToSfColor(DoorColor color);
 sf::Color getSfColorForRoomType(RoomType type);
 sf::Color getSfColorForGemType(GemSubType type);
+sf::Color gemLevelToColor(int level);
 GemSubType stringToGemSubType(const std::string& s);
 std::string wordWrap(const std::string& text, unsigned int lineLength);
 DoorColor stringToDoorColor(const std::string& s);

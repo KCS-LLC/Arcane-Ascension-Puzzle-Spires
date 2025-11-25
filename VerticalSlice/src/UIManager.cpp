@@ -25,6 +25,7 @@ UIManager::UIManager(const sf::Font& font)
       playerPanelTitle(font, "Player", 20),
       monsterPanelTitle(font, "Monster", 20),
       monsterNameText(font, "", 22),
+      monsterHpText(font, "", 18),
       manaTitle(font, "Mana", 18),
       gameOverText(font, "Game Over", 48),
       explorationTitle(font, "Exploration", 30),
@@ -150,6 +151,8 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
 
     playerPanelTitle.setPosition(sf::Vector2f{20, 20});
     monsterPanelTitle.setPosition(sf::Vector2f{windowSize.x - rightPanel.getSize().x + 20, 20});
+    monsterNameText.setPosition(sf::Vector2f{windowSize.x - rightPanel.getSize().x + 20, 50});
+    monsterHpText.setPosition(sf::Vector2f{windowSize.x - rightPanel.getSize().x + 20, 70});
 
     // --- HP Bars ---
     playerHpBarBack.setSize(sf::Vector2f{210, 20});
@@ -215,6 +218,7 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
 
         float monsterHpPercent = static_cast<float>(monster.getCurrentHp()) / monster.getMaxHp();
         monsterHpBarFront.setSize(sf::Vector2f{monsterHpBarBack.getSize().x * monsterHpPercent, monsterHpBarBack.getSize().y});
+        monsterHpText.setString(std::to_string(monster.getCurrentHp()) + "/" + std::to_string(monster.getMaxHp()));
 
         // Update Monster Speed Gauge
         float speedPercent = static_cast<float>(monster.getActionCounter()) / monster.getSpeed();
@@ -440,6 +444,7 @@ void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState cu
             window.draw(playerHpBarFront);
             window.draw(monsterHpBarBack);
             window.draw(monsterHpBarFront);
+            window.draw(monsterHpText);
             window.draw(monsterSpeedGaugeBackground);
             window.draw(monsterSpeedGaugeForeground);
             window.draw(manaTitle);

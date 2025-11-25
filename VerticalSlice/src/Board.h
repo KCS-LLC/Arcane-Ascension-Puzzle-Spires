@@ -24,7 +24,7 @@ public:
     void initialize(const std::vector<GemSubType>& possibleGems);
     void initializeForPowerTrial();
 
-    void render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo);
+    void render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, const sf::Font& font, sf::Clock& pulseClock, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo);
     BaseGem* getGemAt(int r, int c) const;
     int getWidth() const;
     int getHeight() const;
@@ -39,6 +39,8 @@ public:
     void rotateRow(int rowIndex, int direction);
     void rotateColumn(int colIndex, int direction);
     std::vector<sf::Vector2i> getRandomGemCoords(int count, bool nonAttackGemsOnly = false);
+    std::optional<std::pair<sf::Vector2i, sf::Vector2i>> findValidMove() const;
+    void clearActionStates();
     
     std::vector<FallInfo> applyGravityAndRefill(const std::vector<GemSubType>& possibleGems);
     // std::vector<FallInfo> applyGravity();

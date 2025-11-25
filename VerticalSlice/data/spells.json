@@ -5,7 +5,7 @@
     "manaType": "Mental",
     "manaCost": 15,
     "speedCost": 20,
-    "effects": [{ "type": "HIGHLIGHT_MATCH" }]
+    "effects": [{ "type": "HIGHLIGHT_MOVE" }]
   },
   {
     "id": "mana_surge_enhancement",
@@ -21,7 +21,7 @@
     "manaType": "Fire",
     "manaCost": 25,
     "speedCost": 40,
-    "effects": [{ "type": "CREATE_STATIC_TILE", "params": { "tile_type": "burning", "duration": 3 } }]
+    "effects": [{ "type": "CREATE_BURNING_TILE", "params": { "amount": 1 } }]
   },
   {
     "id": "gust_of_wind_air",

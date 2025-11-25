@@ -65,6 +65,7 @@ private:
     sf::Text playerPanelTitle;
     sf::Text monsterPanelTitle;
     sf::Text monsterNameText;
+    sf::Text monsterHpText;
     sf::Text manaTitle;
 
     // Gauges

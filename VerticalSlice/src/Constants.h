@@ -6,6 +6,8 @@ constexpr int BOARD_HEIGHT = 8;
 constexpr int WINDOW_WIDTH = 1280;
 constexpr int WINDOW_HEIGHT = 720;
 
+constexpr float BASE_SWAP_SPEED = 20.0f;
+
 enum class GameMode {
     JUDGEMENT,
     TOWER_CLIMB,

@@ -40,6 +40,13 @@ int Player::getMaxMana() const { return m_maxMana; }
 
 const std::vector<Spell>& Player::getSpells() const { return spells; }
 
+GemSubType Player::getPrimaryManaType() const {
+    if (!m_availableManaTypes.empty()) {
+        return m_availableManaTypes[0];
+    }
+    return GemSubType::Empty; // Or a suitable default/error value
+}
+
 void Player::takeDamage(int amount) {
     m_hp -= amount;
     if (m_hp < 0) m_hp = 0;

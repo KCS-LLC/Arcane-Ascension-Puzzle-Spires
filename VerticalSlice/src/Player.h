@@ -22,6 +22,7 @@ public:
     int getMaxHp() const;
     int getMana(GemSubType type) const;
     int getMaxMana() const;
+    GemSubType getPrimaryManaType() const;
     const std::vector<Spell>& getSpells() const;
     const std::vector<GemSubType>& getManaTypes() const;
     const std::string& getAttunementId() const;

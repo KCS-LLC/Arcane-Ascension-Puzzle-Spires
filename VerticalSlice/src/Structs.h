@@ -8,6 +8,8 @@
 // --- Enums ---
 enum class RoomType { Entrance, Combat, Treasure, Boss, Sanctuary, Special, Puzzle, Trap, AgilityChallenge, EnduranceChallenge, MagicChallenge, Unknown };
 enum class DoorColor { Red, Orange, Yellow, Green, Blue, Indigo, Violet, Copper, Silver, Gold, White, Unknown };
+enum class StatusEffect { None, Burning, Frozen, Poisoned, Drained };
+enum class ActionState { None, Selected, ValidMoveHint };
 
 
 #include "json.hpp"

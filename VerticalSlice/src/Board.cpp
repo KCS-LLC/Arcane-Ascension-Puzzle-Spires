@@ -1,6 +1,8 @@
 #include "PCH.h"
 #include "Board.h"
 #include "Game.h" // For gemTextures
+#include "StringUtils.h"
+#include <cstdint> // For std::uint8_t
 #include <random>
 #include <iostream>
 #include <algorithm>
@@ -61,15 +63,21 @@ void Board::initializeForPowerTrial() {
 
 
 
-void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo) {
+void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, const sf::Font& font, sf::Clock& pulseClock, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo) {
+    sf::RectangleShape background(sf::Vector2f(TILE_SIZE, TILE_SIZE));
+    sf::Text counterText(font, "", 18);
+    counterText.setFillColor(sf::Color::White);
+
+    sf::RectangleShape frame(sf::Vector2f(TILE_SIZE, TILE_SIZE));
+    frame.setFillColor(sf::Color::Transparent);
+    frame.setOutlineThickness(3.0f);
+
     for (int r = 0; r < m_height; ++r) {
         for (int c = 0; c < m_width; ++c) {
             bool shouldDraw = true;
 
-            if (isAnimatingDestruction) {
-                if (destroyingGems.count({r, c})) {
-                    shouldDraw = false;
-                }
+            if (isAnimatingDestruction && destroyingGems.count({r, c})) {
+                shouldDraw = false;
             }
             
             if (isAnimatingSwap && ((r == animatingGems.first.y && c == animatingGems.first.x) || (r == animatingGems.second.y && c == animatingGems.second.x))) {
@@ -86,9 +94,55 @@ void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, bo
             }
 
             if (m_grid[r][c] && shouldDraw) {
+                sf::Vector2f tilePosition(boardOrigin.x + c * TILE_SIZE, boardOrigin.y + r * TILE_SIZE);
+
+                // 1. Draw Background Layer
+                background.setFillColor(gemLevelToColor(m_grid[r][c]->getLevel()));
+                background.setPosition(tilePosition);
+                window.draw(background);
+
+                // 2. Draw Gem Layer
                 sf::Sprite sprite = m_grid[r][c]->getSprite();
-                sprite.setPosition(sf::Vector2f(boardOrigin.x + c * TILE_SIZE, boardOrigin.y + r * TILE_SIZE));
+                sprite.setPosition(tilePosition);
                 window.draw(sprite);
+
+                // 3. Draw Front Effect Layer (Placeholder)
+                if (m_grid[r][c]->getStatusEffect() != StatusEffect::None) {
+                    // Placeholder: Draw a semi-transparent red rectangle for any status effect
+                    sf::RectangleShape effectOverlay(sf::Vector2f(TILE_SIZE, TILE_SIZE));
+                    effectOverlay.setFillColor(sf::Color(255, 0, 0, 80)); // Semi-transparent red
+                    effectOverlay.setPosition(tilePosition);
+                    window.draw(effectOverlay);
+                }
+
+                // 4. Draw Counter/Timer Layer
+                if (m_grid[r][c]->getEffectValue() > 0 && m_grid[r][c]->getEffectMax() > 0) {
+                    float percentage = m_grid[r][c]->getEffectValue() / m_grid[r][c]->getEffectMax();
+                    
+                    sf::RectangleShape timerBarBack(sf::Vector2f(TILE_SIZE, 5));
+                    timerBarBack.setPosition(tilePosition);
+                    timerBarBack.setFillColor(sf::Color(50, 50, 50)); // Dark grey background
+                    window.draw(timerBarBack);
+
+                    sf::RectangleShape timerBarFront(sf::Vector2f(TILE_SIZE * percentage, 5));
+                    timerBarFront.setPosition(tilePosition);
+                    timerBarFront.setFillColor(sf::Color::Red); // Red for burning
+                    window.draw(timerBarFront);
+                }
+
+                // 5. Draw Frame Layer
+                if (m_grid[r][c]->getActionState() == ActionState::ValidMoveHint) {
+                    float alpha = 128 + 127 * std::sin(pulseClock.getElapsedTime().asSeconds() * 10);
+                    sf::Color highlightColor = sf::Color::White;
+                    highlightColor.a = static_cast<std::uint8_t>(alpha);
+                    frame.setOutlineColor(highlightColor);
+                    frame.setPosition(tilePosition);
+                    window.draw(frame);
+                } else if (m_grid[r][c]->getActionState() == ActionState::Selected) {
+                    frame.setOutlineColor(sf::Color::Yellow);
+                    frame.setPosition(tilePosition);
+                    window.draw(frame);
+                }
             }
         }
     }
@@ -271,4 +325,45 @@ int Board::getWidth() const {
 
 int Board::getHeight() const {
     return m_height;
+}
+
+void Board::clearActionStates() {
+    for (int r = 0; r < m_height; ++r) {
+        for (int c = 0; c < m_width; ++c) {
+            if (m_grid[r][c]) {
+                m_grid[r][c]->setActionState(ActionState::None);
+            }
+        }
+    }
+}
+
+std::optional<std::pair<sf::Vector2i, sf::Vector2i>> Board::findValidMove() const {
+    // This method needs to be mutable for the temporary swap, so we cast away constness.
+    Board* mutableThis = const_cast<Board*>(this);
+
+    // Check for horizontal swaps
+    for (int r = 0; r < m_height; ++r) {
+        for (int c = 0; c < m_width - 1; ++c) {
+            mutableThis->swapGems(r, c, r, c + 1);
+            if (mutableThis->findMatches().size() > 0) {
+                mutableThis->swapGems(r, c, r, c + 1); // Swap back
+                return std::make_pair(sf::Vector2i(c, r), sf::Vector2i(c + 1, r));
+            }
+            mutableThis->swapGems(r, c, r, c + 1); // Swap back
+        }
+    }
+
+    // Check for vertical swaps
+    for (int r = 0; r < m_height - 1; ++r) {
+        for (int c = 0; c < m_width; ++c) {
+            mutableThis->swapGems(r, c, r + 1, c);
+            if (mutableThis->findMatches().size() > 0) {
+                mutableThis->swapGems(r, c, r + 1, c); // Swap back
+                return std::make_pair(sf::Vector2i(c, r), sf::Vector2i(c, r + 1));
+            }
+            mutableThis->swapGems(r, c, r + 1, c); // Swap back
+        }
+    }
+
+    return std::nullopt; // No valid move found
 }

@@ -4,24 +4,25 @@ This file tracks the known bugs and design discrepancies in the current build.
 
 ---
 ## Recently Resolved (as of 2025-11-26)
+*   **`Create Burning Tile` Ability Has No Visuals (Bug #V.Elementalist):** Fixed, the ability now applies a `Burning` status effect with a visual indicator and a timer bar.
+*   **`Insight` Ability Has No Visuals (Bug #V.Diviner, #V.Enchanter):** Fixed, the `Insight` ability now provides a clear visual indicator on the two gems that form a valid move.
+*   **Monster HP Lacks Numerical Display (Bug #V.Shadow):** Fixed, the monster's HP bar now includes a numerical display (e.g., "125/150").
 *   **`Chaotic Shift` Leaves Holes in Board (Bug #V.Mender):** Fixed, ability now correctly triggers gravity and refills the board after removing gems.
+*   **Summoner Has Incorrect Ability (Bug #V.Summoner):** Fixed. Corrected `attunements.json` to assign `quick_swap_transference` instead of `convert_mana_transference`.
 
 ---
 ## High Priority (as of 2025-11-26)
 *   **Treasure Chests Do Not Merge (Bug #3.2):** Currently untestable due to the temporary reduction of treasure round moves. To be re-evaluated when the move count is restored.
 
 ### Ability & Data Bugs
-*   **Summoner Has Incorrect Ability (Bug #V.Summoner):** The Summoner's second ability is currently `Convert Mana`. According to the design, it should be `Quick Swap`, the same as the Enchanter's ability.
+
 
 ---
 ## Medium Priority (as of 2025-11-26)
 
 ### UI/UX & Visual Feedback Bugs
-*   **`Insight` Ability Has No Visuals (Bug #V.Diviner, #V.Enchanter):** The `Insight` ability is mechanically functional but provides no visual indicator on the board to highlight a suggested move, making it useless to the player.
-*   **`Create Burning Tile` Ability Has No Visuals (Bug #V.Elementalist):** The ability does not provide any visual indication of which tile is "burning."
 *   **`Minor Heal` Lacks Feedback (Bug #V.Guardian):** The Guardian's `Minor Heal` does not provide obvious visual feedback (e.g., an animation or floating green number), making it difficult to tell if it worked, especially if it coincides with a monster attack.
 *   **`Empower Self`/`Empower Weapon` Need Status Indicators (Bug #V.Guardian, #V.Shadow):** Abilities that grant temporary buffs are untestable and unusable without UI indicators showing that the buff is active and when it expires.
-*   **Monster HP Lacks Numerical Display (Bug #V.Shadow):** Testing abilities like `Empower Weapon` requires seeing the exact HP of the monster. A numerical display (e.g., "125/150") is needed.
 
 ### Ability-Specific Bugs
 *   **`Gust of Wind` Incorrect Functionality (Bug #V.Elementalist, #V.Summoner):** The ability currently only rotates the top row. It needs to be refactored to allow the player to select a row/column and direction.

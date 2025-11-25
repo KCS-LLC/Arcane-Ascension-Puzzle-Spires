@@ -187,7 +187,7 @@ void Game::run() {
         sf::Time deltaTime = clock.restart();
         processEvents();
         update(deltaTime);
-        render();
+        render(dataManager.getFont(), m_pulseClock);
     }
 }
 
@@ -220,18 +220,21 @@ void Game::handleInput(sf::Event event) {
         } else if (action.type == UIActionType::ChangeRoom) {
             moveToRoom(action.destinationRoomId);
         } else if (action.type == UIActionType::CastSpell) {
+            m_board.clearActionStates(); // Clear hints on new action
             const Spell* spell = m_player.castSpell(action.spellIndex);
             if (spell) {
-                bool boardAltered = false;
+                std::vector<sf::Vector2i> gemsToRemove;
                 // The spell was successfully cast. Process its effects.
                 for (const auto& effect : spell->effects) {
-                    if (m_effectProcessor.processEffect(effect, m_player, m_monster, m_board, m_gemFactory, gemTextures)) {
-                        boardAltered = true;
-                    }
+                    auto removed = m_effectProcessor.processEffect(effect, m_player, m_monster, m_board, m_gemFactory, gemTextures);
+                    gemsToRemove.insert(gemsToRemove.end(), removed.begin(), removed.end());
                 }
 
-                if (boardAltered) {
-                    handleMatches(false); // Trigger cascade for effects like gem removal
+                if (!gemsToRemove.empty()) {
+                    m_destroyingGems.insert(gemsToRemove.begin(), gemsToRemove.end());
+                    m_isAnimating = true;
+                    m_isAnimatingDestruction = true;
+                    m_animationClock.restart();
                 }
 
                 // Now check if the monster gets a turn.
@@ -286,6 +289,8 @@ void Game::handleInput(sf::Event event) {
             int col = (mb->position.x - static_cast<int>(m_boardOrigin.x)) / TILE_SIZE;
             int row = (mb->position.y - static_cast<int>(m_boardOrigin.y)) / TILE_SIZE;
 
+            m_board.clearActionStates(); // Clear hints on new action
+
             if (m_selectedGem.x == -1) {
                 m_selectedGem = sf::Vector2i(col, row);
             } else {
@@ -325,6 +330,16 @@ void Game::handleMatches(bool isPlayerMove) {
 
     if (isPlayerMove) {
         m_currentTurn++;
+
+        // Process end-of-turn effects for all gems
+        for (int r = 0; r < m_board.getHeight(); ++r) {
+            for (int c = 0; c < m_board.getWidth(); ++c) {
+                if (BaseGem* gem = m_board.getGemAt(r, c)) {
+                    gem->onTurnEnd(m_board, m_player, m_monster, BASE_SWAP_SPEED); // Pass placeholder speed cost for now
+                }
+            }
+        }
+
         if (m_gameMode == GameMode::TOWER_CLIMB && m_monster.isTurnReady(30)) { // Placeholder speed cost for a match
             m_player.takeDamage(dataManager.getMonsterAttackDamage());
             showPlayerDamageEffect = true;
@@ -482,14 +497,14 @@ void Game::update(sf::Time deltaTime) {
     }
 }
 
-void Game::render() {
+void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
     m_window.clear(sf::Color(30, 30, 30));
 
     // Only render the board and animations during combat-related states
     if (m_gameState == GameState::Playing || m_gameState == GameState::Trial || m_isAnimating || m_gameState == GameState::GameOver || m_gameState == GameState::Judgement_TreasureRound) {
         // Do not render the board or animations if the trial is over
         if (m_gameState != GameState::Summary && m_gameState != GameState::AttunementReveal) {
-            m_board.render(m_window, m_boardOrigin, m_isAnimatingSwap, m_animatingGems, m_isAnimatingDestruction, m_destroyingGems, m_isAnimatingRefill, m_fallInfo);
+            m_board.render(m_window, m_boardOrigin, font, highlightClock, m_isAnimatingSwap, m_animatingGems, m_isAnimatingDestruction, m_destroyingGems, m_isAnimatingRefill, m_fallInfo);
 
             const float swapAnimationDuration = 0.2f;
             const float destructionAnimationDuration = 0.3f;
