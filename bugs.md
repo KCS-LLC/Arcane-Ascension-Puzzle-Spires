@@ -3,6 +3,27 @@
 This file tracks the known bugs and design discrepancies in the current build.
 
 ---
+## Unaddressed (as of 2025-11-25)
+
+### UI/UX Issues
+*   **Ambiguous Cost Display (Bug #2.2):** The `Mana/Speed` cost format on ability buttons is unclear. It is not obvious which number represents Mana Cost and which represents Speed Cost.
+*   **Unclear Mana Consumption (Bug #2.3):** Mana bars do not display numerical values, making it difficult to verify precise mana consumption upon spell casting. While bars visually decrease, the exact amount is unknown.
+*   **`Insight` Ability Has No Visuals (Bug #V.Diviner, #V.Enchanter):** The `Insight` ability activates, but no visual indicator appears on the board to highlight a suggested move. Without this visual component, the ability is non-functional from a player's perspective.
+*   **`Create Burning Tile` Ability Has No Visuals (Bug #V.Elementalist):** The `Create Burning Tile` ability activates, but there is no visual indication of a "Burning Tile" on the board.
+
+### Ability-Specific Bugs
+*   **`Gust of Wind` Incorrect Functionality (Bug #V.Elementalist, #V.Summoner):** The ability currently only rotates the top row, instead of allowing a targeted row/column rotation based on two adjacent tiles (first for target, second for direction).
+*   **`Gust of Wind` Lacks Animation (Bug #V.Elementalist, #V.Summoner):** The row rotation is not animated, resulting in a jarring visual effect.
+
+---
+## In Progress / High Priority (as of 2025-11-25)
+
+### Core Mechanic Bugs
+*   **Incorrect Mana Refill (Bug #2.1a):** The game board correctly generates initial mana gems based on player/monster affinities, but subsequent gem refills (after matches and cascades) do not respect these dynamic mana types.
+*   **Incorrect Player Mana Bars (Bug #2.1b):** The player's mana bars in the UI do not correctly reflect the mana pools of the currently chosen attunement. This implies a disconnect between the player's actual mana types and what the UI is trying to display.
+
+---
+## Older / Resolved Bugs
 
 ### 1. Power Trial Board Generation is Not Random
 
@@ -42,4 +63,3 @@ This file tracks the known bugs and design discrepancies in the current build.
 
 *   **Critical Crash on Load:** The game log shows `JSON error in spells: [json.exception.out_of_range.403] key 'cost' not found`. The game still runs but critical spell data fails to load.
 *   **Unresponsive Input:** Clicking on the overlaid game board tiles during the exploration phase has no effect; the input seems to be incorrectly handled or disabled in this state.
-

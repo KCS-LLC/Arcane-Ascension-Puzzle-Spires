@@ -74,6 +74,7 @@ private:
     sf::RectangleShape monsterHpBarFront;
     std::map<GemSubType, sf::RectangleShape> manaBarBacks;
     std::map<GemSubType, sf::RectangleShape> manaBarFronts;
+    std::map<GemSubType, sf::Text> manaBarTexts;
 
     sf::Text gameOverText;
     std::vector<sf::RectangleShape> spellButtons;

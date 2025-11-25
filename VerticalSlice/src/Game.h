@@ -60,6 +60,7 @@ private:
     JudgementTrial m_currentJudgementTrial;
     TrialPerformance m_trialPerformance;
     std::vector<GemSubType> m_treasureRoundGems; // Gems used in the treasure round
+    std::vector<GemSubType> m_combatGemPool; // Stores the dynamic gem pool for the current combat
     sf::Clock m_trialClock;
     sf::Clock m_pulseClock;
     // Game Stats

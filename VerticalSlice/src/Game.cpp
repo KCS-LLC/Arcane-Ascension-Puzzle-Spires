@@ -136,8 +136,8 @@ void Game::moveToRoom(int destinationRoomId) {
                     }
                     gemPoolSet.insert(GemSubType::Skull); // Always include skulls
                     
-                    std::vector<GemSubType> gemPool(gemPoolSet.begin(), gemPoolSet.end());
-                    m_board.initialize(gemPool);
+                    m_combatGemPool = std::vector<GemSubType>(gemPoolSet.begin(), gemPoolSet.end());
+                    m_board.initialize(m_combatGemPool);
                 }
                 m_gameState = GameState::Playing;
                 break;
@@ -384,8 +384,7 @@ void Game::update(sf::Time deltaTime) {
                 if (m_gameState == GameState::Judgement_TreasureRound) {
                     m_fallInfo = m_board.applyGravityAndRefill(m_treasureRoundGems);
                 } else if (m_gameMode == GameMode::TOWER_CLIMB) {
-                    // This will be used for standard combat once implemented
-                    m_fallInfo = m_board.applyGravityAndRefill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air, GemSubType::Skull});
+                    m_fallInfo = m_board.applyGravityAndRefill(m_combatGemPool);
                 } else if (m_gameState == GameState::Trial) {
                     // This is the default for the initial Judgement trials (Power, Haste, etc.)
                     m_fallInfo = m_board.applyGravityAndRefill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air});

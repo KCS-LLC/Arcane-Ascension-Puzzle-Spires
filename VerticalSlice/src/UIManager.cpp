@@ -223,22 +223,37 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
         // Update Mana Bars
         manaBarBacks.clear();
         manaBarFronts.clear();
+        manaBarTexts.clear();
+
         const auto& manaTypes = player.getManaTypes();
+        // Diagnostic logging (only in combat/trial modes)
+        if (currentState == GameState::Playing || currentState == GameState::Trial) {
+            std::cout << "Updating UI for mana types: ";
+            for(const auto& type : manaTypes) {
+                std::cout << static_cast<int>(type) << " ";
+            }
+            std::cout << std::endl;
+        }
+
         float yOffset = 150.f;
         for (const auto& type : manaTypes) {
             int currentMana = player.getMana(type);
-            int maxMana = 100; // Placeholder: Player class needs a getMaxMana(type) method
+            int maxMana = player.getMaxMana();
 
             sf::RectangleShape back({150, 15});
-            back.setPosition(sf::Vector2f{20, yOffset});
+            back.setPosition(sf::Vector2f(20, yOffset));
             back.setFillColor(sf::Color(50, 50, 50));
             manaBarBacks[type] = back;
 
             float manaPercent = (maxMana > 0) ? static_cast<float>(currentMana) / maxMana : 0.f;
             sf::RectangleShape front({150 * manaPercent, 15});
-            front.setPosition(sf::Vector2f{20, yOffset});
+            front.setPosition(sf::Vector2f(20, yOffset));
             front.setFillColor(getSfColorForGemType(type));
             manaBarFronts[type] = front;
+
+            sf::Text text(font, std::to_string(currentMana) + "/" + std::to_string(maxMana), 12);
+            text.setPosition(sf::Vector2f(175, yOffset));
+            manaBarTexts.emplace(type, text);
 
             yOffset += 25.f;
         }
@@ -250,7 +265,7 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
         float ySpellOffset = 300.f; // Starting Y position for spell buttons
         for (const auto& spell : spells) {
             sf::RectangleShape button({210, 40});
-            button.setPosition(sf::Vector2f{20, ySpellOffset});
+            button.setPosition(sf::Vector2f(20, ySpellOffset));
             if (player.getMana(spell.costType) >= spell.manaCost) {
                 button.setFillColor(sf::Color(100, 100, 180)); // Ready color
             } else {
@@ -260,15 +275,15 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
 
             // Spell Name (left-aligned)
             sf::Text nameText(font, spell.name, 16);
-            nameText.setPosition(sf::Vector2f{30, ySpellOffset + 10});
+            nameText.setPosition(sf::Vector2f(30, ySpellOffset + 10));
             spellButtonTexts.push_back(nameText);
 
             // Spell Cost (right-aligned)
-            std::string costStr = std::to_string(spell.manaCost) + " / " + std::to_string(spell.speedCost);
-            sf::Text costText(font, costStr, 16);
+            std::string costStr = "M:" + std::to_string(spell.manaCost) + " S:" + std::to_string(spell.speedCost);
+            sf::Text costText(font, costStr, 14);
             sf::FloatRect textBounds = costText.getLocalBounds();
             costText.setOrigin(sf::Vector2f(textBounds.position.x + textBounds.size.x, 0));
-            costText.setPosition(sf::Vector2f(20 + 200, ySpellOffset + 10));
+            costText.setPosition(sf::Vector2f(20 + 200, ySpellOffset + 12));
             spellButtonTexts.push_back(costText);
 
             ySpellOffset += 50.f;
@@ -432,6 +447,9 @@ void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState cu
                 window.draw(pair.second);
             }
             for (const auto& pair : manaBarFronts) {
+                window.draw(pair.second);
+            }
+            for (const auto& pair : manaBarTexts) {
                 window.draw(pair.second);
             }
             for (const auto& button : spellButtons) {
