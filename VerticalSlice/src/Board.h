@@ -36,6 +36,9 @@ public:
     std::set<std::pair<int, int>> findMatches();
     void removeGems(const std::set<sf::Vector2i, Vector2iCompare>& matches);
     void setGemAt(int r, int c, std::unique_ptr<BaseGem> gem);
+    void rotateRow(int rowIndex, int direction);
+    void rotateColumn(int colIndex, int direction);
+    std::vector<sf::Vector2i> getRandomGemCoords(int count, bool nonAttackGemsOnly = false);
     
     std::vector<FallInfo> applyGravityAndRefill(const std::vector<GemSubType>& possibleGems);
     // std::vector<FallInfo> applyGravity();

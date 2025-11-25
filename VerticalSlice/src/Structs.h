@@ -6,25 +6,26 @@
 #include "PrimaryGemType.h"
 
 // --- Enums ---
-enum class EffectType { Damage, Heal, Stun, Shield };
-enum class TargetType { Player, Monster };
 enum class RoomType { Entrance, Combat, Treasure, Boss, Sanctuary, Special, Puzzle, Trap, AgilityChallenge, EnduranceChallenge, MagicChallenge, Unknown };
 enum class DoorColor { Red, Orange, Yellow, Green, Blue, Indigo, Violet, Copper, Silver, Gold, White, Unknown };
+
+
+#include "json.hpp"
 
 
 // --- Data Structures ---
 
 struct Effect {
-    EffectType type;
-    int amount;
-    TargetType target;
+    std::string type;
+    std::map<std::string, nlohmann::json> params;
 };
 
 struct Spell {
-    int id;
+    std::string id;
     std::string name;
     GemSubType costType;
-    int costAmount;
+    int manaCost;
+    int speedCost;
     std::vector<Effect> effects;
 };
 
@@ -32,7 +33,7 @@ struct Attunement {
     std::string id;
     std::string name;
     std::string description;
-    std::vector<int> starting_spell_ids;
+    std::vector<std::string> spellIds;
     std::vector<GemSubType> mana_types;
 };
 

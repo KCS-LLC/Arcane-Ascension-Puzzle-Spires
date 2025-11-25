@@ -27,9 +27,10 @@ public:
     const std::string& getAttunementId() const;
 
     void takeDamage(int amount);
+    void heal(int amount);
     void addScore(int amount);
     void addMana(GemSubType type, int amount);
-    int castSpell(int spellIndex);
+    const Spell* castSpell(int spellIndex);
 
     void finalizeJudgement(const JudgementResults& results, const DataManager& dataManager);
 

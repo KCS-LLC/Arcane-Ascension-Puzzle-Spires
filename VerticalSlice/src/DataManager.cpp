@@ -64,7 +64,7 @@ void from_json(const json& j, Attunement& a) {
     j.at("id").get_to(a.id);
     j.at("name").get_to(a.name);
     j.at("description").get_to(a.description);
-    j.at("starting_spells").get_to(a.starting_spell_ids);
+    j.at("spellIds").get_to(a.spellIds);
     
     a.mana_types.clear();
     for (int type_id : j.at("mana_types")) {
@@ -72,11 +72,22 @@ void from_json(const json& j, Attunement& a) {
     }
 }
 
+void from_json(const json& j, Effect& e) {
+    j.at("type").get_to(e.type);
+    if (j.contains("params")) {
+        j.at("params").get_to(e.params);
+    }
+}
+
 void from_json(const json& j, Spell& s) {
     j.at("id").get_to(s.id);
     j.at("name").get_to(s.name);
-    j.at("costAmount").get_to(s.costAmount);
-    s.costType = static_cast<GemSubType>(j.at("costType").get<int>());
+    j.at("manaCost").get_to(s.manaCost);
+    s.costType = stringToGemSubType(j.at("manaType").get<std::string>());
+    j.at("speedCost").get_to(s.speedCost);
+    if (j.contains("effects")) {
+        j.at("effects").get_to(s.effects);
+    }
 }
 
 void from_json(const json& j, Floor& f) {
@@ -268,9 +279,19 @@ PrimaryGemType DataManager::getPrimaryGemType(GemSubType subType) const {
 }
 
 const std::vector<Attunement>& DataManager::getAttunements() const { return attunements; }
-const Attunement* DataManager::getAttunementById(const std::string& id) const { return nullptr; }
+const Attunement* DataManager::getAttunementById(const std::string& id) const {
+    auto it = std::find_if(attunements.begin(), attunements.end(), [&](const Attunement& a) {
+        return a.id == id;
+    });
+
+    if (it != attunements.end()) {
+        return &(*it);
+    }
+    
+    return nullptr; 
+}
 const std::vector<Spell>& DataManager::getAllSpells() const { return spells; }
-const Spell* DataManager::getSpellById(int id) const {
+const Spell* DataManager::getSpellById(const std::string& id) const {
     auto it = std::find_if(spells.begin(), spells.end(), [id](const Spell& spell) {
         return spell.id == id;
     });

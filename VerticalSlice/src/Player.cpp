@@ -13,7 +13,7 @@ Player::Player(int initialHp, const std::vector<Spell>& initialSpells)
 
 void Player::setAttunement(const Attunement& attunement, const DataManager& dataManager) {
     spells.clear();
-    for (int spellId : attunement.starting_spell_ids) {
+    for (const std::string& spellId : attunement.spellIds) {
         const Spell* spell = dataManager.getSpellById(spellId);
         if (spell) {
             spells.push_back(*spell);
@@ -45,6 +45,11 @@ void Player::takeDamage(int amount) {
     if (m_hp < 0) m_hp = 0;
 }
 
+void Player::heal(int amount) {
+    m_hp += amount;
+    if (m_hp > m_maxHp) m_hp = m_maxHp;
+}
+
 void Player::addScore(int amount) {
     m_score += amount;
 }
@@ -59,16 +64,16 @@ void Player::addMana(GemSubType type, int amount) {
     }
 }
 
-int Player::castSpell(int spellIndex) {
+const Spell* Player::castSpell(int spellIndex) {
     if (spellIndex < 0 || spellIndex >= spells.size()) {
-        return 0; // Invalid index
+        return nullptr; // Invalid index
     }
     const Spell& spell = spells[spellIndex];
-    if (getMana(spell.costType) >= spell.costAmount) {
-        mana[spell.costType] -= spell.costAmount;
-        return 1; // Indicate success
+    if (getMana(spell.costType) >= spell.manaCost) {
+        mana[spell.costType] -= spell.manaCost;
+        return &spell; // Return pointer to the cast spell
     }
-    return 0; // Not enough mana
+    return nullptr; // Not enough mana
 }
 
 void Player::setStartingStats(int tactical_score, int mana_affinity_score) {

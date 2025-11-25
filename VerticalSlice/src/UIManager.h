@@ -97,6 +97,11 @@ private:
     sf::Text enduranceTitle;
     sf::Text magicTitle;
 
+    // Attunement Selection UI
+    sf::Text m_attunementSelectionTitle;
+    std::vector<sf::RectangleShape> m_attunementButtons;
+    std::vector<sf::Text> m_attunementButtonTexts;
+
     // Room Exits
     std::vector<sf::RectangleShape> doorButtons;
     std::vector<sf::Text> doorButtonTexts;

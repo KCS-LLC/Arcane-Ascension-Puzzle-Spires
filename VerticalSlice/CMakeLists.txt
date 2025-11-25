@@ -57,6 +57,7 @@ set(SOURCE_FILES
     src/MatchProcessor.cpp
     src/DefaultMatchRule.cpp
     src/TreasureMergeRule.cpp
+    src/EffectProcessor.cpp
 )
 target_sources(game PRIVATE ${SOURCE_FILES})
 

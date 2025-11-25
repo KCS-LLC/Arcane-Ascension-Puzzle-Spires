@@ -193,18 +193,22 @@ void Game::handleInput(sf::Event event) {
             });
             if (it != attunements.end()) {
                 m_player.setAttunement(*it, dataManager);
-                m_gameMode = GameMode::TOWER_CLIMB;
-                // TODO: Set up the first combat of the tower climb
+                startTowerClimb();
             }
         } else if (action.type == UIActionType::ChangeRoom) {
             moveToRoom(action.destinationRoomId);
         } else if (action.type == UIActionType::ChangeRoom) {
             moveToRoom(action.destinationRoomId);
         } else if (action.type == UIActionType::CastSpell) {
-            int damage = m_player.castSpell(action.spellIndex);
-            if (damage > 0) {
-                m_monster.takeDamage(damage);
-                if (m_monster.isTurnReady(70)) { // 70 is placeholder for SPELL_SPEED_COST
+            const Spell* spell = m_player.castSpell(action.spellIndex);
+            if (spell) {
+                // The spell was successfully cast. Process its effects.
+                for (const auto& effect : spell->effects) {
+                    m_effectProcessor.processEffect(effect, m_player, m_monster, m_board, m_gemFactory, gemTextures);
+                }
+
+                // Now check if the monster gets a turn.
+                if (m_monster.isTurnReady(spell->speedCost)) {
                     m_player.takeDamage(dataManager.getMonsterAttackDamage());
                     showPlayerDamageEffect = true;
                     playerDamageClock.restart();
@@ -294,6 +298,11 @@ void Game::handleMatches(bool isPlayerMove) {
 
     if (isPlayerMove) {
         m_currentTurn++;
+        if (m_gameMode == GameMode::TOWER_CLIMB && m_monster.isTurnReady(30)) { // Placeholder speed cost for a match
+            m_player.takeDamage(dataManager.getMonsterAttackDamage());
+            showPlayerDamageEffect = true;
+            playerDamageClock.restart();
+        }
     }
 
     std::set<sf::Vector2i, Vector2iCompare> allRemovedGems;
@@ -323,12 +332,6 @@ void Game::handleMatches(bool isPlayerMove) {
     if (allRemovedGems.empty()) return;
 
     m_currentScore += (allRemovedGems.size() * 100);
-
-    if (m_gameMode == GameMode::TOWER_CLIMB && m_monster.isTurnReady(30)) { // Placeholder speed cost
-        m_player.takeDamage(dataManager.getMonsterAttackDamage());
-        showPlayerDamageEffect = true;
-        playerDamageClock.restart();
-    }
 
     m_isAnimatingSwap = false;
     m_isAnimatingDestruction = true;
@@ -426,21 +429,8 @@ void Game::update(sf::Time deltaTime) {
         }
         std::cout << "Final Treasure Value: " << finalTreasureValue << std::endl;
 
-        // Assign attunement before starting the tower climb
-        const auto& attunements = dataManager.getAttunements();
-        auto it = std::find_if(attunements.begin(), attunements.end(), [&](const Attunement& a) {
-            return a.id == "elementalist";
-        });
-
-        if (it != attunements.end()) {
-            m_player.setAttunement(*it, dataManager);
-        } else {
-            // Handle error case where elementalist attunement is not found
-            std::cerr << "CRITICAL: Elementalist attunement not found!" << std::endl;
-            m_window.close();
-        }
-
-        startTowerClimb();
+        // Transition to the attunement selection screen
+        m_gameState = GameState::Judgement_AttunementSelection;
     }
 
     if (m_gameMode == GameMode::TOWER_CLIMB && m_gameState == GameState::Playing) {

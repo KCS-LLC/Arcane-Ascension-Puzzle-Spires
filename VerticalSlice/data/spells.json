@@ -1,54 +1,106 @@
 [
   {
-    "id": 1,
-    "name": "Fireball",
-    "costType": 1,
-    "costAmount": 10,
-    "effects": [
-      {
-        "type": "damage",
-        "amount": 20,
-        "target": "monster"
-      }
-    ]
+    "id": "insight_mental",
+    "name": "Insight",
+    "manaType": "Mental",
+    "manaCost": 15,
+    "speedCost": 20,
+    "effects": [{ "type": "HIGHLIGHT_MATCH" }]
   },
   {
-    "id": 2,
-    "name": "Ice Shard",
-    "costType": 2,
-    "costAmount": 10,
-    "effects": [
-      {
-        "type": "damage",
-        "amount": 15,
-        "target": "monster"
-      }
-    ]
+    "id": "mana_surge_enhancement",
+    "name": "Mana Surge",
+    "manaType": "Enhancement",
+    "manaCost": 25,
+    "speedCost": 40,
+    "effects": [{ "type": "APPLY_STAT_MODIFIER", "params": { "stat": "mana_gain", "multiplier": 1.5, "duration": 3 } }]
   },
   {
-    "id": 3,
-    "name": "Stone Shield",
-    "costType": 3,
-    "costAmount": 15,
-    "effects": [
-      {
-        "type": "shield",
-        "amount": 25,
-        "target": "player"
-      }
-    ]
+    "id": "create_burning_tile_fire",
+    "name": "Create Burning Tile",
+    "manaType": "Fire",
+    "manaCost": 25,
+    "speedCost": 40,
+    "effects": [{ "type": "CREATE_STATIC_TILE", "params": { "tile_type": "burning", "duration": 3 } }]
   },
   {
-    "id": 4,
-    "name": "Healing Light",
-    "costType": 5,
-    "costAmount": 20,
-    "effects": [
-      {
-        "type": "heal",
-        "amount": 30,
-        "target": "player"
-      }
-    ]
+    "id": "gust_of_wind_air",
+    "name": "Gust of Wind",
+    "manaType": "Air",
+    "manaCost": 20,
+    "speedCost": 30,
+    "effects": [{ "type": "ROTATE_ROW_COLUMN" }]
+  },
+  {
+    "id": "quick_swap_transference",
+    "name": "Quick Swap",
+    "manaType": "Transference",
+    "manaCost": 15,
+    "speedCost": 0,
+    "effects": [{ "type": "FREE_SWAP" }]
+  },
+  {
+    "id": "empower_self_enhancement",
+    "name": "Empower Self",
+    "manaType": "Enhancement",
+    "manaCost": 30,
+    "speedCost": 50,
+    "effects": [{ "type": "APPLY_STAT_MODIFIER", "params": { "stat": "vigor", "amount": 5, "duration": 3 } }]
+  },
+  {
+    "id": "minor_heal_life",
+    "name": "Minor Heal",
+    "manaType": "Life",
+    "manaCost": 25,
+    "speedCost": 40,
+    "effects": [{ "type": "HEAL_PLAYER", "params": { "amount": 20 } }]
+  },
+  {
+    "id": "chaotic_shift_earth",
+    "name": "Chaotic Shift",
+    "manaType": "Earth",
+    "manaCost": 20,
+    "speedCost": 30,
+    "effects": [{ "type": "REMOVE_RANDOM_GEMS", "params": { "amount": 3 } }]
+  },
+  {
+    "id": "shadow_strike_umbral",
+    "name": "Shadow Strike",
+    "manaType": "Umbral",
+    "manaCost": 20,
+    "speedCost": 30,
+    "effects": [{ "type": "DEAL_DAMAGE", "params": { "amount": 15, "damage_type": "umbral" } }]
+  },
+  {
+    "id": "empower_weapon_enhancement",
+    "name": "Empower Weapon",
+    "manaType": "Enhancement",
+    "manaCost": 30,
+    "speedCost": 50,
+    "effects": [{ "type": "APPLY_STAT_MODIFIER", "params": { "stat": "skull_damage", "multiplier": 1.5, "duration": 3 } }]
+  },
+  {
+    "id": "create_weapon_earth",
+    "name": "Create Weapon",
+    "manaType": "Earth",
+    "manaCost": 25,
+    "speedCost": 40,
+    "effects": [{ "type": "TRANSFORM_RANDOM_GEMS", "params": { "to_type": "Attack", "amount": 3 } }]
+  },
+  {
+    "id": "sharpen_weapon_enhancement",
+    "name": "Sharpen Weapon",
+    "manaType": "Enhancement",
+    "manaCost": 20,
+    "speedCost": 30,
+    "effects": [{ "type": "MODIFY_ATTACK_GEM", "params": { "amount": 5 } }]
+  },
+  {
+    "id": "convert_mana_transference",
+    "name": "Convert Mana",
+    "manaType": "Transference",
+    "manaCost": 10,
+    "speedCost": 20,
+    "effects": [{ "type": "CONVERT_MANA" }]
   }
 ]

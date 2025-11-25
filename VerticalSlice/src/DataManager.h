@@ -30,7 +30,7 @@ public:
     const std::vector<Attunement>& getAttunements() const;
     const Attunement* getAttunementById(const std::string& id) const;
     const std::vector<Spell>& getAllSpells() const;
-    const Spell* getSpellById(int id) const;
+    const Spell* getSpellById(const std::string& id) const;
     int getMonsterHP() const;
     int getMonsterSpeed() const;
     int getMonsterAttackDamage() const;

@@ -12,6 +12,7 @@
 #include "Judgement.h"
 #include "MatchDetector.h"
 #include "MatchProcessor.h"
+#include "EffectProcessor.h"
 
 // Forward-declaration of the global texture map
 extern std::map<GemSubType, sf::Texture> gemTextures;
@@ -44,6 +45,7 @@ private:
     Monster m_monster;
     MatchDetector m_matchDetector;
     MatchProcessor m_matchProcessor;
+    EffectProcessor m_effectProcessor;
 
     GameMode m_gameMode;
     GameState m_gameState;

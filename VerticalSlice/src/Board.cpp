@@ -200,6 +200,67 @@ void Board::setGemAt(int r, int c, std::unique_ptr<BaseGem> gem) {
     }
 }
 
+void Board::rotateRow(int rowIndex, int direction) {
+    if (rowIndex < 0 || rowIndex >= m_height) return;
+
+    auto& row = m_grid[rowIndex];
+    if (direction > 0) { // Rotate right
+        std::rotate(row.rbegin(), row.rbegin() + 1, row.rend());
+    } else { // Rotate left
+        std::rotate(row.begin(), row.begin() + 1, row.end());
+    }
+}
+
+void Board::rotateColumn(int colIndex, int direction) {
+    if (colIndex < 0 || colIndex >= m_width) return;
+
+    // Since grid is row-major, we have to copy to a temp vector
+    std::vector<std::unique_ptr<BaseGem>> column;
+    for (int i = 0; i < m_height; ++i) {
+        column.push_back(std::move(m_grid[i][colIndex]));
+    }
+
+    if (direction > 0) { // Rotate down
+        std::rotate(column.rbegin(), column.rbegin() + 1, column.rend());
+    } else { // Rotate up
+        std::rotate(column.begin(), column.begin() + 1, column.end());
+    }
+
+    // Move gems back into the grid
+    for (int i = 0; i < m_height; ++i) {
+        m_grid[i][colIndex] = std::move(column[i]);
+    }
+}
+
+std::vector<sf::Vector2i> Board::getRandomGemCoords(int count, bool nonAttackGemsOnly) {
+    std::vector<sf::Vector2i> allCoords;
+    for (int r = 0; r < m_height; ++r) {
+        for (int c = 0; c < m_width; ++c) {
+            if (m_grid[r][c]) { // Ensure there's a gem at the position
+                if (nonAttackGemsOnly) {
+                    const GemCatalogEntry* entry = m_grid[r][c]->getCatalogEntry();
+                    // This is a simplification. A proper check would involve the DataManager.
+                    if (entry && entry->secondaryTypeId != 1001) { // 1001 is Skull
+                        allCoords.push_back({r, c});
+                    }
+                } else {
+                    allCoords.push_back({r, c});
+                }
+            }
+        }
+    }
+
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(allCoords.begin(), allCoords.end(), g);
+
+    if (allCoords.size() > count) {
+        allCoords.resize(count);
+    }
+
+    return allCoords;
+}
+
 bool Board::isInBounds(int r, int c) const {
     return r >= 0 && r < m_height && c >= 0 && c < m_width;
 }

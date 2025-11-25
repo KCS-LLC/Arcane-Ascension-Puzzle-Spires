@@ -17,6 +17,7 @@ enum class GameState {
     Trial,
     Summary,
     Judgement_TreasureRound,
+    Judgement_AttunementSelection,
     AttunementReveal,
     Exploration,
     Playing,

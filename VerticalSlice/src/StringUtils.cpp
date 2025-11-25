@@ -33,7 +33,7 @@ GemSubType stringToGemSubType(const std::string& s) {
     if (lower_s == "mental") return GemSubType::Mental;
     if (lower_s == "perception") return GemSubType::Perception;
     if (lower_s == "coin") return GemSubType::Coin;
-    if (lower_s == "skull") return GemSubType::Skull;
+    if (lower_s == "skull" || lower_s == "attack") return GemSubType::Skull;
     if (lower_s == "raw") return GemSubType::Raw;
     if (lower_s == "grey") return GemSubType::Grey;
     return GemSubType::Empty; // Default case
@@ -134,20 +134,6 @@ sf::Color getSfColorForGemType(GemSubType type) {
         case GemSubType::Transference: return sf::Color(64, 224, 208);
         default: return sf::Color(128, 128, 128);
     }
-}
-
-EffectType stringToEffectType(const std::string& s) {
-    if (s == "Damage") return EffectType::Damage;
-    if (s == "Heal") return EffectType::Heal;
-    if (s == "Stun") return EffectType::Stun;
-    if (s == "Shield") return EffectType::Shield;
-    return EffectType::Damage; // Default
-}
-
-TargetType stringToTargetType(const std::string& s) {
-    if (s == "Player") return TargetType::Player;
-    if (s == "Monster") return TargetType::Monster;
-    return TargetType::Monster; // Default
 }
 
 std::string wordWrap(const std::string& text, unsigned int lineLength) {
