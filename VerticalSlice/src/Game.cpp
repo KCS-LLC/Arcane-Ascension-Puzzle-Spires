@@ -290,16 +290,36 @@ void Game::handleInput(sf::Event event) {
             int col = (mb->position.x - static_cast<int>(m_boardOrigin.x)) / TILE_SIZE;
             int row = (mb->position.y - static_cast<int>(m_boardOrigin.y)) / TILE_SIZE;
 
-            m_board.clearActionStates(); // Clear hints on new action
+            m_board.clearActionStates();
 
+            if (m_player.hasFreeSwap()) {
+                sf::Vector2i clickedGem = sf::Vector2i(col, row);
+                if (m_quickSwapFirstSelectedGem.x == -1) {
+                    m_quickSwapFirstSelectedGem = clickedGem;
+                    m_board.getGemAt(row, col)->setActionState(ActionState::Selected);
+                } else {
+                    if (m_quickSwapFirstSelectedGem == clickedGem) {
+                        m_board.getGemAt(row, col)->setActionState(ActionState::None);
+                        m_quickSwapFirstSelectedGem = {-1, -1};
+                    } else {
+                        m_isAnimating = true;
+                        m_isAnimatingSwap = true;
+                        m_animatingGems = { m_quickSwapFirstSelectedGem, sf::Vector2i(col, row) };
+                        m_animationClock.restart();
+                        
+                        m_board.getGemAt(m_quickSwapFirstSelectedGem.y, m_quickSwapFirstSelectedGem.x)->setActionState(ActionState::None);
+                        m_player.useFreeSwap();
+                        m_quickSwapFirstSelectedGem = {-1, -1};
+                    }
+                }
+                return; // Consume the event
+            }
+            
+            // --- Normal Swap Logic ---
             if (m_selectedGem.x == -1) {
                 m_selectedGem = sf::Vector2i(col, row);
             } else {
-                bool isFreeSwap = m_player.hasFreeSwap();
-                if (isFreeSwap || m_board.canSwap(m_selectedGem.y, m_selectedGem.x, row, col)) {
-                    if (isFreeSwap) {
-                        m_player.useFreeSwap();
-                    }
+                if (m_board.canSwap(m_selectedGem.y, m_selectedGem.x, row, col)) {
                     m_isAnimating = true;
                     m_isAnimatingSwap = true;
                     m_animatingGems = { m_selectedGem, sf::Vector2i(col, row) };

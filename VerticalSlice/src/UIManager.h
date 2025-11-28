@@ -110,6 +110,7 @@ private:
     std::vector<sf::RectangleShape> doorButtons;
     std::vector<sf::Text> doorButtonTexts;
     std::vector<Teleporter> m_currentConnections;
+    sf::Text m_quickSwapInstructionText;
 };
 
 #endif // UIMANAGER_H

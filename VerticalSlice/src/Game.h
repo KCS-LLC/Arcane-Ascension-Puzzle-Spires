@@ -88,4 +88,7 @@ private:
 
     // Board positioning
     sf::Vector2f m_boardOrigin;
+
+    // Quick Swap state
+    sf::Vector2i m_quickSwapFirstSelectedGem = {-1, -1};
 };

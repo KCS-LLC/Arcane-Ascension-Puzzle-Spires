@@ -37,7 +37,8 @@ UIManager::UIManager(const sf::Font& font)
       agilityTitle(font, "Agility Challenge", 24),
       enduranceTitle(font, "Endurance Challenge", 24),
       magicTitle(font, "Magic Challenge", 24),
-      m_attunementSelectionTitle(font, "", 24)
+      m_attunementSelectionTitle(font, "", 24),
+      m_quickSwapInstructionText(font, "", 18)
 {
     // Positions and colors can be set here
     trialTypeText.setFillColor(sf::Color::White);
@@ -82,6 +83,12 @@ UIManager::UIManager(const sf::Font& font)
     if (!m_effectIconTextures["burning_tile_effect"].loadFromFile("assets/effect_burning.png")) {
         std::cerr << "Failed to load burning tile effect icon" << std::endl;
     }
+
+    m_quickSwapInstructionText.setFillColor(sf::Color::Yellow);
+    m_quickSwapInstructionText.setString("QUICK SWAP: Select a gem to swap.");
+    sf::FloatRect textRect = m_quickSwapInstructionText.getLocalBounds();
+    m_quickSwapInstructionText.setOrigin(sf::Vector2f(textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f));
+    m_quickSwapInstructionText.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f, 350));
 }
       
 bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction) {
@@ -308,6 +315,10 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
 
             ySpellOffset -= 50.f;
         }
+
+        if (player.hasFreeSwap()) {
+            m_quickSwapInstructionText.setString("QUICK SWAP: Select a gem to swap.");
+        }
     }
 
     if (currentState == GameState::Exploration) {
@@ -478,6 +489,10 @@ void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState cu
             }
             for (const auto& text : spellButtonTexts) {
                 window.draw(text);
+            }
+
+            if (m_activeEffectsToRender.size() > 0 && m_activeEffectsToRender[0].effectId == "quick_swap_transference") {
+                window.draw(m_quickSwapInstructionText);
             }
 
             // Render Active Effects
