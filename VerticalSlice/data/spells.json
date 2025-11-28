@@ -13,7 +13,7 @@
     "manaType": "Enhancement",
     "manaCost": 25,
     "speedCost": 40,
-    "effects": [{ "type": "APPLY_STAT_MODIFIER", "params": { "stat": "mana_gain", "multiplier": 1.5, "duration": 3 } }]
+    "effects": [{ "type": "APPLY_STAT_MODIFIER", "params": { "duration": 60.0 } }]
   },
   {
     "id": "create_burning_tile_fire",

@@ -39,6 +39,15 @@ struct Attunement {
     std::vector<GemSubType> mana_types;
 };
 
+struct ActiveEffect {
+    std::string effectId;
+    std::string modifier;
+    float value;
+    float duration;
+    float maxDuration;
+};
+
+
 // New: Represents an entry from secondary_gem_types.json
 struct SecondaryGemTypeData {
     int id;

@@ -66,6 +66,7 @@ private:
     // Game Stats
     int m_currentTurn;
     int m_currentScore;
+    bool m_playerActionPerformedThisTurn = false;
 
     // Gem selection
     sf::Vector2i m_selectedGem = sf::Vector2i(-1, -1);

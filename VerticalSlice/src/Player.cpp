@@ -112,8 +112,36 @@ void Player::finalizeJudgement(const JudgementResults& results, const DataManage
     } else {
         std::cerr << "Could not find final attunement with id: " << m_attunementId << std::endl;
         const Attunement* fallback = dataManager.getAttunementById("adept");
-        if (fallback) {
-            setAttunement(*fallback, dataManager);
+            if (fallback) {
+                    setAttunement(*fallback, dataManager);
+                }
+            }
         }
-    }
-}
+        
+        void Player::addEffect(const ActiveEffect& newEffect) {
+            // Check if an effect with the same ID already exists
+            for (auto& activeEffect : m_activeEffects) {
+                if (activeEffect.effectId == newEffect.effectId) {
+                    // If it exists, stack the duration
+                    activeEffect.duration += newEffect.duration;
+                    // Optional: Clamp to max duration if you have one
+                    if (activeEffect.duration > activeEffect.maxDuration) {
+                        activeEffect.duration = activeEffect.maxDuration;
+                    }
+                    return; // Exit after stacking
+                }
+            }
+            // If no existing effect was found, add the new one
+            m_activeEffects.push_back(newEffect);
+        }
+        
+        void Player::updateEffects(float speedCost) {
+            // Iterate backwards to safely remove elements
+            for (int i = m_activeEffects.size() - 1; i >= 0; --i) {
+                m_activeEffects[i].duration -= speedCost;
+                if (m_activeEffects[i].duration <= 0) {
+                    m_activeEffects.erase(m_activeEffects.begin() + i);
+                }
+            }
+        }
+        

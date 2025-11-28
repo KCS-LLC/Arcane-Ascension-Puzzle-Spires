@@ -223,6 +223,7 @@ void Game::handleInput(sf::Event event) {
             m_board.clearActionStates(); // Clear hints on new action
             const Spell* spell = m_player.castSpell(action.spellIndex);
             if (spell) {
+                m_playerActionPerformedThisTurn = true;
                 std::vector<sf::Vector2i> gemsToRemove;
                 // The spell was successfully cast. Process its effects.
                 for (const auto& effect : spell->effects) {
@@ -327,6 +328,8 @@ void Game::handleMatches(bool isPlayerMove) {
         }
         return;
     }
+
+    m_playerActionPerformedThisTurn = true;
 
     if (isPlayerMove) {
         m_currentTurn++;
@@ -433,6 +436,11 @@ void Game::update(sf::Time deltaTime) {
             }
         }
         return; 
+    }
+
+    if (!m_isAnimating && m_playerActionPerformedThisTurn) {
+        m_player.updateEffects(BASE_SWAP_SPEED);
+        m_playerActionPerformedThisTurn = false; // Reset for the next turn
     }
 
     if (showPlayerDamageEffect && playerDamageClock.getElapsedTime().asMilliseconds() > 200) {

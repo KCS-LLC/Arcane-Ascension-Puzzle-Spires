@@ -33,6 +33,9 @@ public:
     void addMana(GemSubType type, int amount);
     const Spell* castSpell(int spellIndex);
 
+    void addEffect(const ActiveEffect& effect);
+    void updateEffects(float speedCost);
+
     void finalizeJudgement(const JudgementResults& results, const DataManager& dataManager);
 
 private:
@@ -45,6 +48,7 @@ private:
     std::vector<GemSubType> m_availableManaTypes; // Renamed to use m_ prefix
     std::map<GemSubType, int> mana;
     std::vector<Spell> spells;
+    std::vector<ActiveEffect> m_activeEffects;
     std::string m_attunementId;
     int m_score = 0;
 };
