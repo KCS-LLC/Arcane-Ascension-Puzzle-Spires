@@ -255,7 +255,7 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
         //     std::cout << std::endl;
         // }
 
-        float yOffset = 150.f;
+        float yOffset = 100.f; // Start mana bars lower
         for (const auto& type : manaTypes) {
             int currentMana = player.getMana(type);
             int maxMana = player.getMaxMana();
@@ -278,11 +278,11 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
             yOffset += 25.f;
         }
 
-        // Update Spell Buttons
+        // --- Refactored Spell Buttons at Bottom ---
         spellButtons.clear();
         spellButtonTexts.clear();
         const auto& spells = player.getSpells();
-        float ySpellOffset = 300.f; // Starting Y position for spell buttons
+        float ySpellOffset = WINDOW_HEIGHT - 50.f; // Start from the bottom and build up
         for (const auto& spell : spells) {
             sf::RectangleShape button({210, 40});
             button.setPosition(sf::Vector2f(20, ySpellOffset));
@@ -306,7 +306,7 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
             costText.setPosition(sf::Vector2f(20 + 200, ySpellOffset + 12));
             spellButtonTexts.push_back(costText);
 
-            ySpellOffset += 50.f;
+            ySpellOffset -= 50.f;
         }
     }
 
@@ -482,37 +482,41 @@ void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState cu
 
             // Render Active Effects
             {
-                float yOffset = 250.f; // Start below mana bars
+                float xOffset = 20.f; // Start at the left of the panel
+                const float yOffset = 180.f; // A fixed Y position below the mana bars
                 for (const auto& effect : m_activeEffectsToRender) {
                     auto it = m_effectIconTextures.find(effect.effectId);
                     if (it != m_effectIconTextures.end()) {
                         sf::Sprite icon(it->second);
                         
-                        // Dynamically calculate scale to be ~1/3 of a tile size
                         const sf::Texture& texture = it->second;
                         float desiredHeight = TILE_SIZE / 3.0f;
                         float scale = desiredHeight / texture.getSize().y;
                         icon.setScale(sf::Vector2f(scale, scale));
+                        icon.setPosition(sf::Vector2f(xOffset, yOffset));
                         
-                        icon.setPosition(sf::Vector2f(20, yOffset));
+                        float iconWidth = texture.getSize().x * scale;
+                        
                         window.draw(icon);
 
-                        sf::RectangleShape durationBarBack(sf::Vector2f(100, 10));
-                        durationBarBack.setPosition(sf::Vector2f(60, yOffset + 5)); // Adjusted Y for better alignment
+                        // --- Duration Bar ---
+                        sf::RectangleShape durationBarBack(sf::Vector2f(40, 8));
+                        durationBarBack.setPosition(sf::Vector2f(xOffset + iconWidth + 5, yOffset + (desiredHeight / 2) - 4));
                         durationBarBack.setFillColor(sf::Color(50, 50, 50));
                         window.draw(durationBarBack);
 
                         float durationPercent = effect.duration / effect.maxDuration;
-                        sf::RectangleShape durationBarFront(sf::Vector2f(100 * durationPercent, 10));
-                        durationBarFront.setPosition(sf::Vector2f(60, yOffset + 5)); // Adjusted Y for better alignment
+                        sf::RectangleShape durationBarFront(sf::Vector2f(40 * durationPercent, 8));
+                        durationBarFront.setPosition(sf::Vector2f(xOffset + iconWidth + 5, yOffset + (desiredHeight / 2) - 4));
                         durationBarFront.setFillColor(sf::Color(200, 200, 0));
                         window.draw(durationBarFront);
 
-                        sf::Text durationText(font, std::to_string((int)ceil(effect.duration)), 12);
-                        durationText.setPosition(sf::Vector2f(170, yOffset + 3)); // Adjusted Y for better alignment
+                        // --- Duration Text ---
+                        sf::Text durationText(font, std::to_string((int)ceil(effect.duration)), 10);
+                        durationText.setPosition(sf::Vector2f(xOffset + iconWidth + 50, yOffset + (desiredHeight / 2) - 8));
                         window.draw(durationText);
 
-                        yOffset += (desiredHeight + 5); // Increment Y position based on icon size
+                        xOffset += (iconWidth + 80); // Increment X position for the next effect
                     }
                 }
             }

@@ -16,7 +16,7 @@
 std::map<GemSubType, sf::Texture> gemTextures;
 
 Game::Game()
-    : m_window(sf::VideoMode(sf::Vector2u(WINDOW_WIDTH, WINDOW_HEIGHT)), "Judgement"),
+    : m_window(sf::VideoMode(sf::Vector2u(WINDOW_WIDTH, WINDOW_HEIGHT)), "Judgement", sf::Style::Titlebar | sf::Style::Close),
       dataManager(),
       m_uiManager(dataManager.getFont()),
       m_gemFactory(dataManager),
