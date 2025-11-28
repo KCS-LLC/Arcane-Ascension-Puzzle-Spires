@@ -67,9 +67,24 @@ UIManager::UIManager(const sf::Font& font)
     sf::FloatRect titleBounds = m_attunementSelectionTitle.getLocalBounds();
     m_attunementSelectionTitle.setOrigin(sf::Vector2f(titleBounds.position.x + titleBounds.size.x / 2.0f, titleBounds.position.y + titleBounds.size.y / 2.0f));
     m_attunementSelectionTitle.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f, 150));
+
+    // Load effect icons
+    if (!m_effectIconTextures["create_burning_tile_fire"].loadFromFile("assets/effect_burning.png")) {
+        std::cerr << "Failed to load burning effect icon" << std::endl;
+    }
+    if (!m_effectIconTextures["empower_weapon_enhancement"].loadFromFile("assets/fist.png")) {
+        std::cerr << "Failed to load empower weapon icon" << std::endl;
+    }
+    if (!m_effectIconTextures["mana_surge_enhancement"].loadFromFile("assets/gem_enhancement.png")) {
+        std::cerr << "Failed to load mana surge icon" << std::endl;
+    }
+
+    if (!m_effectIconTextures["burning_tile_effect"].loadFromFile("assets/effect_burning.png")) {
+        std::cerr << "Failed to load burning tile effect icon" << std::endl;
+    }
 }
-    
-    bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction) {
+      
+bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction) {
     if (currentState == GameState::Exploration) {
         if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>()) {
             if (mb->button == sf::Mouse::Button::Left) {
@@ -200,7 +215,8 @@ void UIManager::setupTreasureRound() {
     scoreGoalText.setString(""); // No score goal, just maximize
 }
 
-void UIManager::update(const Player& player, const Monster& monster, GameMode gameMode, GameState currentState, const Room* currentRoom, const Floor& currentFloor, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance) {
+void UIManager::update(const Player& player, const Monster& monster, GameMode gameMode, GameState currentState, const Room* currentRoom, const Floor& currentFloor, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::vector<ActiveEffect>& activeEffects) {
+    m_activeEffectsToRender = activeEffects;
     if (currentState == GameState::Trial) {
         turnLimitText.setString("Turns Left: " + std::to_string(currentTrial.turnLimit - currentTrialTurn));
         scoreGoalText.setString("Score Goal: " + std::to_string(currentTrial.scoreGoal));
@@ -387,7 +403,7 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
     }
 }
 
-void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance) {
+void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::map<GemSubType, sf::Texture>& gemTextures) {
 
 
     switch (currentState) {
@@ -462,6 +478,43 @@ void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState cu
             }
             for (const auto& text : spellButtonTexts) {
                 window.draw(text);
+            }
+
+            // Render Active Effects
+            {
+                float yOffset = 250.f; // Start below mana bars
+                for (const auto& effect : m_activeEffectsToRender) {
+                    auto it = m_effectIconTextures.find(effect.effectId);
+                    if (it != m_effectIconTextures.end()) {
+                        sf::Sprite icon(it->second);
+                        
+                        // Dynamically calculate scale to be ~1/3 of a tile size
+                        const sf::Texture& texture = it->second;
+                        float desiredHeight = TILE_SIZE / 3.0f;
+                        float scale = desiredHeight / texture.getSize().y;
+                        icon.setScale(sf::Vector2f(scale, scale));
+                        
+                        icon.setPosition(sf::Vector2f(20, yOffset));
+                        window.draw(icon);
+
+                        sf::RectangleShape durationBarBack(sf::Vector2f(100, 10));
+                        durationBarBack.setPosition(sf::Vector2f(60, yOffset + 5)); // Adjusted Y for better alignment
+                        durationBarBack.setFillColor(sf::Color(50, 50, 50));
+                        window.draw(durationBarBack);
+
+                        float durationPercent = effect.duration / effect.maxDuration;
+                        sf::RectangleShape durationBarFront(sf::Vector2f(100 * durationPercent, 10));
+                        durationBarFront.setPosition(sf::Vector2f(60, yOffset + 5)); // Adjusted Y for better alignment
+                        durationBarFront.setFillColor(sf::Color(200, 200, 0));
+                        window.draw(durationBarFront);
+
+                        sf::Text durationText(font, std::to_string((int)ceil(effect.duration)), 12);
+                        durationText.setPosition(sf::Vector2f(170, yOffset + 3)); // Adjusted Y for better alignment
+                        window.draw(durationText);
+
+                        yOffset += (desiredHeight + 5); // Increment Y position based on icon size
+                    }
+                }
             }
             break;
         case GameState::GameOver:

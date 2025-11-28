@@ -144,4 +144,7 @@ void Player::finalizeJudgement(const JudgementResults& results, const DataManage
                 }
             }
         }
-        
+
+const std::vector<ActiveEffect>& Player::getActiveEffects() const {
+    return m_activeEffects;
+}

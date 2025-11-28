@@ -24,6 +24,7 @@ public:
     int getMaxMana() const;
     GemSubType getPrimaryManaType() const;
     const std::vector<Spell>& getSpells() const;
+    const std::vector<ActiveEffect>& getActiveEffects() const;
     const std::vector<GemSubType>& getManaTypes() const;
     const std::string& getAttunementId() const;
 

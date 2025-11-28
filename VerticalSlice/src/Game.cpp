@@ -227,7 +227,7 @@ void Game::handleInput(sf::Event event) {
                 std::vector<sf::Vector2i> gemsToRemove;
                 // The spell was successfully cast. Process its effects.
                 for (const auto& effect : spell->effects) {
-                    auto removed = m_effectProcessor.processEffect(effect, m_player, m_monster, m_board, m_gemFactory, gemTextures);
+                    auto removed = m_effectProcessor.processEffect(*spell, effect, m_player, m_monster, m_board, m_gemFactory, gemTextures);
                     gemsToRemove.insert(gemsToRemove.end(), removed.begin(), removed.end());
                 }
 
@@ -496,11 +496,11 @@ void Game::update(sf::Time deltaTime) {
     switch (m_gameMode) {
         case GameMode::JUDGEMENT:
         {
-            m_uiManager.update(m_player, m_monster, m_gameMode, m_gameState, nullptr, Floor(), {}, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance);
+            m_uiManager.update(m_player, m_monster, m_gameMode, m_gameState, nullptr, Floor(), {}, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, m_player.getActiveEffects());
             break;
         }
         case GameMode::TOWER_CLIMB:
-            m_uiManager.update(m_player, m_monster, m_gameMode, m_gameState, m_currentRoom, m_currentFloor, m_visitedRoomIds, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance);
+            m_uiManager.update(m_player, m_monster, m_gameMode, m_gameState, m_currentRoom, m_currentFloor, m_visitedRoomIds, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, m_player.getActiveEffects());
             break;
     }
 }
@@ -581,7 +581,7 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
     }
 
     // UI Rendering
-    m_uiManager.render(m_window, m_gameMode, m_gameState, showPlayerDamageEffect, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance);
+    m_uiManager.render(m_window, m_gameMode, m_gameState, showPlayerDamageEffect, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, gemTextures);
 
     m_window.display();
 }
