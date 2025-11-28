@@ -15,7 +15,7 @@ public:
 
     // Pure virtual function makes this an abstract class
     // This is the core of the polymorphic behavior
-    virtual void onMatch(Board& board, Player& player, Monster& monster) = 0;
+    virtual float onMatch(Board& board, Player& player, Monster& monster) = 0;
 
     // Virtual functions for potential future stateful behavior
     virtual void onTurnStart(Board& board) {}

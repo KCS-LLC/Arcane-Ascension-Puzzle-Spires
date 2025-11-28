@@ -295,7 +295,11 @@ void Game::handleInput(sf::Event event) {
             if (m_selectedGem.x == -1) {
                 m_selectedGem = sf::Vector2i(col, row);
             } else {
-                if (m_board.canSwap(m_selectedGem.y, m_selectedGem.x, row, col)) {
+                bool isFreeSwap = m_player.hasFreeSwap();
+                if (isFreeSwap || m_board.canSwap(m_selectedGem.y, m_selectedGem.x, row, col)) {
+                    if (isFreeSwap) {
+                        m_player.useFreeSwap();
+                    }
                     m_isAnimating = true;
                     m_isAnimatingSwap = true;
                     m_animatingGems = { m_selectedGem, sf::Vector2i(col, row) };
@@ -307,14 +311,7 @@ void Game::handleInput(sf::Event event) {
     }
 }
 
-void Game::resolveMatches(const std::vector<sf::Vector2i>& matches) {
-    for (const auto& pos : matches) {
-        BaseGem* gem = m_board.getGemAt(pos.x, pos.y);
-        if (gem) {
-            gem->onMatch(m_board, m_player, m_monster);
-        }
-    }
-}
+
 
 void Game::handleMatches(bool isPlayerMove) {
     auto matchGroups = m_matchDetector.findAllMatches(m_board);
@@ -328,21 +325,6 @@ void Game::handleMatches(bool isPlayerMove) {
         }
         return;
     }
-
-    // --- New Logging ---
-    if (isPlayerMove) {
-        std::cout << "\n[COMBAT TURN] Start of turn. Monster HP: " << m_monster.getCurrentHp() << std::endl;
-        int skullMatches = 0;
-        for (const auto& match : matchGroups) {
-            for (const auto& pos : match) {
-                if (m_board.getGemAt(pos.x, pos.y)->getSubType() == GemSubType::Skull) {
-                    skullMatches++;
-                }
-            }
-        }
-        std::cout << "[COMBAT TURN] Skulls matched: " << skullMatches << std::endl;
-    }
-    // --- End New Logging ---
 
     m_playerActionPerformedThisTurn = true;
 
@@ -366,8 +348,16 @@ void Game::handleMatches(bool isPlayerMove) {
     }
 
     std::set<sf::Vector2i, Vector2iCompare> allRemovedGems;
+    float totalSkullDamageThisTurn = 0.0f; // New centralized damage accumulator
+
     for (const auto& match : matchGroups) {
-        resolveMatches(match); 
+        // Instead of calling resolveMatches, process each gem in the match here
+        for (const auto& pos : match) {
+            BaseGem* gem = m_board.getGemAt(pos.x, pos.y);
+            if (gem) {
+                totalSkullDamageThisTurn += gem->onMatch(m_board, m_player, m_monster);
+            }
+        }
 
         auto resolutionOpt = m_matchProcessor.process(match, m_board, m_gemFactory, dataManager, gemTextures);
         if (resolutionOpt && *resolutionOpt) {
@@ -387,6 +377,13 @@ void Game::handleMatches(bool isPlayerMove) {
                 allRemovedGems.insert(pos);
             }
         }
+    }
+
+    // Apply accumulated damage once
+    if (totalSkullDamageThisTurn > 0.0f) {
+        int finalDamage = static_cast<int>(totalSkullDamageThisTurn);
+        m_monster.takeDamage(finalDamage);
+        std::cout << "[COMBAT TURN] Total Damage Applied: " << finalDamage << ". Monster HP after: " << m_monster.getCurrentHp() << std::endl;
     }
 
     if (allRemovedGems.empty()) return;

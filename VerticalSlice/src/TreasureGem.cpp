@@ -8,7 +8,8 @@ TreasureGem::TreasureGem(const GemCatalogEntry* catalogEntry, const sf::Texture&
     : BaseGem(catalogEntry, texture) {
 }
 
-void TreasureGem::onMatch(Board& board, Player& player, Monster& monster) {
+float TreasureGem::onMatch(Board& board, Player& player, Monster& monster) {
     // Merging logic is handled centrally in Game::processTreasureMerges()
     // This function can be used for animations or sound effects later.
+    return 0.0f;
 }

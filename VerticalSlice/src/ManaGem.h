@@ -7,5 +7,5 @@ public:
     ManaGem(const GemCatalogEntry* catalogEntry, const sf::Texture& texture)
         : BaseGem(catalogEntry, texture) {}
 
-    void onMatch(Board& board, Player& player, Monster& monster) override;
+    float onMatch(Board& board, Player& player, Monster& monster) override;
 };

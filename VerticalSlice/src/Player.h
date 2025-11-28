@@ -29,6 +29,10 @@ public:
     const std::string& getAttunementId() const;
     int getVigor() const;
 
+    bool hasFreeSwap() const;
+    void grantFreeSwap();
+    void useFreeSwap();
+
     float getStatModifier(const std::string& modifier) const;
 
     void takeDamage(int amount);
@@ -49,6 +53,7 @@ private:
     int m_maxHp;
     int m_maxMana;
     int m_vigor = 0;
+    bool m_hasFreeSwap = false;
     std::vector<GemSubType> m_availableManaTypes; // Renamed to use m_ prefix
     std::map<GemSubType, int> mana;
     std::vector<Spell> spells;

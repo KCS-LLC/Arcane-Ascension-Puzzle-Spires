@@ -104,12 +104,7 @@ const std::string& Player::getAttunementId() const {
 }
 
 int Player::getVigor() const {
-    float vigorFromEffects = getStatModifier("vigor");
-    int totalVigor = m_vigor + static_cast<int>(vigorFromEffects);
-    std::cout << "[GET VIGOR] Base Vigor: " << m_vigor 
-              << ", Vigor from Effects: " << vigorFromEffects 
-              << ", Total Vigor: " << totalVigor << std::endl;
-    return totalVigor;
+    return m_vigor + static_cast<int>(getStatModifier("vigor"));
 }
 
 void Player::finalizeJudgement(const JudgementResults& results, const DataManager& dataManager) {
@@ -184,4 +179,16 @@ float Player::getStatModifier(const std::string& modifier) const {
         }
         return total; // Default additive bonus is 0.0
     }
+}
+
+bool Player::hasFreeSwap() const {
+    return m_hasFreeSwap;
+}
+
+void Player::grantFreeSwap() {
+    m_hasFreeSwap = true;
+}
+
+void Player::useFreeSwap() {
+    m_hasFreeSwap = false;
 }

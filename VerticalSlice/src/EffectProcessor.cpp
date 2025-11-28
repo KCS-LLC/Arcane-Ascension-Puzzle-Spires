@@ -61,9 +61,9 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
         activeEffect.duration = effect.params.at("duration").get<float>();
         activeEffect.maxDuration = effect.params.at("duration").get<float>();
 
-        std::cout << "[EFFECT CREATE] Creating effect '" << activeEffect.effectId << "' with modifier '" << activeEffect.modifier << "'" << std::endl;
-
         player.addEffect(activeEffect);
+    } else if (effect.type == "FREE_SWAP") {
+        player.grantFreeSwap();
     }
      else if (effect.type == "CREATE_BURNING_TILE") {
                 int amount = 1; // Default to 1 burning tile
