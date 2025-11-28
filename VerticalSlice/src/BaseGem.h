@@ -19,7 +19,6 @@ public:
 
     // Virtual functions for potential future stateful behavior
     virtual void onTurnStart(Board& board) {}
-    virtual void onTurnEnd(Board& board, Player& player, Monster& monster, float speedCost);
 
     // Common getters
     GemSubType getSubType() const;
@@ -41,15 +40,6 @@ public:
     void setStatusEffect(StatusEffect effect);
     ActionState getActionState() const;
     void setActionState(ActionState state);
-    int getCounter() const; // Existing counter getter
-    void setCounter(int value); // Existing counter setter
-
-    float getEffectValue() const;
-    void setEffectValue(float value);
-    float getEffectMax() const;
-    void setEffectMax(float value);
-    float getPeriodicActivationValue() const;
-    void setPeriodicActivationValue(float value);
 
 protected:
     const GemCatalogEntry* m_catalogEntry;
@@ -60,7 +50,4 @@ protected:
     int m_level;
     StatusEffect m_statusEffect;
     ActionState m_actionState;
-    float m_effectValue;
-    float m_effectMax;
-    float m_periodicActivationValue;
 };

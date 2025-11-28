@@ -8,7 +8,7 @@
 #include "Game.h"       // Include for gemTextures global
 #include "Constants.h" // For BASE_SWAP_SPEED
 
-std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, const Effect& effect, Player& player, Monster& monster, Board& board, GemFactory& gemFactory, const std::map<GemSubType, sf::Texture>& gemTextures) {
+std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, const Effect& effect, Player& player, Monster& monster, Board& board, GemFactory& gemFactory, TimeManager& timeManager, const std::map<GemSubType, sf::Texture>& gemTextures) {
     if (effect.type == "DEAL_DAMAGE") {
         if (effect.params.count("amount")) {
             monster.takeDamage(effect.params.at("amount").get<int>());
@@ -75,18 +75,11 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
                     BaseGem* gem = board.getGemAt(coord.x, coord.y);
                     if (gem) {
                         gem->setStatusEffect(StatusEffect::Burning);
-                        gem->setEffectValue(3.0f * BASE_SWAP_SPEED);
-                        gem->setEffectMax(3.0f * BASE_SWAP_SPEED);
-                        gem->setPeriodicActivationValue(BASE_SWAP_SPEED);
-
-                        // Create an ActiveEffect for the player's UI
-                        ActiveEffect activeEffect;
-                        activeEffect.effectId = "burning_tile_effect"; // Use the predefined ID for UI lookup
-                        activeEffect.modifier = "burning_tile_status"; // A generic modifier for display
-                        activeEffect.value = 3.0f * BASE_SWAP_SPEED; // Value can represent total burning duration
-                        activeEffect.duration = 3.0f * BASE_SWAP_SPEED;
-                        activeEffect.maxDuration = 3.0f * BASE_SWAP_SPEED;
-                        player.addEffect(activeEffect);
+                        
+                        long long currentTime = timeManager.getCurrentTime().totalTimeUnits;
+                        timeManager.addEvent({currentTime + 20, TimeEventType::BurningTile_Activation, coord});
+                        timeManager.addEvent({currentTime + 40, TimeEventType::BurningTile_Activation, coord});
+                        timeManager.addEvent({currentTime + 60, TimeEventType::BurningTile_Expire, coord});
                     }
                 }
             }

@@ -13,6 +13,7 @@
 #include "MatchDetector.h"
 #include "MatchProcessor.h"
 #include "EffectProcessor.h"
+#include "TimeManager.h"
 
 // Forward-declaration of the global texture map
 extern std::map<GemSubType, sf::Texture> gemTextures;
@@ -21,7 +22,7 @@ class Game {
 public:
     Game();
     void run();
-
+    void handleTimeEvent(const TimeEvent& event);
 private:
     void processEvents();
     void update(sf::Time deltaTime);
@@ -39,6 +40,7 @@ private:
     sf::RenderWindow m_window;
     DataManager dataManager;
     UIManager m_uiManager;
+    TimeManager m_timeManager;
     GemFactory m_gemFactory;
         Board m_board;
     Player m_player;

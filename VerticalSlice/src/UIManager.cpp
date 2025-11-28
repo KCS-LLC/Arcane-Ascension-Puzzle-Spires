@@ -5,6 +5,7 @@
 #include "DataManager.h"
 #include "Constants.h"
 #include "StringUtils.h"
+#include "TimeManager.h"
 
 UIManager::UIManager(const sf::Font& font)
     : font(font),
@@ -38,7 +39,9 @@ UIManager::UIManager(const sf::Font& font)
       enduranceTitle(font, "Endurance Challenge", 24),
       magicTitle(font, "Magic Challenge", 24),
       m_attunementSelectionTitle(font, "", 24),
-      m_quickSwapInstructionText(font, "", 18)
+      m_quickSwapInstructionText(font, "", 18),
+      m_dateText(font, "", 16),
+      m_timeText(font, "", 16)
 {
     // Positions and colors can be set here
     trialTypeText.setFillColor(sf::Color::White);
@@ -89,6 +92,11 @@ UIManager::UIManager(const sf::Font& font)
     sf::FloatRect textRect = m_quickSwapInstructionText.getLocalBounds();
     m_quickSwapInstructionText.setOrigin(sf::Vector2f(textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f));
     m_quickSwapInstructionText.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f, 350));
+
+    m_dateText.setFillColor(sf::Color::White);
+    m_timeText.setFillColor(sf::Color::White);
+    m_dateText.setPosition(sf::Vector2f(WINDOW_WIDTH - 240, 10));
+    m_timeText.setPosition(sf::Vector2f(WINDOW_WIDTH - 240, 30));
 }
       
 bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction) {
@@ -222,7 +230,10 @@ void UIManager::setupTreasureRound() {
     scoreGoalText.setString(""); // No score goal, just maximize
 }
 
-void UIManager::update(const Player& player, const Monster& monster, GameMode gameMode, GameState currentState, const Room* currentRoom, const Floor& currentFloor, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::vector<ActiveEffect>& activeEffects) {
+void UIManager::update(const Player& player, const Monster& monster, const TimeManager& timeManager, GameMode gameMode, GameState currentState, const Room* currentRoom, const Floor& currentFloor, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::vector<ActiveEffect>& activeEffects) {
+    m_dateText.setString(timeManager.getDateString());
+    m_timeText.setString(timeManager.getTimeString());
+
     m_activeEffectsToRender = activeEffects;
     if (currentState == GameState::Trial) {
         turnLimitText.setString("Turns Left: " + std::to_string(currentTrial.turnLimit - currentTrialTurn));
@@ -415,7 +426,8 @@ void UIManager::update(const Player& player, const Monster& monster, GameMode ga
 }
 
 void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::map<GemSubType, sf::Texture>& gemTextures) {
-
+    window.draw(m_dateText);
+    window.draw(m_timeText);
 
     switch (currentState) {
         case GameState::Intro:

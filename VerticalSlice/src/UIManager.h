@@ -12,6 +12,7 @@
 class Player;
 class Monster;
 class DataManager;
+class TimeManager;
 struct Room;
 struct Attunement;
 enum class GameState;
@@ -33,7 +34,7 @@ public:
     void setup(const Player& player, const sf::Vector2u& windowSize, const sf::Vector2f& boardOrigin, const std::vector<Attunement>& attunements);
     void setupTrial(const JudgementTrial& trial);
     void setupTreasureRound();
-    void update(const Player& player, const Monster& monster, GameMode gameMode, GameState currentState, const Room* currentRoom, const Floor& currentFloor, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::vector<ActiveEffect>& activeEffects);
+    void update(const Player& player, const Monster& monster, const TimeManager& timeManager, GameMode gameMode, GameState currentState, const Room* currentRoom, const Floor& currentFloor, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::vector<ActiveEffect>& activeEffects);
     void render(sf::RenderWindow& window, GameMode gameMode, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::map<GemSubType, sf::Texture>& gemTextures);
 
     const std::vector<sf::RectangleShape>& getSpellButtons() const;
@@ -111,6 +112,8 @@ private:
     std::vector<sf::Text> doorButtonTexts;
     std::vector<Teleporter> m_currentConnections;
     sf::Text m_quickSwapInstructionText;
+    sf::Text m_dateText;
+    sf::Text m_timeText;
 };
 
 #endif // UIMANAGER_H

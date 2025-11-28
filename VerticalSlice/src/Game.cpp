@@ -224,10 +224,11 @@ void Game::handleInput(sf::Event event) {
             const Spell* spell = m_player.castSpell(action.spellIndex);
             if (spell) {
                 m_playerActionPerformedThisTurn = true;
+                m_timeManager.advanceTime(spell->speedCost, *this);
                 std::vector<sf::Vector2i> gemsToRemove;
                 // The spell was successfully cast. Process its effects.
                 for (const auto& effect : spell->effects) {
-                    auto removed = m_effectProcessor.processEffect(*spell, effect, m_player, m_monster, m_board, m_gemFactory, gemTextures);
+                    auto removed = m_effectProcessor.processEffect(*spell, effect, m_player, m_monster, m_board, m_gemFactory, m_timeManager, gemTextures);
                     gemsToRemove.insert(gemsToRemove.end(), removed.begin(), removed.end());
                 }
 
@@ -358,15 +359,7 @@ void Game::handleMatches(bool isPlayerMove) {
 
     if (isPlayerMove) {
         m_currentTurn++;
-
-        // Process end-of-turn effects for all gems
-        for (int r = 0; r < m_board.getHeight(); ++r) {
-            for (int c = 0; c < m_board.getWidth(); ++c) {
-                if (BaseGem* gem = m_board.getGemAt(r, c)) {
-                    gem->onTurnEnd(m_board, m_player, m_monster, BASE_SWAP_SPEED); // Pass placeholder speed cost for now
-                }
-            }
-        }
+        m_timeManager.advanceTime(BASE_SWAP_SPEED, *this);
 
         if (m_gameMode == GameMode::TOWER_CLIMB && m_monster.isTurnReady(30)) { // Placeholder speed cost for a match
             m_player.takeDamage(dataManager.getMonsterAttackDamage());
@@ -536,11 +529,11 @@ void Game::update(sf::Time deltaTime) {
     switch (m_gameMode) {
         case GameMode::JUDGEMENT:
         {
-            m_uiManager.update(m_player, m_monster, m_gameMode, m_gameState, nullptr, Floor(), {}, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, m_player.getActiveEffects());
+            m_uiManager.update(m_player, m_monster, m_timeManager, m_gameMode, m_gameState, nullptr, Floor(), {}, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, m_player.getActiveEffects());
             break;
         }
         case GameMode::TOWER_CLIMB:
-            m_uiManager.update(m_player, m_monster, m_gameMode, m_gameState, m_currentRoom, m_currentFloor, m_visitedRoomIds, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, m_player.getActiveEffects());
+            m_uiManager.update(m_player, m_monster, m_timeManager, m_gameMode, m_gameState, m_currentRoom, m_currentFloor, m_visitedRoomIds, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, m_player.getActiveEffects());
             break;
     }
 }
@@ -640,6 +633,35 @@ void Game::setupTreasureRound() {
 }
 
 bool Game::processTreasureMerges() {
+
     // TODO: Implement the treasure merge logic here.
+
     return false;
+
+}
+
+
+
+void Game::handleTimeEvent(const TimeEvent& event) {
+    switch (event.type) {
+        case TimeEventType::BurningTile_Activation: {
+            BaseGem* gem = m_board.getGemAt(event.coordinates.x, event.coordinates.y);
+            if (gem && gem->getStatusEffect() == StatusEffect::Burning) {
+                float damage = (m_player.getMaxMana() * 0.10f) * gem->getLevel();
+                m_monster.takeDamage(static_cast<int>(damage));
+                std::cout << "[EVENT] Burning tile dealt " << static_cast<int>(damage) << " damage. Monster HP: " << m_monster.getCurrentHp() << std::endl;
+            }
+            break;
+        }
+        case TimeEventType::BurningTile_Expire: {
+            BaseGem* gem = m_board.getGemAt(event.coordinates.x, event.coordinates.y);
+            if (gem && gem->getStatusEffect() == StatusEffect::Burning) {
+                float damage = (m_player.getMaxMana() * 0.10f) * gem->getLevel();
+                m_monster.takeDamage(static_cast<int>(damage));
+                std::cout << "[EVENT] Burning tile dealt final " << static_cast<int>(damage) << " damage and expired. Monster HP: " << m_monster.getCurrentHp() << std::endl;
+                gem->setStatusEffect(StatusEffect::None);
+            }
+            break;
+        }
+    }
 }

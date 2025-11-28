@@ -115,21 +115,6 @@ void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, co
                     window.draw(effectOverlay);
                 }
 
-                // 4. Draw Counter/Timer Layer
-                if (m_grid[r][c]->getEffectValue() > 0 && m_grid[r][c]->getEffectMax() > 0) {
-                    float percentage = m_grid[r][c]->getEffectValue() / m_grid[r][c]->getEffectMax();
-                    
-                    sf::RectangleShape timerBarBack(sf::Vector2f(TILE_SIZE, 5));
-                    timerBarBack.setPosition(tilePosition);
-                    timerBarBack.setFillColor(sf::Color(50, 50, 50)); // Dark grey background
-                    window.draw(timerBarBack);
-
-                    sf::RectangleShape timerBarFront(sf::Vector2f(TILE_SIZE * percentage, 5));
-                    timerBarFront.setPosition(tilePosition);
-                    timerBarFront.setFillColor(sf::Color::Red); // Red for burning
-                    window.draw(timerBarFront);
-                }
-
                 // 5. Draw Frame Layer
                 if (m_grid[r][c]->getActionState() == ActionState::ValidMoveHint) {
                     float alpha = 128 + 127 * std::sin(pulseClock.getElapsedTime().asSeconds() * 10);
