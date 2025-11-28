@@ -45,7 +45,7 @@
     "manaType": "Enhancement",
     "manaCost": 30,
     "speedCost": 50,
-    "effects": [{ "type": "APPLY_STAT_MODIFIER", "params": { "stat": "vigor", "amount": 5, "duration": 3 } }]
+    "effects": [{ "type": "APPLY_STAT_MODIFIER", "params": { "stat": "vigor", "amount": 5, "duration": 90.0 } }]
   },
   {
     "id": "minor_heal_life",
@@ -77,7 +77,7 @@
     "manaType": "Enhancement",
     "manaCost": 30,
     "speedCost": 50,
-    "effects": [{ "type": "APPLY_STAT_MODIFIER", "params": { "stat": "skull_damage", "multiplier": 1.5, "duration": 3 } }]
+    "effects": [{ "type": "APPLY_STAT_MODIFIER", "params": { "stat": "skull_damage", "multiplier": 1.5, "duration": 90.0 } }]
   },
   {
     "id": "create_weapon_earth",

@@ -329,6 +329,21 @@ void Game::handleMatches(bool isPlayerMove) {
         return;
     }
 
+    // --- New Logging ---
+    if (isPlayerMove) {
+        std::cout << "\n[COMBAT TURN] Start of turn. Monster HP: " << m_monster.getCurrentHp() << std::endl;
+        int skullMatches = 0;
+        for (const auto& match : matchGroups) {
+            for (const auto& pos : match) {
+                if (m_board.getGemAt(pos.x, pos.y)->getSubType() == GemSubType::Skull) {
+                    skullMatches++;
+                }
+            }
+        }
+        std::cout << "[COMBAT TURN] Skulls matched: " << skullMatches << std::endl;
+    }
+    // --- End New Logging ---
+
     m_playerActionPerformedThisTurn = true;
 
     if (isPlayerMove) {

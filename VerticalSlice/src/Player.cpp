@@ -103,6 +103,15 @@ const std::string& Player::getAttunementId() const {
     return m_attunementId;
 }
 
+int Player::getVigor() const {
+    float vigorFromEffects = getStatModifier("vigor");
+    int totalVigor = m_vigor + static_cast<int>(vigorFromEffects);
+    std::cout << "[GET VIGOR] Base Vigor: " << m_vigor 
+              << ", Vigor from Effects: " << vigorFromEffects 
+              << ", Total Vigor: " << totalVigor << std::endl;
+    return totalVigor;
+}
+
 void Player::finalizeJudgement(const JudgementResults& results, const DataManager& dataManager) {
     m_attunementId = determineAttunement(results, dataManager);
     const Attunement* finalAttunement = dataManager.getAttunementById(m_attunementId);
@@ -118,33 +127,61 @@ void Player::finalizeJudgement(const JudgementResults& results, const DataManage
             }
         }
         
-        void Player::addEffect(const ActiveEffect& newEffect) {
-            // Check if an effect with the same ID already exists
-            for (auto& activeEffect : m_activeEffects) {
-                if (activeEffect.effectId == newEffect.effectId) {
-                    // If it exists, stack the duration
-                    activeEffect.duration += newEffect.duration;
-                    // Optional: Clamp to max duration if you have one
-                    if (activeEffect.duration > activeEffect.maxDuration) {
-                        activeEffect.duration = activeEffect.maxDuration;
-                    }
-                    return; // Exit after stacking
-                }
+void Player::addEffect(const ActiveEffect& newEffect) {
+    for (auto& activeEffect : m_activeEffects) {
+        if (activeEffect.effectId == newEffect.effectId) {
+            float initialDuration = newEffect.maxDuration;
+            activeEffect.maxDuration += (initialDuration / 2.0f);
+            activeEffect.duration += initialDuration;
+            if (activeEffect.duration > activeEffect.maxDuration) {
+                activeEffect.duration = activeEffect.maxDuration;
             }
-            // If no existing effect was found, add the new one
-            m_activeEffects.push_back(newEffect);
+            activeEffect.justAppliedThisTurn = true;
+            return;
         }
+    }
+    
+    ActiveEffect effectToAdd = newEffect;
+    effectToAdd.justAppliedThisTurn = true;
+    m_activeEffects.push_back(effectToAdd);
+}
         
-        void Player::updateEffects(float speedCost) {
-            // Iterate backwards to safely remove elements
-            for (int i = m_activeEffects.size() - 1; i >= 0; --i) {
-                m_activeEffects[i].duration -= speedCost;
-                if (m_activeEffects[i].duration <= 0) {
-                    m_activeEffects.erase(m_activeEffects.begin() + i);
-                }
-            }
+void Player::updateEffects(float speedCost) {
+    for (int i = m_activeEffects.size() - 1; i >= 0; --i) {
+        auto& effect = m_activeEffects[i];
+        
+        if (effect.justAppliedThisTurn) {
+            effect.justAppliedThisTurn = false;
+            continue;
         }
+
+        effect.duration -= speedCost;
+
+        if (effect.duration <= 0) {
+            m_activeEffects.erase(m_activeEffects.begin() + i);
+        }
+    }
+}
 
 const std::vector<ActiveEffect>& Player::getActiveEffects() const {
     return m_activeEffects;
+}
+
+float Player::getStatModifier(const std::string& modifier) const {
+    if (modifier == "skull_damage") {
+        for (const auto& effect : m_activeEffects) {
+            if (effect.modifier == modifier) {
+                return effect.value; // Return the first multiplier found
+            }
+        }
+        return 1.0f; // Default multiplier is 1.0 (no change)
+    } else {
+        float total = 0.0f;
+        for (const auto& effect : m_activeEffects) {
+            if (effect.modifier == modifier) {
+                total += effect.value; // Sum additive bonuses like vigor
+            }
+        }
+        return total; // Default additive bonus is 0.0
+    }
 }

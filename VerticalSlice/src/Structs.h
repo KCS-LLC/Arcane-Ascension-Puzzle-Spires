@@ -45,6 +45,7 @@ struct ActiveEffect {
     float value;
     float duration;
     float maxDuration;
+    bool justAppliedThisTurn = false;
 };
 
 

@@ -61,9 +61,9 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
         activeEffect.duration = effect.params.at("duration").get<float>();
         activeEffect.maxDuration = effect.params.at("duration").get<float>();
 
+        std::cout << "[EFFECT CREATE] Creating effect '" << activeEffect.effectId << "' with modifier '" << activeEffect.modifier << "'" << std::endl;
+
         player.addEffect(activeEffect);
-        std::cout << "EffectProcessor: Added effect - ID: " << activeEffect.effectId 
-                  << ", Modifier: " << activeEffect.modifier << std::endl;
     }
      else if (effect.type == "CREATE_BURNING_TILE") {
                 int amount = 1; // Default to 1 burning tile
@@ -87,8 +87,6 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
                         activeEffect.duration = 3.0f * BASE_SWAP_SPEED;
                         activeEffect.maxDuration = 3.0f * BASE_SWAP_SPEED;
                         player.addEffect(activeEffect);
-                        std::cout << "EffectProcessor: Added Burning Tile effect - ID: " << activeEffect.effectId
-                                  << ", Modifier: " << activeEffect.modifier << std::endl;
                     }
                 }
             }

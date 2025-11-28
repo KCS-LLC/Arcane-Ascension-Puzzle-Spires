@@ -27,6 +27,9 @@ public:
     const std::vector<ActiveEffect>& getActiveEffects() const;
     const std::vector<GemSubType>& getManaTypes() const;
     const std::string& getAttunementId() const;
+    int getVigor() const;
+
+    float getStatModifier(const std::string& modifier) const;
 
     void takeDamage(int amount);
     void heal(int amount);
@@ -38,7 +41,6 @@ public:
     void updateEffects(float speedCost);
 
     void finalizeJudgement(const JudgementResults& results, const DataManager& dataManager);
-
 private:
     void setStartingStats(int tactical_score, int mana_affinity_score);
     std::string determineAttunement(const JudgementResults& results, const DataManager& dataManager) const;
@@ -46,6 +48,7 @@ private:
     int m_hp;
     int m_maxHp;
     int m_maxMana;
+    int m_vigor = 0;
     std::vector<GemSubType> m_availableManaTypes; // Renamed to use m_ prefix
     std::map<GemSubType, int> mana;
     std::vector<Spell> spells;
