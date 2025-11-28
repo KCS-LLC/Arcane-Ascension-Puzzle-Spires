@@ -2,6 +2,7 @@
   {
     "id": "insight_mental",
     "name": "Insight",
+    "description": "Highlights a random valid move on the board. Multiple castings in a row will highlight additional moves, or notify if all have been revealed.",
     "manaType": "Mental",
     "manaCost": 15,
     "speedCost": 20,
@@ -10,14 +11,16 @@
   {
     "id": "mana_surge_enhancement",
     "name": "Mana Surge",
+    "description": "Doubles the amount of mana gained from matches for a short duration.",
     "manaType": "Enhancement",
     "manaCost": 25,
     "speedCost": 40,
-    "effects": [{ "type": "APPLY_STAT_MODIFIER", "params": { "duration": 60.0 } }]
+    "effects": [{ "type": "APPLY_STAT_MODIFIER", "params": { "stat": "mana_gain", "multiplier": 2.0, "duration": 60.0 } }]
   },
   {
     "id": "create_burning_tile_fire",
     "name": "Create Burning Tile",
+    "description": "Creates a special tile that deals fire damage to the enemy each turn.",
     "manaType": "Fire",
     "manaCost": 25,
     "speedCost": 40,
@@ -26,6 +29,7 @@
   {
     "id": "gust_of_wind_air",
     "name": "Gust of Wind",
+    "description": "Rotates all gems in the chosen row or column.",
     "manaType": "Air",
     "manaCost": 20,
     "speedCost": 30,
@@ -34,6 +38,7 @@
   {
     "id": "quick_swap_transference",
     "name": "Quick Swap",
+    "description": "Swaps two gems without needing to form a match.",
     "manaType": "Transference",
     "manaCost": 15,
     "speedCost": 0,
@@ -42,6 +47,7 @@
   {
     "id": "empower_self_enhancement",
     "name": "Empower Self",
+    "description": "Temporarily increases your Vigor, reducing damage taken and slightly boosting Skull/Fist damage.",
     "manaType": "Enhancement",
     "manaCost": 30,
     "speedCost": 50,
@@ -50,6 +56,7 @@
   {
     "id": "minor_heal_life",
     "name": "Minor Heal",
+    "description": "Heals you for a small amount of HP.",
     "manaType": "Life",
     "manaCost": 25,
     "speedCost": 40,
@@ -58,6 +65,7 @@
   {
     "id": "chaotic_shift_earth",
     "name": "Chaotic Shift",
+    "description": "Destroys up to 3 random gems on the board, causing new gems to fall.",
     "manaType": "Earth",
     "manaCost": 20,
     "speedCost": 30,
@@ -66,6 +74,7 @@
   {
     "id": "shadow_strike_umbral",
     "name": "Shadow Strike",
+    "description": "Deals a small amount of direct Umbral damage to the enemy.",
     "manaType": "Umbral",
     "manaCost": 20,
     "speedCost": 30,
@@ -74,6 +83,7 @@
   {
     "id": "empower_weapon_enhancement",
     "name": "Empower Weapon",
+    "description": "Temporarily increases the damage dealt by Skull matches.",
     "manaType": "Enhancement",
     "manaCost": 30,
     "speedCost": 50,
@@ -82,6 +92,7 @@
   {
     "id": "create_weapon_earth",
     "name": "Create Weapon",
+    "description": "Converts up to 3 random gems into Skull gems.",
     "manaType": "Earth",
     "manaCost": 25,
     "speedCost": 40,
@@ -90,6 +101,7 @@
   {
     "id": "sharpen_weapon_enhancement",
     "name": "Sharpen Weapon",
+    "description": "Increases the damage value of a single Skull gem on the board.",
     "manaType": "Enhancement",
     "manaCost": 20,
     "speedCost": 30,
@@ -98,6 +110,7 @@
   {
     "id": "convert_mana_transference",
     "name": "Convert Mana",
+    "description": "Converts a small amount of one mana type to another.",
     "manaType": "Transference",
     "manaCost": 10,
     "speedCost": 20,

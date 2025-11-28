@@ -25,6 +25,7 @@ struct Effect {
 struct Spell {
     std::string id;
     std::string name;
+    std::string description;
     GemSubType costType;
     int manaCost;
     int speedCost;

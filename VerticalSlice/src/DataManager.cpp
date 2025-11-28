@@ -82,6 +82,9 @@ void from_json(const json& j, Effect& e) {
 void from_json(const json& j, Spell& s) {
     j.at("id").get_to(s.id);
     j.at("name").get_to(s.name);
+    if (j.contains("description")) {
+        j.at("description").get_to(s.description);
+    }
     j.at("manaCost").get_to(s.manaCost);
     s.costType = stringToGemSubType(j.at("manaType").get<std::string>());
     j.at("speedCost").get_to(s.speedCost);
