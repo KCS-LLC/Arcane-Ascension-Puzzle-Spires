@@ -317,14 +317,22 @@ void Game::handleInput(sf::Event event) {
             
             // --- Normal Swap Logic ---
             if (m_selectedGem.x == -1) {
+                // First gem selection
                 m_selectedGem = sf::Vector2i(col, row);
+                m_board.getGemAt(row, col)->setActionState(ActionState::Selected);
             } else {
-                if (m_board.canSwap(m_selectedGem.y, m_selectedGem.x, row, col)) {
-                    m_isAnimating = true;
-                    m_isAnimatingSwap = true;
-                    m_animatingGems = { m_selectedGem, sf::Vector2i(col, row) };
-                    m_animationClock.restart();
+                // Second gem selection
+                if (m_board.isAdjacent(sf::Vector2i(m_selectedGem.y, m_selectedGem.x), sf::Vector2i(row, col))) {
+                    if (m_board.canSwap(m_selectedGem.y, m_selectedGem.x, row, col)) {
+                        m_isAnimating = true;
+                        m_isAnimatingSwap = true;
+                        m_animatingGems = { m_selectedGem, sf::Vector2i(col, row) };
+                        m_animationClock.restart();
+                    }
                 }
+                
+                // Always clear selection on second click, whether it was a swap or a cancel
+                m_board.getGemAt(m_selectedGem.y, m_selectedGem.x)->setActionState(ActionState::None);
                 m_selectedGem = sf::Vector2i(-1, -1);
             }
         }

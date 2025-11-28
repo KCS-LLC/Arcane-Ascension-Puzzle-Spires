@@ -41,6 +41,7 @@ public:
     std::vector<sf::Vector2i> getRandomGemCoords(int count, bool nonAttackGemsOnly = false);
     std::optional<std::pair<sf::Vector2i, sf::Vector2i>> findValidMove() const;
     void clearActionStates();
+    bool isAdjacent(sf::Vector2i pos1, sf::Vector2i pos2) const;
     
     std::vector<FallInfo> applyGravityAndRefill(const std::vector<GemSubType>& possibleGems);
     // std::vector<FallInfo> applyGravity();

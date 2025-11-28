@@ -367,3 +367,8 @@ std::optional<std::pair<sf::Vector2i, sf::Vector2i>> Board::findValidMove() cons
 
     return std::nullopt; // No valid move found
 }
+
+bool Board::isAdjacent(sf::Vector2i pos1, sf::Vector2i pos2) const {
+    return (std::abs(pos1.x - pos2.x) == 1 && pos1.y == pos2.y) ||
+           (std::abs(pos1.y - pos2.y) == 1 && pos1.x == pos2.x);
+}
