@@ -70,3 +70,7 @@ void BaseGem::setStatusEffect(StatusEffect effect) { m_statusEffect = effect; }
 
 ActionState BaseGem::getActionState() const { return m_actionState; }
 void BaseGem::setActionState(ActionState state) { m_actionState = state; }
+
+void BaseGem::levelUp() {
+    m_level++;
+}

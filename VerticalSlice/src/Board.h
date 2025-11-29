@@ -39,7 +39,7 @@ public:
     void setGemAt(int r, int c, std::unique_ptr<BaseGem> gem);
     void rotateRow(int rowIndex, int direction);
     void rotateColumn(int colIndex, int direction);
-    std::vector<sf::Vector2i> getRandomGemCoords(int count, bool nonAttackGemsOnly = false);
+    std::vector<sf::Vector2i> getRandomGemCoords(int count, bool nonAttackGemsOnly = false, std::optional<GemSubType> specificType = std::nullopt);
     std::optional<std::pair<sf::Vector2i, sf::Vector2i>> findValidMove() const;
     void clearActionStates();
     bool isAdjacent(sf::Vector2i pos1, sf::Vector2i pos2) const;

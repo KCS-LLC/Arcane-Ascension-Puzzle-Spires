@@ -302,19 +302,22 @@ void Board::rotateColumn(int colIndex, int direction) {
     }
 }
 
-std::vector<sf::Vector2i> Board::getRandomGemCoords(int count, bool nonAttackGemsOnly) {
-    std::vector<sf::Vector2i> allCoords;
+std::vector<sf::Vector2i> Board::getRandomGemCoords(int count, bool nonAttackGemsOnly, std::optional<GemSubType> specificType) {
+    std::vector<sf::Vector2i> filteredCoords;
     for (int r = 0; r < m_height; ++r) {
         for (int c = 0; c < m_width; ++c) {
             if (m_grid[r][c]) { // Ensure there's a gem at the position
-                if (nonAttackGemsOnly) {
+                if (specificType) {
+                    if (m_grid[r][c]->getSubType() == *specificType) {
+                        filteredCoords.push_back({r, c});
+                    }
+                } else if (nonAttackGemsOnly) {
                     const GemCatalogEntry* entry = m_grid[r][c]->getCatalogEntry();
-                    // This is a simplification. A proper check would involve the DataManager.
                     if (entry && entry->secondaryTypeId != 1001) { // 1001 is Skull
-                        allCoords.push_back({r, c});
+                        filteredCoords.push_back({r, c});
                     }
                 } else {
-                    allCoords.push_back({r, c});
+                    filteredCoords.push_back({r, c});
                 }
             }
         }
@@ -322,13 +325,13 @@ std::vector<sf::Vector2i> Board::getRandomGemCoords(int count, bool nonAttackGem
 
     std::random_device rd;
     std::mt19937 g(rd());
-    std::shuffle(allCoords.begin(), allCoords.end(), g);
+    std::shuffle(filteredCoords.begin(), filteredCoords.end(), g);
 
-    if (allCoords.size() > count) {
-        allCoords.resize(count);
+    if (filteredCoords.size() > count) {
+        filteredCoords.resize(count);
     }
 
-    return allCoords;
+    return filteredCoords;
 }
 
 bool Board::isInBounds(int r, int c) const {

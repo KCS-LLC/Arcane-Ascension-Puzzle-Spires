@@ -23,7 +23,16 @@ public:
     Game();
     void run();
     void handleTimeEvent(const TimeEvent& event);
+    void setBoardStateDirty(bool isDirty);
+
+    // Getters for game components
+    Player& getPlayer();
+    Monster& getMonster();
+    Board& getBoard();
+    GemFactory& getGemFactory();
+    TimeManager& getTimeManager();
 private:
+    bool m_boardStateDirty = false;
     void processEvents();
     void update(sf::Time deltaTime);
     void render(const sf::Font& font, sf::Clock& pulseClock);

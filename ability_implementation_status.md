@@ -12,18 +12,18 @@ This document tracks the current implementation status of each Quartz-Rank Abili
     *   **To Reach 100:** Implement tracking for already-revealed moves to allow the spell to find and highlight new ones on subsequent casts. Add a UI notification when no more unique moves can be found.
 
 *   **Mana Surge**
-    *   **Score:** 10/100
-    *   **Reasoning:** The spell exists and applies a buff, but the buff itself is a non-functional placeholder (`generic_buff` with a value of 0). The core logic to actually double mana gain from matches is completely missing.
-    *   **To Reach 100:** Implement a `mana_gain` stat modifier in the `Player` class. Update the `onMatch` logic for mana gems (in `ManaGem.cpp`) to check for this modifier and apply the multiplier to the mana gained.
+    *   **Score:** 100/100
+    *   **Reasoning:** The `mana_gain` stat modifier is fully implemented. The `Player` class correctly tracks the multiplier, and `ManaGem::onMatch` uses it to double mana gain. The effect icon is also correctly displayed in the UI.
+    *   **To Reach 100:** (Already at 100)
 
 ---
 
 ## Elementalist
 
 *   **Create Burning Tile**
-    *   **Score:** 80/100
-    *   **Reasoning:** The ability correctly creates a tile with a burning status effect and a timer. A UI icon with a duration is also added. However, the "deals fire damage to the enemy each turn" part is not fully implemented. The tile has a status, but there's no code that triggers its damage effect at the start or end of a turn.
-    *   **To Reach 100:** Add logic to the game's turn processing loop (likely in `Game.cpp` or a new `Board::onTurnEnd` method) to iterate the board, find gems with the `Burning` status effect, and apply damage to the monster.
+    *   **Score:** 100/100
+    *   **Reasoning:** The ability now correctly uses the centralized `TimeManager` to deal damage over time. All visual feedback, including a scaled icon and a horizontal duration bar, is implemented. The tile is also correctly destroyed upon expiration.
+    *   **To Reach 100:** (Already at 100)
 
 *   **Gust of Wind**
     *   **Score:** 0/100

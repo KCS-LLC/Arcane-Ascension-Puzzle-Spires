@@ -24,6 +24,7 @@ enum class GameState {
     AttunementReveal,
     Exploration,
     Playing,
+    CombatVictory,
     GameOver,
     Treasure,
     Special,

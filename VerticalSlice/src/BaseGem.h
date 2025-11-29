@@ -36,6 +36,7 @@ public:
     // New layer getters/setters
     int getLevel() const;
     void setLevel(int level);
+    void levelUp();
     StatusEffect getStatusEffect() const;
     void setStatusEffect(StatusEffect effect);
     ActionState getActionState() const;

@@ -204,6 +204,12 @@ void Game::processEvents() {
     }
 }
 
+Player& Game::getPlayer() { return m_player; }
+Monster& Game::getMonster() { return m_monster; }
+Board& Game::getBoard() { return m_board; }
+GemFactory& Game::getGemFactory() { return m_gemFactory; }
+TimeManager& Game::getTimeManager() { return m_timeManager; }
+
 void Game::handleInput(sf::Event event) {
     if (event.is<sf::Event::Closed>()) {
         m_window.close();
@@ -223,8 +229,6 @@ void Game::handleInput(sf::Event event) {
             }
         } else if (action.type == UIActionType::ChangeRoom) {
             moveToRoom(action.destinationRoomId);
-        } else if (action.type == UIActionType::ChangeRoom) {
-            moveToRoom(action.destinationRoomId);
         } else if (action.type == UIActionType::CastSpell) {
             m_board.clearActionStates(); // Clear hints on new action
             const Spell* spell = m_player.castSpell(action.spellIndex);
@@ -234,7 +238,7 @@ void Game::handleInput(sf::Event event) {
                 std::vector<sf::Vector2i> gemsToRemove;
                 // The spell was successfully cast. Process its effects.
                 for (const auto& effect : spell->effects) {
-                    auto removed = m_effectProcessor.processEffect(*spell, effect, m_player, m_monster, m_board, m_gemFactory, m_timeManager, gemTextures);
+                    auto removed = m_effectProcessor.processEffect(*spell, effect, *this);
                     gemsToRemove.insert(gemsToRemove.end(), removed.begin(), removed.end());
                 }
 
@@ -255,6 +259,7 @@ void Game::handleInput(sf::Event event) {
         }
         return; // UI handled the event
     }
+
 
     if (auto* mb = event.getIf<sf::Event::MouseButtonPressed>()) {
         if (mb->button == sf::Mouse::Button::Left) {
@@ -413,12 +418,15 @@ void Game::handleMatches(bool isPlayerMove) {
         std::cout << "[COMBAT TURN] Total Damage Applied: " << finalDamage << ". Monster HP after: " << m_monster.getCurrentHp() << std::endl;
     }
 
-    if (allRemovedGems.empty()) return;
+    if (allRemovedGems.empty()) {
+        return;
+    }
 
     m_currentScore += (allRemovedGems.size() * 100);
 
     m_isAnimatingSwap = false;
     m_isAnimatingDestruction = true;
+    m_isAnimating = true;
     m_destroyingGems = allRemovedGems;
     m_animationClock.restart();
 }
@@ -427,6 +435,11 @@ void Game::update(sf::Time deltaTime) {
     const float swapAnimationDuration = 0.2f;
     const float destructionAnimationDuration = 0.3f;
     const float refillAnimationDuration = 0.3f;
+
+    if (!m_isAnimating && m_boardStateDirty) {
+        m_boardStateDirty = false;
+        handleMatches(false);
+    }
 
     if (m_isAnimating) {
         if (m_isAnimatingSwap) {
@@ -468,10 +481,7 @@ void Game::update(sf::Time deltaTime) {
                 m_isAnimatingRefill = false;
                 handleMatches(false); // Cascade-initiated move
                 
-                // If no new matches were found, end animation cycle
-                if (!m_isAnimatingDestruction) {
-                    m_isAnimating = false;
-                }
+    std::cout << "[UPDATE] Animation cycle finished." << std::endl;
             }
         }
         return; 
@@ -522,13 +532,16 @@ void Game::update(sf::Time deltaTime) {
         m_gameState = GameState::Judgement_AttunementSelection;
     }
 
-    if (m_gameMode == GameMode::TOWER_CLIMB && m_gameState == GameState::Playing) {
+    if (m_gameMode == GameMode::TOWER_CLIMB && (m_gameState == GameState::Playing || m_gameState == GameState::CombatVictory)) {
         if (m_player.getHp() <= 0) {
             m_gameState = GameState::GameOver;
         } else if (m_monster.getCurrentHp() <= 0) {
-            // clearedRoomIds.insert(m_currentRoom->id); // Mark room as cleared
-            m_gameState = GameState::Exploration; // Player wins, go back to exploring
+            m_gameState = GameState::CombatVictory;
         }
+    }
+
+    if (m_gameState == GameState::CombatVictory && !m_isAnimating && !m_boardStateDirty) {
+        m_gameState = GameState::Exploration;
     }
 
     // Main game logic updates
@@ -542,6 +555,16 @@ void Game::update(sf::Time deltaTime) {
             m_uiManager.update(m_player, m_monster, m_timeManager, m_gameMode, m_gameState, m_currentRoom, m_currentFloor, m_visitedRoomIds, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, m_player.getActiveEffects());
             break;
     }
+
+    // After all other updates, check for new matches that might have been created by spells
+    if (!m_isAnimating && m_boardStateDirty) {
+        m_boardStateDirty = false;
+        handleMatches(false);
+    }
+}
+
+void Game::setBoardStateDirty(bool isDirty) {
+    m_boardStateDirty = isDirty;
 }
 
 void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
