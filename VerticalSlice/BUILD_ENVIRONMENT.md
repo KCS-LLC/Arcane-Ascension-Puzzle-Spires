@@ -6,20 +6,20 @@ This document outlines the specific technical environment required to successful
 
 ## 1. Compiler
 
-The project is built using the G++ compiler provided by MSYS2.
+The project is built using the Clang C++ compiler provided by MSYS2.
 
--   **Compiler:** `g++.exe (Rev8, Built by MSYS2 project)`
--   **Version:** `15.2.0`
+-   **Compiler:** `clang++.exe`
+-   **Version:** `21.1.5`
 
 ---
 
 ## 2. SFML Library
 
-The project is linked against a specific version of the SFML library. The syntax used in the codebase, particularly for event handling, is specific to this major version.
+The project is linked against a specific version of the SFML library, compiled from source with Clang to ensure compatibility.
 
--   **SFML Version:** `3.0.2`
--   **Include Path:** `C:/Program Files (x86)/SFML/include`
--   **Library Path:** `C:/Program Files (x86)/SFML/lib`
+-   **SFML Version:** `3.0.2` (compiled with Clang)
+-   **SFML Source Path:** `C:/dev/SFML`
+-   **SFML Build Path:** `C:/dev/sfml-build-clang`
 
 ---
 
@@ -34,39 +34,51 @@ All game assets (fonts, sprites, etc.) must be located in a directory named `ass
 
 ## 3. Build Process (CMake)
 
-This project uses CMake to generate build files. The recommended toolchain on Windows is MSYS2 with MinGW-w64.
+This project uses CMake to generate build files. The recommended toolchain on Windows is MSYS2 with Clang and Ninja.
 
-1.  **Create a Build Directory:**
-    From the `VerticalSlice` directory, create and navigate to a build directory.
+1.  **Build SFML from Source (First Time Setup):**
+    Since the project uses Clang, SFML must also be compiled with Clang.
+
+    a.  **Create SFML Build Directory:**
+        ```bash
+        mkdir C:\dev\sfml-build-clang
+        ```
+
+    b.  **Configure SFML with CMake:**
+        ```bash
+        cmake -S C:\dev\SFML -B C:\dev\sfml-build-clang -G "Ninja" -DCMAKE_CXX_COMPILER=clang++ -DBUILD_SHARED_LIBS=OFF
+        ```
+
+    c.  **Build SFML with Ninja:**
+        ```bash
+        ninja -C C:\dev\sfml-build-clang
+        ```
+    This will produce Clang-compatible SFML libraries in `C:\dev\sfml-build-clang\lib`.
+
+2.  **Configure Game Project with CMake:**
+    From the `VerticalSlice` directory, create and navigate to a build directory, then run CMake to generate the Ninja build files.
+
     ```bash
     mkdir build
     cd build
+    cmake .. -G "Ninja" -DCMAKE_CXX_COMPILER=clang++
     ```
-
-2.  **Configure with CMake:**
-    Run CMake to generate the Makefiles.
-    ```bash
-    cmake .. -G "MinGW Makefiles"
-    ```
-
-3.  **Compile the Project:**
-    Use `mingw32-make` to compile the executable.
-    ```bash
-    mingw32-make
-    ```
+    *Note: `CMAKE_CXX_CLANG_TIDY` is automatically set in `CMakeLists.txt`.*
 The final executable, `game.exe`, along with the required `assets` and `data` directories, will be located in the `build` directory.
 
 
 ## Dependencies
 
-*   **SFML 3.0.2:** The core graphics and windowing library.
+*   **Clang C++ Compiler:** Version 21.1.5 or newer, for compilation and PCH generation.
+*   **Ninja Build Tool:** For faster incremental builds.
+*   **SFML 3.0.2:** The core graphics and windowing library (compiled with Clang).
 *   **nlohmann/json:** A header-only library for parsing JSON data. The file `json.hpp` is located in the `src` directory and is required for the `DataManager`.
 
 
 
 ## Precompiled Headers (PCH)
 
-To significantly speed up compilation times and simplify header management, this project uses precompiled headers.
+To significantly speed up compilation times and simplify header management, this project uses precompiled headers. The PCH is generated and utilized by the Clang compiler, ensuring full compatibility with Clang-Tidy.
 
 -   **PCH File:** `src/PCH.h`
 -   **Configuration:** The `CMakeLists.txt` file is configured via `target_precompile_headers` to first compile `PCH.h` and then automatically include it in all other source files.
@@ -74,7 +86,7 @@ To significantly speed up compilation times and simplify header management, this
 The `PCH.h` file includes common, stable headers that are used throughout the project, such as:
 *   SFML library headers
 *   C++ Standard Library headers (`<vector>`, `<string>`, `<map>`, etc.)
-*   Stable project-specific headers (`Constants.h`)
+*   Stable project-specific headers (`Constants.h`, `Structs.h`)
 
 This approach avoids the need to repeatedly include these common headers in every `.cpp` file, making the build process much more efficient. When adding new, widely-used and stable headers, they should be added to `PCH.h`. Headers that are specific to a single `.cpp` file should be included directly in that file.
 

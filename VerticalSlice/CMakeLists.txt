@@ -4,6 +4,10 @@ cmake_minimum_required(VERSION 3.10)
 # Set the project name and language
 project(ArcaneAscensionVerticalSlice VERSION 1.0 LANGUAGES CXX)
 
+# Enable compilation database generation and auto-run clang-tidy
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_CLANG_TIDY "clang-tidy")
+
 # Set the C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -12,10 +16,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # We bypass the problematic SFMLConfig.cmake by finding everything ourselves.
 
 # 1. Define the path to our compiled SFML installation
-set(SFML_ROOT "C:/SFML-3.0.2-mingw")
+set(SFML_ROOT "C:/dev/sfml-build-clang")
 
 # 2. Define Include Directories
-include_directories(${SFML_ROOT}/include)
+include_directories("C:/dev/SFML/include")
 
 # 3. Define Link Directories (where to find .a files)
 link_directories(${SFML_ROOT}/lib)
