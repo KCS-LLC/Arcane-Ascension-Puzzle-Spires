@@ -32,40 +32,25 @@ Game::Game()
       m_currentTurn(0),
       m_currentScore(0)
 {
-    std::cout << "[DEBUG] Game constructor start." << std::endl;
     m_window = std::make_unique<sf::RenderWindow>(sf::VideoMode(sf::Vector2u(WINDOW_WIDTH, WINDOW_HEIGHT)), "Judgement", sf::Style::Titlebar | sf::Style::Close);
-    std::cout << "[DEBUG] Window object constructed." << std::endl;
-
-    if (!m_window->isOpen()) {
-        std::cerr << "[FATAL] SFML Window failed to create. The program will now exit. Press Enter to continue." << std::endl;
-        std::cin.get();
-    }
-
     m_window->setFramerateLimit(60);
-    std::cout << "[DEBUG] Framerate limit set." << std::endl;
     loadTextures();
-    std::cout << "[DEBUG] Textures loaded." << std::endl;
 
     const int boardPixelWidth = BOARD_WIDTH * TILE_SIZE;
     const int boardPixelHeight = BOARD_HEIGHT * TILE_SIZE;
     m_boardOrigin.x = (WINDOW_WIDTH - boardPixelWidth) / 2.0f;
     m_boardOrigin.y = WINDOW_HEIGHT - boardPixelHeight - 20.0f;
-    std::cout << "[DEBUG] Board origin calculated." << std::endl;
 
     m_uiManager.setup(m_player, m_window->getSize(), m_boardOrigin, {}); // Passing empty attunements for now
-    std::cout << "[DEBUG] UIManager setup." << std::endl;
 
     dataManager.loadAttunements("data/attunements.json");
-    std::cout << "[DEBUG] Attunements loaded." << std::endl;
     const Attunement* defaultAttunement = dataManager.getAttunementById("diviner");
     if (defaultAttunement) {
         m_player.setAttunement(*defaultAttunement, dataManager);
-        std::cout << "[DEBUG] Default attunement set." << std::endl;
     } else {
         std::cerr << "Error: Could not find default attunement 'adept'." << std::endl;
     }
     m_judgementTrials = dataManager.getJudgementTrials();
-    std::cout << "[DEBUG] Judgement trials loaded." << std::endl;
     if (!m_judgementTrials.empty()) {
         m_trialOrder.resize(m_judgementTrials.size());
         std::iota(m_trialOrder.begin(), m_trialOrder.end(), 0); // Fill with 0, 1, 2...
@@ -76,9 +61,7 @@ Game::Game()
         
         m_currentTrialOrderIndex = 0;
         setupJudgementTrial(m_judgementTrials[m_trialOrder[m_currentTrialOrderIndex]]);
-        std::cout << "[DEBUG] Judgement trial setup complete." << std::endl;
     }
-    std::cout << "[DEBUG] Game constructor end." << std::endl;
 }
 
 void Game::loadTextures() {
