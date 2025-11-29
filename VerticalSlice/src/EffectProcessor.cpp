@@ -11,11 +11,11 @@
 
 std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, const Effect& effect, Game& game) {
     if (effect.type == "DEAL_DAMAGE") {
-        if (effect.params.count("amount")) {
+        if (effect.params.count("amount") != 0) {
             game.getMonster().takeDamage(effect.params.at("amount").get<int>());
         }
     } else if (effect.type == "HEAL_PLAYER") {
-        if (effect.params.count("amount")) {
+        if (effect.params.count("amount") != 0) {
             game.getPlayer().heal(effect.params.at("amount").get<int>());
         }
     } else if (effect.type == "ROTATE_ROW_COLUMN") {
@@ -25,19 +25,19 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
         request.abilityId = "gust_of_wind";
         game.startTargeting(request);
     } else if (effect.type == "REMOVE_RANDOM_GEMS") {
-        if (effect.params.count("amount")) {
+        if (effect.params.count("amount") != 0) {
             int amount = effect.params.at("amount").get<int>();
             return game.getBoard().getRandomGemCoords(amount); // Return coords to be removed
         }
     } else if (effect.type == "TRANSFORM_RANDOM_GEMS") {
-        if (effect.params.count("amount") && effect.params.count("to_type")) {
+        if (effect.params.count("amount") != 0 && effect.params.count("to_type") != 0) {
             int amount = effect.params.at("amount").get<int>();
             std::string toTypeStr = effect.params.at("to_type").get<std::string>();
             GemSubType toType = stringToGemSubType(toTypeStr);
             
             std::vector<sf::Vector2i> coords = game.getBoard().getRandomGemCoords(amount, true);
             for (const auto& coord : coords) {
-                if (gemTextures.count(toType)) {
+                if (gemTextures.count(toType) != 0) {
                     game.getBoard().setGemAt(coord.x, coord.y, game.getGemFactory().createGem(toType, gemTextures.at(toType)));
                 }
             }
@@ -47,29 +47,29 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
         std::vector<sf::Vector2i> attackGemCoords = game.getBoard().getRandomGemCoords(1, false, GemSubType::Skull); // Get 1 random Skull gem
         if (!attackGemCoords.empty()) {
             BaseGem* gem = game.getBoard().getGemAt(attackGemCoords[0].x, attackGemCoords[0].y);
-            if (gem) { // The gem is guaranteed to be a Skull gem, so no need to check again
+            if (gem != nullptr) { // The gem is guaranteed to be a Skull gem, so no need to check again
                 gem->levelUp();
                 std::cout << "[EFFECT] Sharpened a Skull gem to level " << gem->getLevel() << std::endl;
             }
         }
     } else if (effect.type == "HIGHLIGHT_MOVE") {
                 auto validMove = game.getBoard().findValidMove();
-                if (validMove) {
+                if (validMove.has_value()) {
                     game.getBoard().getGemAt(validMove->first.y, validMove->first.x)->setActionState(ActionState::ValidMoveHint);
                     game.getBoard().getGemAt(validMove->second.y, validMove->second.x)->setActionState(ActionState::ValidMoveHint);
                 }
             } else if (effect.type == "APPLY_STAT_MODIFIER") {
         ActiveEffect activeEffect;
         activeEffect.effectId = spell.id;
-        if (effect.params.count("stat")) {
+        if (effect.params.count("stat") != 0) {
             activeEffect.modifier = effect.params.at("stat").get<std::string>();
         } else {
             activeEffect.modifier = "generic_buff"; // Default value for effects without a specific stat
         }
 
-        if (effect.params.count("multiplier")) {
+        if (effect.params.count("multiplier") != 0) {
             activeEffect.value = effect.params.at("multiplier").get<float>();
-        } else if (effect.params.count("amount")) {
+        } else if (effect.params.count("amount") != 0) {
             activeEffect.value = effect.params.at("amount").get<float>();
         }
         activeEffect.duration = effect.params.at("duration").get<float>();
@@ -85,13 +85,13 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
     }
      else if (effect.type == "CREATE_BURNING_TILE") {
         int amount = 1; // Default to 1 burning tile
-        if (effect.params.count("amount")) {
+        if (effect.params.count("amount") != 0) {
             amount = effect.params.at("amount").get<int>();
         }
         std::vector<sf::Vector2i> coords = game.getBoard().getRandomGemCoords(amount);
         for (const auto& coord : coords) {
             BaseGem* gem = game.getBoard().getGemAt(coord.x, coord.y);
-            if (gem) {
+            if (gem != nullptr) {
                 gem->setStatusEffect(StatusEffect::Burning);
                 
                 long long currentTime = game.getTimeManager().getCurrentTime().totalTimeUnits;

@@ -18,8 +18,8 @@ BaseGem::BaseGem(const GemCatalogEntry* catalogEntry, const sf::Texture& texture
     
     // Scale the sprite to fit the tile size
     sf::Vector2u textureSize = texture.getSize();
-    float scaleX = static_cast<float>(TILE_SIZE) / textureSize.x;
-    float scaleY = static_cast<float>(TILE_SIZE) / textureSize.y;
+    float scaleX = static_cast<float>(TILE_SIZE) / static_cast<float>(textureSize.x);
+    float scaleY = static_cast<float>(TILE_SIZE) / static_cast<float>(textureSize.y);
     m_sprite.setScale(sf::Vector2f(scaleX, scaleY));
 }
 
@@ -50,8 +50,8 @@ void BaseGem::transform(const GemCatalogEntry* newCatalogEntry, const sf::Textur
 
     // Rescale the sprite to fit the tile size, in case the new texture has different dimensions
     sf::Vector2u textureSize = newTexture.getSize();
-    float scaleX = static_cast<float>(TILE_SIZE) / textureSize.x;
-    float scaleY = static_cast<float>(TILE_SIZE) / textureSize.y;
+    float scaleX = static_cast<float>(TILE_SIZE) / static_cast<float>(textureSize.x);
+    float scaleY = static_cast<float>(TILE_SIZE) / static_cast<float>(textureSize.y);
     m_sprite.setScale(sf::Vector2f(scaleX, scaleY));
 }
 

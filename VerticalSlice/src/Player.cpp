@@ -16,7 +16,7 @@ void Player::setAttunement(const Attunement& attunement, const DataManager& data
     spells.clear();
     for (const std::string& spellId : attunement.spellIds) {
         const Spell* spell = dataManager.getSpellById(spellId);
-        if (spell) {
+        if (spell != nullptr) {
             spells.push_back(*spell);
         }
     }
@@ -113,12 +113,12 @@ void Player::finalizeJudgement(const JudgementResults& results, const DataManage
     m_attunementId = determineAttunement(results, dataManager);
     const Attunement* finalAttunement = dataManager.getAttunementById(m_attunementId);
 
-    if (finalAttunement) {
+    if (finalAttunement != nullptr) {
         setAttunement(*finalAttunement, dataManager);
     } else {
         std::cerr << "Could not find final attunement with id: " << m_attunementId << std::endl;
         const Attunement* fallback = dataManager.getAttunementById("adept");
-            if (fallback) {
+            if (fallback != nullptr) {
                     setAttunement(*fallback, dataManager);
                 }
             }
@@ -154,7 +154,7 @@ void Player::updateEffects(float speedCost) {
     // Reset temporary modifiers before recalculating
     m_manaGainMultiplier = 1.0f;
 
-    for (int i = m_activeEffects.size() - 1; i >= 0; --i) {
+    for (int i = static_cast<int>(m_activeEffects.size()) - 1; i >= 0; --i) {
         auto& effect = m_activeEffects[i];
         
         if (effect.justAppliedThisTurn) {

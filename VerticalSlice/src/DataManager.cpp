@@ -285,9 +285,9 @@ const SecondaryGemTypeData* DataManager::getSecondaryGemTypeData(int secondaryTy
 
 PrimaryGemType DataManager::getPrimaryGemType(GemSubType subType) const {
     const GemCatalogEntry* gce = getGemCatalogEntry(subType);
-    if (gce && gce->secondaryTypeId != -1) {
+    if (gce != nullptr && gce->secondaryTypeId != -1) {
         const SecondaryGemTypeData* sgtd = getSecondaryGemTypeData(gce->secondaryTypeId);
-        if (sgtd) {
+        if (sgtd != nullptr) {
             return sgtd->primaryType;
         }
     }

@@ -8,7 +8,7 @@ GemFactory::GemFactory(const DataManager& dataManager) : m_dataManager(dataManag
 
 std::unique_ptr<BaseGem> GemFactory::createGem(GemSubType subType, const sf::Texture& texture) {
     const GemCatalogEntry* catalogEntry = m_dataManager.getGemCatalogEntry(subType);
-    if (!catalogEntry) {
+    if (catalogEntry == nullptr) {
         return nullptr;
     }
 
