@@ -14,7 +14,7 @@ void TimeManager::advanceTime(int timeUnits, Game& game) {
         return;
     }
 
-    long long targetTime = m_currentTime.totalTimeUnits + timeUnits;
+
 
     // Process events that occur during this time block
     processEvents(game);

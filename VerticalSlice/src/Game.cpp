@@ -576,6 +576,9 @@ void Game::update(sf::Time deltaTime) {
         case GameMode::TOWER_CLIMB:
             m_uiManager.update(m_player, m_monster, m_timeManager, m_gameMode, m_gameState, m_playMode, m_targetingRequest, m_currentRoom, m_currentFloor, m_visitedRoomIds, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, m_player.getActiveEffects());
             break;
+        case GameMode::GAME_OVER:
+            // No specific updates needed for main game logic in GAME_OVER mode
+            break;
     }
 
     // After all other updates, check for new matches that might have been created by spells
