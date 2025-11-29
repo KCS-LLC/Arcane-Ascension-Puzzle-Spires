@@ -111,6 +111,7 @@ private:
     std::vector<sf::Text> doorButtonTexts;
     std::vector<Teleporter> m_currentConnections;
     sf::Text m_quickSwapInstructionText;
+    sf::Text m_targetingPromptText;
     sf::Text m_dateText;
     sf::Text m_timeText;
 };

@@ -9,7 +9,7 @@ This document outlines the architectural plan for improving the UI, handling dif
 - **Next Steps:**
     - [x] Move targeting prompt text into `spells.json`.
     - [ ] Refactor "Quick Swap" to use the new system.
-    - [ ] Refine UI feedback for targeting (e.g., highlighting the selected row/column).
+    - [x] Refine UI feedback for targeting (e.g., highlighting the selected row/column).
 
 ## 2. Centralized UI Text
 

@@ -40,6 +40,7 @@ UIManager::UIManager(const sf::Font& font)
       magicTitle(font, "Magic Challenge", 24),
       m_attunementSelectionTitle(font, "", 24),
       m_quickSwapInstructionText(font, "", 18),
+      m_targetingPromptText(font, "", 18),
       m_dateText(font, "", 16),
       m_timeText(font, "", 16)
 {
@@ -73,6 +74,7 @@ UIManager::UIManager(const sf::Font& font)
     m_attunementSelectionTitle.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f, 150));
 
     m_quickSwapInstructionText.setFillColor(sf::Color::Yellow);
+    m_targetingPromptText.setFillColor(sf::Color::Yellow);
 
     m_dateText.setFillColor(sf::Color::White);
     m_timeText.setFillColor(sf::Color::White);
@@ -315,8 +317,12 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
             ySpellOffset -= 50.f;
         }
 
-        if (player.hasFreeSwap()) {
-            m_quickSwapInstructionText.setString("QUICK SWAP: Select a gem to swap.");
+    }
+
+    if (playMode == PlayMode::Targeting) {
+        const Spell* spell = dataManager.getSpellById(targetingRequest.abilityId);
+        if (spell) {
+            m_targetingPromptText.setString(wordWrap(spell->targetingPrompt, 50));
         }
     }
 
@@ -496,13 +502,10 @@ void UIManager::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin
             }
 
             if (playMode == PlayMode::Targeting) {
-                if (targetingRequest.abilityId == "gust_of_wind") {
-                    m_quickSwapInstructionText.setString(wordWrap("GUST OF WIND: Select a gem, then an adjacent gem to choose the direction.", 50));
-                    sf::FloatRect textRect = m_quickSwapInstructionText.getLocalBounds();
-                    m_quickSwapInstructionText.setOrigin(sf::Vector2f(textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f));
-                    m_quickSwapInstructionText.setPosition(sf::Vector2f(boardOrigin.x + (BOARD_WIDTH * TILE_SIZE) / 2.0f, boardOrigin.y - 70.0f));
-                    window.draw(m_quickSwapInstructionText);
-                }
+                sf::FloatRect textRect = m_targetingPromptText.getLocalBounds();
+                m_targetingPromptText.setOrigin(sf::Vector2f(textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f));
+                m_targetingPromptText.setPosition(sf::Vector2f(boardOrigin.x + (BOARD_WIDTH * TILE_SIZE) / 2.0f, boardOrigin.y - 70.0f));
+                window.draw(m_targetingPromptText);
             }
 
             // Render Active Effects

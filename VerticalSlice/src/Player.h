@@ -32,10 +32,6 @@ public:
 
     void setManaGainMultiplier(float multiplier);
 
-    bool hasFreeSwap() const;
-    void grantFreeSwap();
-    void useFreeSwap();
-
     float getStatModifier(const std::string& modifier) const;
 
     void takeDamage(int amount);
@@ -57,7 +53,6 @@ private:
     int m_maxMana;
     int m_vigor = 0;
     float m_manaGainMultiplier = 1.0f;
-    bool m_hasFreeSwap = false;
     std::vector<GemSubType> m_availableManaTypes; // Renamed to use m_ prefix
     std::map<GemSubType, int> mana;
     std::vector<Spell> spells;

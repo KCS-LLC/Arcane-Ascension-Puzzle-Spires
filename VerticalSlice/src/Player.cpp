@@ -196,17 +196,7 @@ float Player::getStatModifier(const std::string& modifier) const {
             }
         }
         return total; // Default additive bonus is 0.0
+        }
     }
-}
-
-bool Player::hasFreeSwap() const {
-    return m_hasFreeSwap;
-}
-
-void Player::grantFreeSwap() {
-    m_hasFreeSwap = true;
-}
-
-void Player::useFreeSwap() {
-    m_hasFreeSwap = false;
-}
+    
+    

@@ -303,6 +303,9 @@ void Game::handleInput(sf::Event event) {
             int row = (mb->position.y - static_cast<int>(m_boardOrigin.y)) / TILE_SIZE;
 
             if (m_playMode == PlayMode::Targeting) {
+                if (m_targetingSelections.empty()) {
+                    m_board.getGemAt(row, col)->setActionState(ActionState::Selected);
+                }
                 m_targetingSelections.push_back({col, row});
                 if (m_targetingSelections.size() >= m_targetingRequest.numberOfClicks) {
                     resolveTargeting();
@@ -312,28 +315,6 @@ void Game::handleInput(sf::Event event) {
 
             m_board.clearActionStates();
 
-            if (m_player.hasFreeSwap()) {
-                sf::Vector2i clickedGem = sf::Vector2i(col, row);
-                if (m_quickSwapFirstSelectedGem.x == -1) {
-                    m_quickSwapFirstSelectedGem = clickedGem;
-                    m_board.getGemAt(row, col)->setActionState(ActionState::Selected);
-                } else {
-                    if (m_quickSwapFirstSelectedGem == clickedGem) {
-                        m_board.getGemAt(row, col)->setActionState(ActionState::None);
-                        m_quickSwapFirstSelectedGem = {-1, -1};
-                    } else {
-                        m_isAnimating = true;
-                        m_isAnimatingSwap = true;
-                        m_animatingGems = { m_quickSwapFirstSelectedGem, sf::Vector2i(col, row) };
-                        m_animationClock.restart();
-                        
-                        m_board.getGemAt(m_quickSwapFirstSelectedGem.y, m_quickSwapFirstSelectedGem.x)->setActionState(ActionState::None);
-                        m_player.useFreeSwap();
-                        m_quickSwapFirstSelectedGem = {-1, -1};
-                    }
-                }
-                return; // Consume the event
-            }
             
             // --- Normal Swap Logic ---
             if (m_selectedGem.x == -1) {
@@ -781,6 +762,17 @@ void Game::resolveTargeting() {
                 m_rotationDirection = (dy > 0) ? 1 : -1;
                 m_animationClock.restart();
             }
+        }
+    } else if (m_targetingRequest.abilityId == "quick_swap_transference") {
+        if (m_targetingSelections.size() == 2) {
+            sf::Vector2i firstClick = m_targetingSelections[0];
+            sf::Vector2i secondClick = m_targetingSelections[1];
+
+            m_isAnimating = true;
+            m_isAnimatingSwap = true;
+            // Note: The click coordinates are (col, row), but m_animatingGems expects (x, y) which corresponds to (col, row)
+            m_animatingGems = { {firstClick.x, firstClick.y}, {secondClick.x, secondClick.y} };
+            m_animationClock.restart();
         }
     }
 

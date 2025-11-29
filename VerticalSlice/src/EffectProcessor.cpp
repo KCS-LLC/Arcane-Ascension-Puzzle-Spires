@@ -77,7 +77,11 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
 
         game.getPlayer().addEffect(activeEffect);
     } else if (effect.type == "FREE_SWAP") {
-        game.getPlayer().grantFreeSwap();
+        TargetingRequest request;
+        request.numberOfClicks = 2;
+        request.type = TargetType::Gem;
+        request.abilityId = spell.id; // Use the spell's ID
+        game.startTargeting(request);
     }
      else if (effect.type == "CREATE_BURNING_TILE") {
         int amount = 1; // Default to 1 burning tile
