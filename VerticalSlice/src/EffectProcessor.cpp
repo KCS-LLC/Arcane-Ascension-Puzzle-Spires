@@ -66,23 +66,29 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
         player.grantFreeSwap();
     }
      else if (effect.type == "CREATE_BURNING_TILE") {
-                int amount = 1; // Default to 1 burning tile
-                if (effect.params.count("amount")) {
-                    amount = effect.params.at("amount").get<int>();
+        int amount = 1; // Default to 1 burning tile
+        if (effect.params.count("amount")) {
+            amount = effect.params.at("amount").get<int>();
+        }
+        std::vector<sf::Vector2i> coords = board.getRandomGemCoords(amount);
+        for (const auto& coord : coords) {
+            BaseGem* gem = board.getGemAt(coord.x, coord.y);
+            if (gem) {
+                gem->setStatusEffect(StatusEffect::Burning);
+                
+                long long currentTime = timeManager.getCurrentTime().totalTimeUnits;
+                const int tickInterval = 20; // Activates every 20 time units
+                
+                // Schedule activation events
+                for (int i = 1; i <= (BURNING_TILE_DURATION / tickInterval) -1; ++i) {
+                     timeManager.addEvent({currentTime + (i * tickInterval), TimeEventType::BurningTile_Activation, coord});
                 }
-                std::vector<sf::Vector2i> coords = board.getRandomGemCoords(amount);
-                for (const auto& coord : coords) {
-                    BaseGem* gem = board.getGemAt(coord.x, coord.y);
-                    if (gem) {
-                        gem->setStatusEffect(StatusEffect::Burning);
-                        
-                        long long currentTime = timeManager.getCurrentTime().totalTimeUnits;
-                        timeManager.addEvent({currentTime + 20, TimeEventType::BurningTile_Activation, coord});
-                        timeManager.addEvent({currentTime + 40, TimeEventType::BurningTile_Activation, coord});
-                        timeManager.addEvent({currentTime + 60, TimeEventType::BurningTile_Expire, coord});
-                    }
-                }
+
+                // Schedule expiration event
+                timeManager.addEvent({currentTime + BURNING_TILE_DURATION, TimeEventType::BurningTile_Expire, coord});
             }
+        }
+    }
             
             // Other effects will be added here
     return {}; // Return empty vector if no gems were removed

@@ -9,6 +9,7 @@
 // Forward declarations
 class Player; 
 class Monster;
+class TimeManager;
 
 class Board {
 public:
@@ -24,7 +25,7 @@ public:
     void initialize(const std::vector<GemSubType>& possibleGems);
     void initializeForPowerTrial();
 
-    void render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, const sf::Font& font, sf::Clock& pulseClock, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo);
+    void render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, const sf::Font& font, sf::Clock& pulseClock, const TimeManager& timeManager, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo, const std::map<std::string, sf::Texture>& effectIconTextures);
     BaseGem* getGemAt(int r, int c) const;
     int getWidth() const;
     int getHeight() const;

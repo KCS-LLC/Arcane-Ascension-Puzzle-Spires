@@ -72,21 +72,6 @@ UIManager::UIManager(const sf::Font& font)
     m_attunementSelectionTitle.setOrigin(sf::Vector2f(titleBounds.position.x + titleBounds.size.x / 2.0f, titleBounds.position.y + titleBounds.size.y / 2.0f));
     m_attunementSelectionTitle.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f, 150));
 
-    // Load effect icons
-    if (!m_effectIconTextures["create_burning_tile_fire"].loadFromFile("assets/effect_burning.png")) {
-        std::cerr << "Failed to load burning effect icon" << std::endl;
-    }
-    if (!m_effectIconTextures["empower_weapon_enhancement"].loadFromFile("assets/fist.png")) {
-        std::cerr << "Failed to load empower weapon icon" << std::endl;
-    }
-    if (!m_effectIconTextures["mana_surge_enhancement"].loadFromFile("assets/gem_enhancement.png")) {
-        std::cerr << "Failed to load mana surge icon" << std::endl;
-    }
-
-    if (!m_effectIconTextures["burning_tile_effect"].loadFromFile("assets/effect_burning.png")) {
-        std::cerr << "Failed to load burning tile effect icon" << std::endl;
-    }
-
     m_quickSwapInstructionText.setFillColor(sf::Color::Yellow);
     m_quickSwapInstructionText.setString("QUICK SWAP: Select a gem to swap.");
     sf::FloatRect textRect = m_quickSwapInstructionText.getLocalBounds();
@@ -95,8 +80,15 @@ UIManager::UIManager(const sf::Font& font)
 
     m_dateText.setFillColor(sf::Color::White);
     m_timeText.setFillColor(sf::Color::White);
-    m_dateText.setPosition(sf::Vector2f(WINDOW_WIDTH - 240, 10));
-    m_timeText.setPosition(sf::Vector2f(WINDOW_WIDTH - 240, 30));
+
+    // Center the date/time text at the top
+    sf::FloatRect dateRect = m_dateText.getLocalBounds();
+    m_dateText.setOrigin(sf::Vector2f(dateRect.position.x + dateRect.size.x / 2.0f, dateRect.position.y + dateRect.size.y / 2.0f));
+    m_dateText.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f, 20));
+
+    sf::FloatRect timeRect = m_timeText.getLocalBounds();
+    m_timeText.setOrigin(sf::Vector2f(timeRect.position.x + timeRect.size.x / 2.0f, timeRect.position.y + timeRect.size.y / 2.0f));
+    m_timeText.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f, 40));
 }
       
 bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction) {
@@ -425,7 +417,7 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
     }
 }
 
-void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::map<GemSubType, sf::Texture>& gemTextures) {
+void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::map<GemSubType, sf::Texture>& gemTextures, const std::map<std::string, sf::Texture>& effectIconTextures) {
     window.draw(m_dateText);
     window.draw(m_timeText);
 
@@ -512,8 +504,8 @@ void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState cu
                 float xOffset = 20.f; // Start at the left of the panel
                 const float yOffset = 180.f; // A fixed Y position below the mana bars
                 for (const auto& effect : m_activeEffectsToRender) {
-                    auto it = m_effectIconTextures.find(effect.effectId);
-                    if (it != m_effectIconTextures.end()) {
+                    auto it = effectIconTextures.find(effect.effectId);
+                    if (it != effectIconTextures.end()) {
                         sf::Sprite icon(it->second);
                         
                         const sf::Texture& texture = it->second;

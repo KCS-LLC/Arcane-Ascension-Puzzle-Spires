@@ -83,3 +83,7 @@ std::string TimeManager::getTimeString() const {
        << std::setfill('0') << std::setw(2) << m_currentTime.minute;
     return ss.str();
 }
+
+const std::vector<TimeEvent>& TimeManager::getEvents() const {
+    return m_events;
+}

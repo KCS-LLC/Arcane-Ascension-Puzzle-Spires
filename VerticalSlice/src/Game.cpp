@@ -75,6 +75,9 @@ void Game::loadTextures() {
             }
         }
     }
+    if (!m_effectIconTextures["burning_tile_effect"].loadFromFile("assets/effect_burning.png")) {
+        std::cerr << "Failed to load burning tile effect icon" << std::endl;
+    }
 }
 
 void Game::setupJudgementTrial(const JudgementTrial& trial) {
@@ -545,7 +548,7 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
     if (m_gameState == GameState::Playing || m_gameState == GameState::Trial || m_isAnimating || m_gameState == GameState::GameOver || m_gameState == GameState::Judgement_TreasureRound) {
         // Do not render the board or animations if the trial is over
         if (m_gameState != GameState::Summary && m_gameState != GameState::AttunementReveal) {
-            m_board.render(m_window, m_boardOrigin, font, highlightClock, m_isAnimatingSwap, m_animatingGems, m_isAnimatingDestruction, m_destroyingGems, m_isAnimatingRefill, m_fallInfo);
+            m_board.render(m_window, m_boardOrigin, font, highlightClock, m_timeManager, m_isAnimatingSwap, m_animatingGems, m_isAnimatingDestruction, m_destroyingGems, m_isAnimatingRefill, m_fallInfo, m_effectIconTextures);
 
             const float swapAnimationDuration = 0.2f;
             const float destructionAnimationDuration = 0.3f;
@@ -614,7 +617,7 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
     }
 
     // UI Rendering
-    m_uiManager.render(m_window, m_gameMode, m_gameState, showPlayerDamageEffect, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, gemTextures);
+    m_uiManager.render(m_window, m_gameMode, m_gameState, showPlayerDamageEffect, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, gemTextures, m_effectIconTextures);
 
     m_window.display();
 }
@@ -659,7 +662,12 @@ void Game::handleTimeEvent(const TimeEvent& event) {
                 float damage = (m_player.getMaxMana() * 0.10f) * gem->getLevel();
                 m_monster.takeDamage(static_cast<int>(damage));
                 std::cout << "[EVENT] Burning tile dealt final " << static_cast<int>(damage) << " damage and expired. Monster HP: " << m_monster.getCurrentHp() << std::endl;
-                gem->setStatusEffect(StatusEffect::None);
+                
+                // Add the gem to be destroyed
+                m_destroyingGems.insert(event.coordinates);
+                m_isAnimating = true;
+                m_isAnimatingDestruction = true;
+                m_animationClock.restart();
             }
             break;
         }

@@ -2,6 +2,7 @@
 #include "Board.h"
 #include "Game.h" // For gemTextures
 #include "StringUtils.h"
+#include "TimeManager.h" // Include for TimeManager
 #include <cstdint> // For std::uint8_t
 #include <random>
 #include <iostream>
@@ -63,7 +64,7 @@ void Board::initializeForPowerTrial() {
 
 
 
-void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, const sf::Font& font, sf::Clock& pulseClock, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo) {
+void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, const sf::Font& font, sf::Clock& pulseClock, const TimeManager& timeManager, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo, const std::map<std::string, sf::Texture>& effectIconTextures) {
     sf::RectangleShape background(sf::Vector2f(TILE_SIZE, TILE_SIZE));
     sf::Text counterText(font, "", 18);
     counterText.setFillColor(sf::Color::White);
@@ -106,13 +107,43 @@ void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, co
                 sprite.setPosition(tilePosition);
                 window.draw(sprite);
 
-                // 3. Draw Front Effect Layer (Placeholder)
-                if (m_grid[r][c]->getStatusEffect() != StatusEffect::None) {
-                    // Placeholder: Draw a semi-transparent red rectangle for any status effect
-                    sf::RectangleShape effectOverlay(sf::Vector2f(TILE_SIZE, TILE_SIZE));
-                    effectOverlay.setFillColor(sf::Color(255, 0, 0, 80)); // Semi-transparent red
-                    effectOverlay.setPosition(tilePosition);
-                    window.draw(effectOverlay);
+                // 3. Draw Front Effect Layer
+                if (m_grid[r][c]->getStatusEffect() == StatusEffect::Burning) {
+                    auto it = effectIconTextures.find("burning_tile_effect");
+                    if (it != effectIconTextures.end()) {
+                        sf::Sprite effectSprite(it->second);
+                        
+                        // Scale the icon to fit the tile
+                        sf::Vector2u textureSize = it->second.getSize();
+                        effectSprite.setScale(sf::Vector2f(static_cast<float>(TILE_SIZE) / textureSize.x, static_cast<float>(TILE_SIZE) / textureSize.y));
+                        
+                        effectSprite.setPosition(tilePosition);
+                        window.draw(effectSprite);
+
+                        // Find the relevant BurningTile_Expire event and draw the duration bar
+                        const std::vector<TimeEvent>& events = timeManager.getEvents();
+                        for (const auto& event : events) {
+                            if (event.type == TimeEventType::BurningTile_Expire && event.coordinates == sf::Vector2i(r, c)) {
+                                long long startTime = event.triggerTime - BURNING_TILE_DURATION; // Infer start time
+                                long long currentTime = timeManager.getCurrentTime().totalTimeUnits;
+                                float durationPercent = 1.0f - static_cast<float>(currentTime - startTime) / BURNING_TILE_DURATION;
+                                durationPercent = std::max(0.0f, std::min(1.0f, durationPercent)); // Clamp between 0 and 1
+
+                                if (durationPercent > 0) {
+                                    sf::RectangleShape durationBarBack(sf::Vector2f(TILE_SIZE, 4));
+                                    durationBarBack.setFillColor(sf::Color(50, 50, 50));
+                                    durationBarBack.setPosition(sf::Vector2f(tilePosition.x, tilePosition.y));
+                                    window.draw(durationBarBack);
+
+                                    sf::RectangleShape durationBarFront(sf::Vector2f(TILE_SIZE * durationPercent, 4));
+                                    durationBarFront.setFillColor(sf::Color::Red);
+                                    durationBarFront.setPosition(sf::Vector2f(tilePosition.x, tilePosition.y));
+                                    window.draw(durationBarFront);
+                                }
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 // 5. Draw Frame Layer

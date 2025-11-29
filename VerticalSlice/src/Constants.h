@@ -7,6 +7,7 @@ constexpr int WINDOW_WIDTH = 1280;
 constexpr int WINDOW_HEIGHT = 720;
 
 constexpr float BASE_SWAP_SPEED = 20.0f;
+constexpr int BURNING_TILE_DURATION = 100;
 
 enum class GameMode {
     JUDGEMENT,

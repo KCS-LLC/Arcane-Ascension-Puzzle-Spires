@@ -87,6 +87,7 @@ private:
     // Combat UI state
     bool showPlayerDamageEffect = false;
     sf::Clock playerDamageClock;
+    std::map<std::string, sf::Texture> m_effectIconTextures;
 
     // Board positioning
     sf::Vector2f m_boardOrigin;

@@ -47,6 +47,9 @@ public:
     // Returns a formatted string for the time (e.g., "08:00")
     std::string getTimeString() const;
 
+    // Returns the raw event list (for rendering purposes)
+    const std::vector<TimeEvent>& getEvents() const;
+
 private:
     GameTime m_currentTime;
     std::vector<TimeEvent> m_events;

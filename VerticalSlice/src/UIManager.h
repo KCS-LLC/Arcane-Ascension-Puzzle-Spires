@@ -35,7 +35,7 @@ public:
     void setupTrial(const JudgementTrial& trial);
     void setupTreasureRound();
     void update(const Player& player, const Monster& monster, const TimeManager& timeManager, GameMode gameMode, GameState currentState, const Room* currentRoom, const Floor& currentFloor, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::vector<ActiveEffect>& activeEffects);
-    void render(sf::RenderWindow& window, GameMode gameMode, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::map<GemSubType, sf::Texture>& gemTextures);
+    void render(sf::RenderWindow& window, GameMode gameMode, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::map<GemSubType, sf::Texture>& gemTextures, const std::map<std::string, sf::Texture>& effectIconTextures);
 
     const std::vector<sf::RectangleShape>& getSpellButtons() const;
 
@@ -43,7 +43,6 @@ private:
     sf::Font font;
     sf::Clock m_pulseClock;
     std::vector<ActiveEffect> m_activeEffectsToRender;
-    std::map<std::string, sf::Texture> m_effectIconTextures;
 
     // Judgement Trial UI
     sf::Text trialTypeText;
