@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include <memory>
+// removed <memory> include
 #include "Board.h"
 #include "DataManager.h"
 #include "Player.h"
@@ -53,12 +53,12 @@ private:
     bool processTreasureMerges();
     void moveToRoom(int destinationRoomId);
 
-    std::unique_ptr<sf::RenderWindow> m_window;
-    DataManager dataManager;
+    sf::RenderWindow m_window;
+    DataManager dataManager; // Must be initialized before managers that use it.
     UIManager m_uiManager;
     TimeManager m_timeManager;
     GemFactory m_gemFactory;
-        Board m_board;
+    Board m_board;
     Player m_player;
     Monster m_monster;
     MatchDetector m_matchDetector;

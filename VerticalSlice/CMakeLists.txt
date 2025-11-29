@@ -89,4 +89,12 @@ add_custom_command(TARGET game POST_BUILD
     "${CMAKE_CURRENT_BINARY_DIR}/data"
 )
 
+# Automatically copy required runtime DLLs to the build directory for portability.
+set(MINGW_BIN_PATH "C:/msys64/mingw64/bin")
+add_custom_command(TARGET game POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${MINGW_BIN_PATH}/libstdc++-6.dll" "${CMAKE_CURRENT_BINARY_DIR}")
+add_custom_command(TARGET game POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${MINGW_BIN_PATH}/libgcc_s_seh-1.dll" "${CMAKE_CURRENT_BINARY_DIR}")
+add_custom_command(TARGET game POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${MINGW_BIN_PATH}/libwinpthread-1.dll" "${CMAKE_CURRENT_BINARY_DIR}")
+add_custom_command(TARGET game POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${MINGW_BIN_PATH}/libatomic-1.dll" "${CMAKE_CURRENT_BINARY_DIR}")
+add_custom_command(TARGET game POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${MINGW_BIN_PATH}/zlib1.dll" "${CMAKE_CURRENT_BINARY_DIR}")
+
 message(STATUS "Project configured to build 'game.exe' with manually found SFML libraries.")

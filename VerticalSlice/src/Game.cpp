@@ -16,7 +16,8 @@
 std::map<GemSubType, sf::Texture> gemTextures;
 
 Game::Game()
-    : dataManager(),
+    : m_window(sf::VideoMode(sf::Vector2u(WINDOW_WIDTH, WINDOW_HEIGHT)), "Judgement", sf::Style::Titlebar | sf::Style::Close),
+      dataManager(),
       m_uiManager(dataManager.getFont()),
       m_gemFactory(dataManager),
       m_board(BOARD_WIDTH, BOARD_HEIGHT, m_gemFactory),
@@ -32,8 +33,7 @@ Game::Game()
       m_currentTurn(0),
       m_currentScore(0)
 {
-    m_window = std::make_unique<sf::RenderWindow>(sf::VideoMode(sf::Vector2u(WINDOW_WIDTH, WINDOW_HEIGHT)), "Judgement", sf::Style::Titlebar | sf::Style::Close);
-    m_window->setFramerateLimit(60);
+    m_window.setFramerateLimit(60);
     loadTextures();
 
     const int boardPixelWidth = BOARD_WIDTH * TILE_SIZE;
@@ -41,7 +41,7 @@ Game::Game()
     m_boardOrigin.x = (WINDOW_WIDTH - boardPixelWidth) / 2.0f;
     m_boardOrigin.y = WINDOW_HEIGHT - boardPixelHeight - 20.0f;
 
-    m_uiManager.setup(m_player, m_window->getSize(), m_boardOrigin, {}); // Passing empty attunements for now
+    m_uiManager.setup(m_player, m_window.getSize(), m_boardOrigin, {}); // Passing empty attunements for now
 
     dataManager.loadAttunements("data/attunements.json");
     const Attunement* defaultAttunement = dataManager.getAttunementById("diviner");
@@ -189,7 +189,7 @@ void Game::moveToRoom(int destinationRoomId) {
 
 void Game::run() {
     sf::Clock clock;
-    while (m_window->isOpen()) {
+    while (m_window.isOpen()) {
         sf::Time deltaTime = clock.restart();
         processEvents();
         update(deltaTime);
@@ -198,7 +198,7 @@ void Game::run() {
 }
 
 void Game::processEvents() {
-    for (auto event = m_window->pollEvent(); event; event = m_window->pollEvent()) {
+    for (auto event = m_window.pollEvent(); event; event = m_window.pollEvent()) {
         if (m_isAnimating) continue; // Ignore input during animations
         handleInput(*event);
     }
@@ -212,7 +212,7 @@ TimeManager& Game::getTimeManager() { return m_timeManager; }
 
 void Game::handleInput(sf::Event event) {
     if (event.is<sf::Event::Closed>()) {
-        m_window->close();
+        m_window.close();
     }
 
     UIAction action;
@@ -576,13 +576,13 @@ void Game::setBoardStateDirty(bool isDirty) {
 }
 
 void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
-    m_window->clear(sf::Color(30, 30, 30));
+    m_window.clear(sf::Color(30, 30, 30));
 
     // Only render the board and animations during combat-related states
     if (m_gameState == GameState::Playing || m_gameState == GameState::Trial || m_isAnimating || m_gameState == GameState::GameOver || m_gameState == GameState::Judgement_TreasureRound) {
         // Do not render the board or animations if the trial is over
         if (m_gameState != GameState::Summary && m_gameState != GameState::AttunementReveal) {
-            m_board.render(*m_window, m_boardOrigin, font, highlightClock, m_timeManager, m_isAnimatingSwap, m_animatingGems, m_isAnimatingDestruction, m_destroyingGems, m_isAnimatingRefill, m_fallInfo, m_effectIconTextures, m_isAnimatingRowRotation, m_rotatingRow, m_isAnimatingColumnRotation, m_rotatingColumn);
+            m_board.render(m_window, m_boardOrigin, font, highlightClock, m_timeManager, m_isAnimatingSwap, m_animatingGems, m_isAnimatingDestruction, m_destroyingGems, m_isAnimatingRefill, m_fallInfo, m_effectIconTextures, m_isAnimatingRowRotation, m_rotatingRow, m_isAnimatingColumnRotation, m_rotatingColumn);
 
             const float swapAnimationDuration = 0.2f;
             const float destructionAnimationDuration = 0.3f;
@@ -599,14 +599,14 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                 if (g1) {
                     sf::Sprite s1 = g1->getSprite();
                     s1.setPosition(p1_local + (p2_local - p1_local) * p + m_boardOrigin);
-                    m_window->draw(s1);
+                    m_window.draw(s1);
                 }
 
                 BaseGem* g2 = m_board.getGemAt(m_animatingGems.second.y, m_animatingGems.second.x);
                 if (g2) {
                     sf::Sprite s2 = g2->getSprite();
                     s2.setPosition(p2_local + (p1_local - p2_local) * p + m_boardOrigin);
-                    m_window->draw(s2);
+                    m_window.draw(s2);
                 }
             }
 
@@ -627,7 +627,7 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                         sprite.setScale({baseScaleX * scale, baseScaleY * scale});
                         
                         sprite.setPosition({pos.y * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.x, pos.x * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.y});
-                        m_window->draw(sprite);
+                        m_window.draw(sprite);
                     }
                 }
             }
@@ -643,7 +643,7 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                         
                         sf::Sprite sprite = gem->getSprite();
                         sprite.setPosition(start_local + (end_local - start_local) * p + m_boardOrigin);
-                        m_window->draw(sprite);
+                        m_window.draw(sprite);
                     }
                 }
             }
@@ -659,7 +659,7 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                         if (newX < 0) newX += BOARD_WIDTH;
                         if (newX >= BOARD_WIDTH) newX -= BOARD_WIDTH;
                         sprite.setPosition(sf::Vector2f(newX * TILE_SIZE + m_boardOrigin.x, m_rotatingRow * TILE_SIZE + m_boardOrigin.y));
-                        m_window->draw(sprite);
+                        m_window.draw(sprite);
                     }
                 }
             } else if (m_isAnimatingColumnRotation) {
@@ -672,7 +672,7 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                         if (newY < 0) newY += BOARD_HEIGHT;
                         if (newY >= BOARD_HEIGHT) newY -= BOARD_HEIGHT;
                         sprite.setPosition(sf::Vector2f(m_rotatingColumn * TILE_SIZE + m_boardOrigin.x, newY * TILE_SIZE + m_boardOrigin.y));
-                        m_window->draw(sprite);
+                        m_window.draw(sprite);
                     }
                 }
             }
@@ -680,9 +680,9 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
     }
 
     // UI Rendering
-    m_uiManager.render(*m_window, m_boardOrigin, m_gameMode, m_gameState, m_playMode, m_targetingRequest, showPlayerDamageEffect, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, gemTextures, m_effectIconTextures);
+    m_uiManager.render(m_window, m_boardOrigin, m_gameMode, m_gameState, m_playMode, m_targetingRequest, showPlayerDamageEffect, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, gemTextures, m_effectIconTextures);
 
-    m_window->display();
+    m_window.display();
 }
 
 void Game::setupTreasureRound() {
