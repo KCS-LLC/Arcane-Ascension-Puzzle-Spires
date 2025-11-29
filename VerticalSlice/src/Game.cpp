@@ -302,6 +302,14 @@ void Game::handleInput(sf::Event event) {
             int col = (mb->position.x - static_cast<int>(m_boardOrigin.x)) / TILE_SIZE;
             int row = (mb->position.y - static_cast<int>(m_boardOrigin.y)) / TILE_SIZE;
 
+            if (m_playMode == PlayMode::Targeting) {
+                m_targetingSelections.push_back({col, row});
+                if (m_targetingSelections.size() >= m_targetingRequest.numberOfClicks) {
+                    resolveTargeting();
+                }
+                return; // Consume the click
+            }
+
             m_board.clearActionStates();
 
             if (m_player.hasFreeSwap()) {
@@ -481,7 +489,23 @@ void Game::update(sf::Time deltaTime) {
                 m_isAnimatingRefill = false;
                 handleMatches(false); // Cascade-initiated move
                 
-    std::cout << "[UPDATE] Animation cycle finished." << std::endl;
+                if (!m_isAnimatingDestruction) {
+                    m_isAnimating = false;
+                }
+            }
+        } else if (m_isAnimatingRowRotation) {
+            if (m_animationClock.getElapsedTime().asSeconds() >= 0.3f) {
+                m_isAnimating = false;
+                m_isAnimatingRowRotation = false;
+                m_board.rotateRow(m_rotatingRow, m_rotationDirection);
+                m_boardStateDirty = true;
+            }
+        } else if (m_isAnimatingColumnRotation) {
+            if (m_animationClock.getElapsedTime().asSeconds() >= 0.3f) {
+                m_isAnimating = false;
+                m_isAnimatingColumnRotation = false;
+                m_board.rotateColumn(m_rotatingColumn, m_rotationDirection);
+                m_boardStateDirty = true;
             }
         }
         return; 
@@ -548,11 +572,11 @@ void Game::update(sf::Time deltaTime) {
     switch (m_gameMode) {
         case GameMode::JUDGEMENT:
         {
-            m_uiManager.update(m_player, m_monster, m_timeManager, m_gameMode, m_gameState, nullptr, Floor(), {}, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, m_player.getActiveEffects());
+            m_uiManager.update(m_player, m_monster, m_timeManager, m_gameMode, m_gameState, m_playMode, m_targetingRequest, nullptr, Floor(), {}, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, m_player.getActiveEffects());
             break;
         }
         case GameMode::TOWER_CLIMB:
-            m_uiManager.update(m_player, m_monster, m_timeManager, m_gameMode, m_gameState, m_currentRoom, m_currentFloor, m_visitedRoomIds, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, m_player.getActiveEffects());
+            m_uiManager.update(m_player, m_monster, m_timeManager, m_gameMode, m_gameState, m_playMode, m_targetingRequest, m_currentRoom, m_currentFloor, m_visitedRoomIds, dataManager, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, m_player.getActiveEffects());
             break;
     }
 
@@ -574,7 +598,7 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
     if (m_gameState == GameState::Playing || m_gameState == GameState::Trial || m_isAnimating || m_gameState == GameState::GameOver || m_gameState == GameState::Judgement_TreasureRound) {
         // Do not render the board or animations if the trial is over
         if (m_gameState != GameState::Summary && m_gameState != GameState::AttunementReveal) {
-            m_board.render(m_window, m_boardOrigin, font, highlightClock, m_timeManager, m_isAnimatingSwap, m_animatingGems, m_isAnimatingDestruction, m_destroyingGems, m_isAnimatingRefill, m_fallInfo, m_effectIconTextures);
+            m_board.render(m_window, m_boardOrigin, font, highlightClock, m_timeManager, m_isAnimatingSwap, m_animatingGems, m_isAnimatingDestruction, m_destroyingGems, m_isAnimatingRefill, m_fallInfo, m_effectIconTextures, m_isAnimatingRowRotation, m_rotatingRow, m_isAnimatingColumnRotation, m_rotatingColumn);
 
             const float swapAnimationDuration = 0.2f;
             const float destructionAnimationDuration = 0.3f;
@@ -639,11 +663,40 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                     }
                 }
             }
+
+            // Render rotation animation
+            if (m_isAnimatingRowRotation) {
+                p = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / 0.3f);
+                for (int c = 0; c < BOARD_WIDTH; ++c) {
+                    BaseGem* gem = m_board.getGemAt(m_rotatingRow, c);
+                    if (gem) {
+                        sf::Sprite sprite = gem->getSprite();
+                        float newX = (c + m_rotationDirection * p);
+                        if (newX < 0) newX += BOARD_WIDTH;
+                        if (newX >= BOARD_WIDTH) newX -= BOARD_WIDTH;
+                        sprite.setPosition(sf::Vector2f(newX * TILE_SIZE + m_boardOrigin.x, m_rotatingRow * TILE_SIZE + m_boardOrigin.y));
+                        m_window.draw(sprite);
+                    }
+                }
+            } else if (m_isAnimatingColumnRotation) {
+                p = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / 0.3f);
+                for (int r = 0; r < BOARD_HEIGHT; ++r) {
+                    BaseGem* gem = m_board.getGemAt(r, m_rotatingColumn);
+                    if (gem) {
+                        sf::Sprite sprite = gem->getSprite();
+                        float newY = (r + m_rotationDirection * p);
+                        if (newY < 0) newY += BOARD_HEIGHT;
+                        if (newY >= BOARD_HEIGHT) newY -= BOARD_HEIGHT;
+                        sprite.setPosition(sf::Vector2f(m_rotatingColumn * TILE_SIZE + m_boardOrigin.x, newY * TILE_SIZE + m_boardOrigin.y));
+                        m_window.draw(sprite);
+                    }
+                }
+            }
         }
     }
 
     // UI Rendering
-    m_uiManager.render(m_window, m_gameMode, m_gameState, showPlayerDamageEffect, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, gemTextures, m_effectIconTextures);
+    m_uiManager.render(m_window, m_gameMode, m_gameState, m_playMode, m_targetingRequest, showPlayerDamageEffect, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, gemTextures, m_effectIconTextures);
 
     m_window.display();
 }
@@ -698,4 +751,41 @@ void Game::handleTimeEvent(const TimeEvent& event) {
             break;
         }
     }
+}
+
+void Game::startTargeting(TargetingRequest request) {
+    m_playMode = PlayMode::Targeting;
+    m_targetingRequest = request;
+    m_targetingSelections.clear();
+}
+
+void Game::resolveTargeting() {
+    if (m_targetingRequest.abilityId == "gust_of_wind") {
+        if (m_targetingSelections.size() == 2) {
+            sf::Vector2i firstClick = m_targetingSelections[0];
+            sf::Vector2i secondClick = m_targetingSelections[1];
+
+            int dx = secondClick.x - firstClick.x;
+            int dy = secondClick.y - firstClick.y;
+
+            if (abs(dx) > abs(dy)) { // Horizontal rotation
+                m_isAnimating = true;
+                m_isAnimatingRowRotation = true;
+                m_rotatingRow = firstClick.y;
+                m_rotationDirection = (dx > 0) ? 1 : -1;
+                m_animationClock.restart();
+            } else { // Vertical rotation
+                m_isAnimating = true;
+                m_isAnimatingColumnRotation = true;
+                m_rotatingColumn = firstClick.x;
+                m_rotationDirection = (dy > 0) ? 1 : -1;
+                m_animationClock.restart();
+            }
+        }
+    }
+
+    // Reset targeting state
+    m_playMode = PlayMode::Normal;
+    m_targetingRequest = {};
+    m_targetingSelections.clear();
 }

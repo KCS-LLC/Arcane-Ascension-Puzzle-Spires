@@ -76,7 +76,7 @@ UIManager::UIManager(const sf::Font& font)
     m_quickSwapInstructionText.setString("QUICK SWAP: Select a gem to swap.");
     sf::FloatRect textRect = m_quickSwapInstructionText.getLocalBounds();
     m_quickSwapInstructionText.setOrigin(sf::Vector2f(textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f));
-    m_quickSwapInstructionText.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f, 350));
+    m_quickSwapInstructionText.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f, 80.0f));
 
     m_dateText.setFillColor(sf::Color::White);
     m_timeText.setFillColor(sf::Color::White);
@@ -222,7 +222,7 @@ void UIManager::setupTreasureRound() {
     scoreGoalText.setString(""); // No score goal, just maximize
 }
 
-void UIManager::update(const Player& player, const Monster& monster, const TimeManager& timeManager, GameMode gameMode, GameState currentState, const Room* currentRoom, const Floor& currentFloor, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::vector<ActiveEffect>& activeEffects) {
+void UIManager::update(const Player& player, const Monster& monster, const TimeManager& timeManager, GameMode gameMode, GameState currentState, PlayMode playMode, const TargetingRequest& targetingRequest, const Room* currentRoom, const Floor& currentFloor, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::vector<ActiveEffect>& activeEffects) {
     m_dateText.setString(timeManager.getDateString());
     m_timeText.setString(timeManager.getTimeString());
 
@@ -417,7 +417,7 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
     }
 }
 
-void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState currentState, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::map<GemSubType, sf::Texture>& gemTextures, const std::map<std::string, sf::Texture>& effectIconTextures) {
+void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState currentState, PlayMode playMode, const TargetingRequest& targetingRequest, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::map<GemSubType, sf::Texture>& gemTextures, const std::map<std::string, sf::Texture>& effectIconTextures) {
     window.draw(m_dateText);
     window.draw(m_timeText);
 
@@ -497,6 +497,13 @@ void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState cu
 
             if (m_activeEffectsToRender.size() > 0 && m_activeEffectsToRender[0].effectId == "quick_swap_transference") {
                 window.draw(m_quickSwapInstructionText);
+            }
+
+            if (playMode == PlayMode::Targeting) {
+                if (targetingRequest.abilityId == "gust_of_wind") {
+                    m_quickSwapInstructionText.setString("GUST OF WIND: Select a gem, then an adjacent gem to choose the direction.");
+                    window.draw(m_quickSwapInstructionText);
+                }
             }
 
             // Render Active Effects

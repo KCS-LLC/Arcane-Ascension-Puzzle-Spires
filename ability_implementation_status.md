@@ -26,9 +26,9 @@ This document tracks the current implementation status of each Quartz-Rank Abili
     *   **To Reach 100:** (Already at 100)
 
 *   **Gust of Wind**
-    *   **Score:** 0/100
-    *   **Reasoning:** The effect type `ROTATE_ROW_COLUMN` exists, but the implementation in `EffectProcessor.cpp` is a placeholder (`board.rotateRow(0, 1);`). It does not allow the player to choose a row or column, and there is no UI for this interaction.
-    *   **To Reach 100:** Implement a new game state and UI to prompt the player to select a row or column. Implement the corresponding board logic to rotate the chosen row/column.
+    *   **Score:** 50/100
+    *   **Reasoning:** The core unified targeting system has been implemented and is functional. The "Gust of Wind" ability now correctly initiates targeting mode and processes a selected row for rotation. The next steps involve refining the UI feedback and refactoring "Quick Swap" to use this new system.
+    *   **To Reach 100:** Refine UI feedback for targeting (e.g., visual selection of row/column). Refactor "Quick Swap" to utilize the new unified targeting system.
 
 ---
 
@@ -105,9 +105,9 @@ This document tracks the current implementation status of each Quartz-Rank Abili
 ## Summoner
 
 *   **Gust of Wind**
-    *   **Score:** 0/100
-    *   **Reasoning:** (Same as Elementalist's Gust of Wind) The effect type `ROTATE_ROW_COLUMN` exists, but the implementation in `EffectProcessor.cpp` is a placeholder (`board.rotateRow(0, 1);`). It does not allow the player to choose a row or column, and there is no UI for this interaction.
-    *   **To Reach 100:** Implement a new game state and UI to prompt the player to select a row or column. Implement the corresponding board logic to rotate the chosen row/column.
+    *   **Score:** 10/100
+    *   **Reasoning:** Architectural planning for a unified, scalable targeting system is complete. Implementation of this central system has begun, starting with "Gust of Wind" as the first use case.
+    *   **To Reach 100:** Complete the implementation of the unified targeting system, including the UI prompts and board rotation logic. Then, refactor "Quick Swap" to use the same system.
 
 *   **Quick Swap**
     *   **Score:** 100/100

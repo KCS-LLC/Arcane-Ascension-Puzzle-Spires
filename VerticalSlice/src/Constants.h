@@ -35,3 +35,14 @@ enum class GameState {
     EnduranceChallenge,
     MagicChallenge
 };
+
+enum class PlayMode {
+    Normal,
+    Targeting
+};
+
+enum class TargetType {
+    Gem,
+    Row,
+    Column
+};

@@ -31,7 +31,13 @@ public:
     Board& getBoard();
     GemFactory& getGemFactory();
     TimeManager& getTimeManager();
+    void startTargeting(TargetingRequest request);
 private:
+    PlayMode m_playMode = PlayMode::Normal;
+    TargetingRequest m_targetingRequest;
+    std::vector<sf::Vector2i> m_targetingSelections;
+
+    void resolveTargeting();
     bool m_boardStateDirty = false;
     void processEvents();
     void update(sf::Time deltaTime);
@@ -88,6 +94,11 @@ private:
     bool m_isSwappingBack = false; // Flag for the reverse animation
     bool m_isAnimatingDestruction = false;
     bool m_isAnimatingRefill = false;
+    bool m_isAnimatingRowRotation = false;
+    bool m_isAnimatingColumnRotation = false;
+    int m_rotatingRow;
+    int m_rotatingColumn;
+    int m_rotationDirection;
     sf::Clock m_animationClock;
     std::pair<sf::Vector2i, sf::Vector2i> m_animatingGems;
     std::set<sf::Vector2i, Vector2iCompare> m_destroyingGems;

@@ -64,7 +64,7 @@ void Board::initializeForPowerTrial() {
 
 
 
-void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, const sf::Font& font, sf::Clock& pulseClock, const TimeManager& timeManager, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo, const std::map<std::string, sf::Texture>& effectIconTextures) {
+void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, const sf::Font& font, sf::Clock& pulseClock, const TimeManager& timeManager, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo, const std::map<std::string, sf::Texture>& effectIconTextures, bool isAnimatingRowRotation, int rotatingRow, bool isAnimatingColumnRotation, int rotatingColumn) {
     sf::RectangleShape background(sf::Vector2f(TILE_SIZE, TILE_SIZE));
     sf::Text counterText(font, "", 18);
     counterText.setFillColor(sf::Color::White);
@@ -92,6 +92,14 @@ void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, co
                         break;
                     }
                 }
+            }
+
+            // NEW: Rotation animation check
+            if (isAnimatingRowRotation && r == rotatingRow) {
+                shouldDraw = false;
+            }
+            if (isAnimatingColumnRotation && c == rotatingColumn) {
+                shouldDraw = false;
             }
 
             if (m_grid[r][c] && shouldDraw) {

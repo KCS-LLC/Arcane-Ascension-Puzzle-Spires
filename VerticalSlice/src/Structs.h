@@ -14,8 +14,13 @@ enum class ActionState { None, Selected, ValidMoveHint };
 
 #include "json.hpp"
 
-
 // --- Data Structures ---
+
+struct TargetingRequest {
+    int numberOfClicks = 0;
+    TargetType type = TargetType::Gem;
+    std::string abilityId = ""; // e.g., "quick_swap", "gust_of_wind"
+};
 
 struct Effect {
     std::string type;

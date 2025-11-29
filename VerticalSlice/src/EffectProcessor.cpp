@@ -19,8 +19,11 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
             game.getPlayer().heal(effect.params.at("amount").get<int>());
         }
     } else if (effect.type == "ROTATE_ROW_COLUMN") {
-        // Placeholder for UI interaction
-        game.getBoard().rotateRow(0, 1);
+        TargetingRequest request;
+        request.numberOfClicks = 2;
+        request.type = TargetType::Row;
+        request.abilityId = "gust_of_wind";
+        game.startTargeting(request);
     } else if (effect.type == "REMOVE_RANDOM_GEMS") {
         if (effect.params.count("amount")) {
             int amount = effect.params.at("amount").get<int>();
