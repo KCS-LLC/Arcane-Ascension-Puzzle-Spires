@@ -30,6 +30,7 @@
     "id": "gust_of_wind_air",
     "name": "Gust of Wind",
     "description": "Rotates all gems in the chosen row or column.",
+    "targeting_prompt": "GUST OF WIND: Select a gem, then an adjacent gem to choose the direction.",
     "manaType": "Air",
     "manaCost": 20,
     "speedCost": 30,

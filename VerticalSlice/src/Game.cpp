@@ -696,7 +696,7 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
     }
 
     // UI Rendering
-    m_uiManager.render(m_window, m_gameMode, m_gameState, m_playMode, m_targetingRequest, showPlayerDamageEffect, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, gemTextures, m_effectIconTextures);
+    m_uiManager.render(m_window, m_boardOrigin, m_gameMode, m_gameState, m_playMode, m_targetingRequest, showPlayerDamageEffect, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, gemTextures, m_effectIconTextures);
 
     m_window.display();
 }

@@ -31,6 +31,7 @@ struct Spell {
     std::string id;
     std::string name;
     std::string description;
+    std::string targetingPrompt;
     GemSubType costType;
     int manaCost;
     int speedCost;

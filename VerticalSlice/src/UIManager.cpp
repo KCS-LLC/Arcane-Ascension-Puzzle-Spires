@@ -73,10 +73,6 @@ UIManager::UIManager(const sf::Font& font)
     m_attunementSelectionTitle.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f, 150));
 
     m_quickSwapInstructionText.setFillColor(sf::Color::Yellow);
-    m_quickSwapInstructionText.setString("QUICK SWAP: Select a gem to swap.");
-    sf::FloatRect textRect = m_quickSwapInstructionText.getLocalBounds();
-    m_quickSwapInstructionText.setOrigin(sf::Vector2f(textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f));
-    m_quickSwapInstructionText.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f, 80.0f));
 
     m_dateText.setFillColor(sf::Color::White);
     m_timeText.setFillColor(sf::Color::White);
@@ -417,7 +413,7 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
     }
 }
 
-void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState currentState, PlayMode playMode, const TargetingRequest& targetingRequest, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::map<GemSubType, sf::Texture>& gemTextures, const std::map<std::string, sf::Texture>& effectIconTextures) {
+void UIManager::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, GameMode gameMode, GameState currentState, PlayMode playMode, const TargetingRequest& targetingRequest, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::map<GemSubType, sf::Texture>& gemTextures, const std::map<std::string, sf::Texture>& effectIconTextures) {
     window.draw(m_dateText);
     window.draw(m_timeText);
 
@@ -501,7 +497,10 @@ void UIManager::render(sf::RenderWindow& window, GameMode gameMode, GameState cu
 
             if (playMode == PlayMode::Targeting) {
                 if (targetingRequest.abilityId == "gust_of_wind") {
-                    m_quickSwapInstructionText.setString("GUST OF WIND: Select a gem, then an adjacent gem to choose the direction.");
+                    m_quickSwapInstructionText.setString(wordWrap("GUST OF WIND: Select a gem, then an adjacent gem to choose the direction.", 50));
+                    sf::FloatRect textRect = m_quickSwapInstructionText.getLocalBounds();
+                    m_quickSwapInstructionText.setOrigin(sf::Vector2f(textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f));
+                    m_quickSwapInstructionText.setPosition(sf::Vector2f(boardOrigin.x + (BOARD_WIDTH * TILE_SIZE) / 2.0f, boardOrigin.y - 70.0f));
                     window.draw(m_quickSwapInstructionText);
                 }
             }

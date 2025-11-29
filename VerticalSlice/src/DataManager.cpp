@@ -85,6 +85,9 @@ void from_json(const json& j, Spell& s) {
     if (j.contains("description")) {
         j.at("description").get_to(s.description);
     }
+    if (j.contains("targeting_prompt")) {
+        j.at("targeting_prompt").get_to(s.targetingPrompt);
+    }
     j.at("manaCost").get_to(s.manaCost);
     s.costType = stringToGemSubType(j.at("manaType").get<std::string>());
     j.at("speedCost").get_to(s.speedCost);
