@@ -17,9 +17,9 @@ The project is in a stable, compiling state. The core gameplay loop, combining p
 *   **UI Feedback:** The UI provides clear visual feedback for player/monster stats, spell readiness, and monster attacks, with distinct screens for combat and exploration.
 
 ## How to Build and Run
-1.  **Environment:** Ensure you have a C++ compiler (like g++) and SFML 3.0+ installed and configured.
-2.  **Build:** Use the compile command specified in `BUILD_ENVIRONMENT.md`.
-3.  **Run:** Execute the generated `game.exe` from within the `VerticalSlice` directory.
+1.  **Environment:** Ensure you have the MSYS2 environment with the Clang C++ compiler and Ninja build tool installed.
+2.  **Compile SFML:** This project requires a specific version of the SFML library compiled with Clang. Follow the detailed steps in `BUILD_ENVIRONMENT.md` to compile SFML from source.
+3.  **Build & Run:** Use the build commands specified in `BUILD_ENVIRONMENT.md` to compile and run the game. The final executable will be located in the `build` directory.
 
 ## Next Steps
 The foundational exploration and combat loop is complete. The next major focus will be on fleshing out the non-combat room encounters (Treasure, Puzzle, Trap, and the new Challenge rooms) and implementing a greater variety of monsters.
