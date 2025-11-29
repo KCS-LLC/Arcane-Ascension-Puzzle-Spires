@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <sstream>
 
-std::string gemSubTypeToString(GemSubType type) {
+std::string gemSubtypeToString(GemSubType type) {
     // This function will need to be updated with all gem types
     switch (type) {
         case GemSubType::Fire: return "fire";

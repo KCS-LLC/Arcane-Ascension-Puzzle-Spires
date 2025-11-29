@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "DataManager.h"
 #include "Structs.h"
+#include "StringUtils.h"
 
 Player::Player(int initialHp, const std::vector<Spell>& initialSpells)
     : m_hp(initialHp), m_maxHp(initialHp), m_maxMana(100), spells(initialSpells) {
@@ -68,6 +69,7 @@ void Player::addMana(GemSubType type, int amount) {
         if (it->second > m_maxMana) {
             it->second = m_maxMana;
         }
+        std::cout << "[MANA GAIN] Gained " << amount << " " << gemSubtypeToString(type) << " mana." << std::endl;
     }
 }
 
@@ -140,20 +142,36 @@ void Player::addEffect(const ActiveEffect& newEffect) {
     effectToAdd.justAppliedThisTurn = true;
     m_activeEffects.push_back(effectToAdd);
 }
+float Player::getManaGainMultiplier() const {
+    return m_manaGainMultiplier;
+}
+
+void Player::setManaGainMultiplier(float multiplier) {
+    m_manaGainMultiplier = multiplier;
+}
         
 void Player::updateEffects(float speedCost) {
+    // Reset temporary modifiers before recalculating
+    m_manaGainMultiplier = 1.0f;
+
     for (int i = m_activeEffects.size() - 1; i >= 0; --i) {
         auto& effect = m_activeEffects[i];
         
         if (effect.justAppliedThisTurn) {
             effect.justAppliedThisTurn = false;
-            continue;
+            // continue; // Don't continue, apply buffs immediately
         }
 
         effect.duration -= speedCost;
 
         if (effect.duration <= 0) {
             m_activeEffects.erase(m_activeEffects.begin() + i);
+            continue; // Skip to next effect as this one is gone
+        }
+
+        // Apply the effect's stat modifier
+        if (effect.modifier == "mana_gain") {
+            m_manaGainMultiplier = effect.value;
         }
     }
 }

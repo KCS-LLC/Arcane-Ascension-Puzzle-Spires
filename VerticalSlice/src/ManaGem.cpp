@@ -3,6 +3,7 @@
 #include "Player.h"
 
 float ManaGem::onMatch(Board& board, Player& player, Monster& monster) {
-    player.addMana(getSubType(), 10);
+    int manaGained = static_cast<int>(10 * player.getManaGainMultiplier());
+    player.addMana(getSubType(), manaGained);
     return 0.0f;
 }

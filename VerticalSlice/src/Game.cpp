@@ -78,6 +78,9 @@ void Game::loadTextures() {
     if (!m_effectIconTextures["burning_tile_effect"].loadFromFile("assets/effect_burning.png")) {
         std::cerr << "Failed to load burning tile effect icon" << std::endl;
     }
+    if (!m_effectIconTextures["mana_surge_enhancement"].loadFromFile("assets/gem_enhancement.png")) {
+        std::cerr << "Failed to load mana surge icon" << std::endl;
+    }
 }
 
 void Game::setupJudgementTrial(const JudgementTrial& trial) {

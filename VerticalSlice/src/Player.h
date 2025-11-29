@@ -28,6 +28,9 @@ public:
     const std::vector<GemSubType>& getManaTypes() const;
     const std::string& getAttunementId() const;
     int getVigor() const;
+    float getManaGainMultiplier() const;
+
+    void setManaGainMultiplier(float multiplier);
 
     bool hasFreeSwap() const;
     void grantFreeSwap();
@@ -53,6 +56,7 @@ private:
     int m_maxHp;
     int m_maxMana;
     int m_vigor = 0;
+    float m_manaGainMultiplier = 1.0f;
     bool m_hasFreeSwap = false;
     std::vector<GemSubType> m_availableManaTypes; // Renamed to use m_ prefix
     std::map<GemSubType, int> mana;
