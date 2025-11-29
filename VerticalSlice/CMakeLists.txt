@@ -27,11 +27,11 @@ link_directories(${SFML_ROOT}/lib)
 # 4. Define all the libraries we need to link, based on the working g++ command
 # For SFML, we use the static libraries (ending in -s)
 set(SFML_LIBRARIES
-    sfml-graphics-s
-    sfml-window-s
-    sfml-system-s
+    sfml-graphics-s-d
+    sfml-window-s-d
+    sfml-system-s-d
     opengl32
-    freetype
+    freetyped
     winmm
     gdi32
     user32

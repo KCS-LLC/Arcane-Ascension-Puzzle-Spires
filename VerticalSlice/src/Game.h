@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <memory>
 #include "Board.h"
 #include "DataManager.h"
 #include "Player.h"
@@ -52,7 +53,7 @@ private:
     bool processTreasureMerges();
     void moveToRoom(int destinationRoomId);
 
-    sf::RenderWindow m_window;
+    std::unique_ptr<sf::RenderWindow> m_window;
     DataManager dataManager;
     UIManager m_uiManager;
     TimeManager m_timeManager;

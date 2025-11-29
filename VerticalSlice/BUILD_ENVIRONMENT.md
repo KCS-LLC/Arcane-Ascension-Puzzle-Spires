@@ -1,107 +1,162 @@
-# Build Environment & Configuration
+# Build Environment & Configuration (Clang)
 
-This document outlines the specific technical environment required to successfully compile and run the Vertical Slice prototype. Adhering to these configurations will prevent common compilation and runtime errors.
-
----
-
-## 1. Compiler
-
-The project is built using the Clang C++ compiler provided by MSYS2.
-
--   **Compiler:** `clang++.exe`
--   **Version:** `21.1.5`
+This document outlines the specific technical environment required to successfully compile, run, and debug the Vertical Slice prototype using the Clang toolchain on Windows with MSYS2. Adhering to these configurations is critical to prevent compilation, linking, and runtime errors.
 
 ---
 
-## 2. SFML Library
+## 1. Toolchain: MSYS2 with MinGW-w64 and Clang
 
-The project is linked against a specific version of the SFML library, compiled from source with Clang to ensure compatibility.
+The project is built using the Clang C++ compiler provided by the **`mingw-w64`** toolchain within MSYS2. It is essential to use this specific toolchain for compilers, linkers, libraries, and debuggers to ensure ABI compatibility.
 
--   **SFML Version:** `3.0.2` (compiled with Clang)
+-   **Compiler:** `clang++.exe` (from the `mingw-w64` toolchain)
+-   **Linker:** `lld.exe` (from the `mingw-w64` toolchain)
+-   **Debugger:** `gdb.exe` (from the `mingw-w64` toolchain)
+
+### Initial Setup
+
+Install the required toolchain components via the MSYS2 terminal:
+
+```bash
+# Installs Clang, LLD, and other core build tools for the mingw-w64 environment
+pacman -S mingw-w64-x86_64-clang mingw-w64-x86_64-lld
+
+# Installs the Ninja build tool
+pacman -S mingw-w64-x86_64-ninja
+
+# Installs the GDB debugger for the mingw-w64 environment
+pacman -S mingw-w64-x86_64-gdb
+```
+
+---
+
+## 2. SFML Library (Build from Source)
+
+The project must be linked against a version of SFML compiled from source with the exact same `mingw-w64` Clang toolchain to ensure compatibility. A **Debug** build is required for development.
+
+-   **SFML Version:** `3.0.2` or compatible
 -   **SFML Source Path:** `C:/dev/SFML`
 -   **SFML Build Path:** `C:/dev/sfml-build-clang`
 
----
+### SFML Build Process
 
-## 3. Asset Locations
-
-All game assets (fonts, sprites, etc.) must be located in a directory named `assets` within the same directory as the game executable.
-
--   **Relative Path:** `./assets/`
--   **Example:** For the executable at `C:/Users/renga/SteamGame/VerticalSlice/game.exe`, the font must be at `C:/Users/renga/SteamGame/VerticalSlice/assets/OpenSans-Regular.ttf`.
-
----
-
-## 3. Build Process (CMake)
-
-This project uses CMake to generate build files. The recommended toolchain on Windows is MSYS2 with Clang and Ninja.
-
-1.  **Build SFML from Source (First Time Setup):**
-    Since the project uses Clang, SFML must also be compiled with Clang.
-
-    a.  **Create SFML Build Directory:**
-        ```bash
-        mkdir C:\dev\sfml-build-clang
-        ```
-
-    b.  **Configure SFML with CMake:**
-        ```bash
-        cmake -S C:\dev\SFML -B C:\dev\sfml-build-clang -G "Ninja" -DCMAKE_CXX_COMPILER=clang++ -DBUILD_SHARED_LIBS=OFF
-        ```
-
-    c.  **Build SFML with Ninja:**
-        ```bash
-        ninja -C C:\dev\sfml-build-clang
-        ```
-    This will produce Clang-compatible SFML libraries in `C:\dev\sfml-build-clang\lib`.
-
-2.  **Configure Game Project with CMake:**
-    From the `VerticalSlice` directory, create and navigate to a build directory, then run CMake to generate the Ninja build files.
-
-    ```bash
-    mkdir build
-    cd build
-    cmake .. -G "Ninja" -DCMAKE_CXX_COMPILER=clang++
+1.  **Create SFML Build Directory:**
+    ```powershell
+    # Ensure the directory is clean before configuring
+    Remove-Item -Path C:\dev\sfml-build-clang -Recurse -Force
+    New-Item -Path C:\dev\sfml-build-clang -ItemType Directory
     ```
-    *Note: `CMAKE_CXX_CLANG_TIDY` is automatically set in `CMakeLists.txt`.*
-The final executable, `game.exe`, along with the required `assets` and `data` directories, will be located in the `build` directory.
 
+2.  **Configure SFML with CMake:**
+    Run this command from the project's root directory. It is configured to create a static, debug build of SFML.
+    ```bash
+    cmake -S C:/dev/SFML -B C:/dev/sfml-build-clang -G "Ninja" `
+      -DCMAKE_BUILD_TYPE=Debug `
+      -DBUILD_SHARED_LIBS=OFF `
+      -DCMAKE_C_COMPILER=clang `
+      -DCMAKE_CXX_COMPILER=clang++ `
+      -DSFML_USE_STATIC_STD_LIBS=ON
+    ```
 
-## Dependencies
+3.  **Build SFML with Ninja:**
+    ```bash
+    ninja -C C:\dev\sfml-build-clang
+    ```
+    This will produce Clang-compatible SFML debug libraries (e.g., `libsfml-graphics-s-d.a`) in `C:\dev\sfml-build-clang\lib`.
 
-*   **Clang C++ Compiler:** Version 21.1.5 or newer, for compilation and PCH generation.
-*   **Ninja Build Tool:** For faster incremental builds.
-*   **SFML 3.0.2:** The core graphics and windowing library (compiled with Clang).
-*   **nlohmann/json:** A header-only library for parsing JSON data. The file `json.hpp` is located in the `src` directory and is required for the `DataManager`.
+---
 
+## 3. Game Build Process (CMake)
 
+The game project itself is also built with CMake and Ninja.
 
-## Precompiled Headers (PCH)
+1.  **Configure Game Project with CMake:**
+    From the project's root directory, run the following command:
+    ```bash
+    cmake -S VerticalSlice -B VerticalSlice/build -G "Ninja" -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug
+    ```
 
-To significantly speed up compilation times and simplify header management, this project uses precompiled headers. The PCH is generated and utilized by the Clang compiler, ensuring full compatibility with Clang-Tidy.
+2.  **Build Game with Ninja:**
+    ```bash
+    ninja -C VerticalSlice/build
+    ```
+    The final executable, `game.exe`, will be located in the `VerticalSlice/build` directory.
 
--   **PCH File:** `src/PCH.h`
--   **Configuration:** The `CMakeLists.txt` file is configured via `target_precompile_headers` to first compile `PCH.h` and then automatically include it in all other source files.
+---
 
-The `PCH.h` file includes common, stable headers that are used throughout the project, such as:
-*   SFML library headers
-*   C++ Standard Library headers (`<vector>`, `<string>`, `<map>`, etc.)
-*   Stable project-specific headers (`Constants.h`, `Structs.h`)
+## 4. Runtime & Debugging
 
-This approach avoids the need to repeatedly include these common headers in every `.cpp` file, making the build process much more efficient. When adding new, widely-used and stable headers, they should be added to `PCH.h`. Headers that are specific to a single `.cpp` file should be included directly in that file.
+### Runtime Dependencies (DLLs)
 
-## Failed Refactoring Attempt (Gem/Tile Data Structure)
+To run `game.exe` outside of the MSYS2 terminal (e.g., by double-clicking or from a debugger), essential runtime DLLs from the `mingw64` toolchain must be present in the same directory as the executable.
 
-An attempt was made to refactor the core gem/tile data structure to support advanced mechanics like Auras and Special Tiles. This involved significant changes to `Gem.h`, `Player.h`, `Player.cpp`, `Board.h`, `Board.cpp`, `Game.h`, `Game.cpp`, `DataManager.h`, `DataManager.cpp`, `StringUtils.h`, and `UIManager.h`.
+Copy the following files from `C:/msys64/mingw64/bin` to `VerticalSlice/build`:
+-   `libstdc++-6.dll`
+-   `libgcc_s_seh-1.dll`
+-   `libwinpthread-1.dll`
 
-Despite thorough efforts to correctly implement the new hierarchical type system, manage header dependencies (including converting direct member objects to `std::unique_ptr` where necessary), and resolve numerous compilation errors, the project consistently failed to link. The primary symptom was a series of "undefined reference to" errors for various methods within the `DataManager` class.
+### VS Code Debugger Setup (`.vscode/`)
 
-**Suspected Causes:**
+To debug the application in Visual Studio Code, create two files in a `.vscode` directory at the project root.
 
-*   **C++ ABI Mismatch:** Incompatibilities in the Application Binary Interface (ABI) used by different parts of the MinGW/GCC toolchain for standard library types (e.g., `std::string`) or other components.
-*   **Subtle Toolchain/Environment Issue:** A deep-seated problem within the build environment that prevented the linker from finding the compiled definitions of `DataManager` methods, even when object files were correctly generated.
+#### `launch.json`
+This file configures the debugger to launch the game, correctly pointing to the `mingw64` GDB and setting the `PATH` to find the runtime DLLs.
 
-**Resolution:**
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) Launch Game",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/VerticalSlice/build/game.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/VerticalSlice/build",
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "C:/msys64/mingw64/bin;${env:PATH}"
+                }
+            ],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:/msys64/mingw64/bin/gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}
+```
 
-The project was rolled back to the previous stable commit (before the refactoring attempt) to restore a working build. Further investigation of such linker issues would require advanced debugging tools (e.g., `nm`, `ldd` on Linux/WSL, or a full IDE debugger) and human expertise to diagnose the root cause of the ABI mismatch or toolchain problem.
+#### `tasks.json`
+This file configures a default build task so you can compile the project by pressing `Ctrl+Shift+B`.
 
+```json
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build-game",
+            "type": "shell",
+            "command": "ninja",
+            "args": [
+                "-C",
+                "${workspaceFolder}/VerticalSlice/build"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ]
+}
+```
