@@ -50,12 +50,12 @@ GemSubType Player::getPrimaryManaType() const {
 
 void Player::takeDamage(int amount) {
     m_hp -= amount;
-    if (m_hp < 0) m_hp = 0;
+    m_hp = std::max(0, m_hp);
 }
 
 void Player::heal(int amount) {
     m_hp += amount;
-    if (m_hp > m_maxHp) m_hp = m_maxHp;
+    m_hp = std::min(m_maxHp, m_hp);
 }
 
 void Player::addScore(int amount) {
@@ -94,11 +94,11 @@ void Player::setStartingStats(int tactical_score, int mana_affinity_score) {
 std::string Player::determineAttunement(const JudgementResults& results, const DataManager& dataManager) const {
     if (results.powerScore >= results.hasteScore && results.powerScore >= results.controlScore) {
         return "executioner";
-    } else if (results.hasteScore >= results.powerScore && results.hasteScore >= results.controlScore) {
+    } 
+    if (results.hasteScore >= results.powerScore && results.hasteScore >= results.controlScore) {
         return "elementalist";
-    } else {
-        return "guardian";
-    }
+    } 
+    return "guardian";
 }
 
 const std::string& Player::getAttunementId() const {
@@ -130,9 +130,7 @@ void Player::addEffect(const ActiveEffect& newEffect) {
             float initialDuration = newEffect.maxDuration;
             activeEffect.maxDuration += (initialDuration / 2.0f);
             activeEffect.duration += initialDuration;
-            if (activeEffect.duration > activeEffect.maxDuration) {
-                activeEffect.duration = activeEffect.maxDuration;
-            }
+            activeEffect.duration = std::min(activeEffect.duration, activeEffect.maxDuration);
             activeEffect.justAppliedThisTurn = true;
             return;
         }
@@ -188,15 +186,13 @@ float Player::getStatModifier(const std::string& modifier) const {
             }
         }
         return 1.0f; // Default multiplier is 1.0 (no change)
-    } else {
-        float total = 0.0f;
-        for (const auto& effect : m_activeEffects) {
-            if (effect.modifier == modifier) {
-                total += effect.value; // Sum additive bonuses like vigor
-            }
-        }
-        return total; // Default additive bonus is 0.0
+    } 
+    
+    float total = 0.0f;
+    for (const auto& effect : m_activeEffects) {
+        if (effect.modifier == modifier) {
+            total += effect.value; // Sum additive bonuses like vigor
         }
     }
-    
-    
+    return total; // Default additive bonus is 0.0
+}
