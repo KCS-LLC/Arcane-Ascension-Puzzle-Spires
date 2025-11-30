@@ -18,12 +18,6 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
         if (effect.params.count("amount") != 0) {
             game.getPlayer().heal(effect.params.at("amount").get<int>());
         }
-    } else if (effect.type == "ROTATE_ROW_COLUMN") {
-        TargetingRequest request;
-        request.numberOfClicks = 2;
-        request.type = TargetType::Row;
-        request.abilityId = "gust_of_wind";
-        game.startTargeting(request);
     } else if (effect.type == "REMOVE_RANDOM_GEMS") {
         if (effect.params.count("amount") != 0) {
             int amount = effect.params.at("amount").get<int>();
@@ -72,12 +66,6 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
         activeEffect.maxDuration = effect.params.at("duration").get<float>();
 
         game.getPlayer().addEffect(activeEffect);
-    } else if (effect.type == "FREE_SWAP") {
-        TargetingRequest request;
-        request.numberOfClicks = 2;
-        request.type = TargetType::Gem;
-        request.abilityId = spell.id; // Use the spell's ID
-        game.startTargeting(request);
     }
      else if (effect.type == "CREATE_BURNING_TILE") {
         int amount = 1; // Default to 1 burning tile

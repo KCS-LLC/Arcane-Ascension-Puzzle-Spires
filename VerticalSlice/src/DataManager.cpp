@@ -9,6 +9,12 @@
 
 using json = nlohmann::json;
 
+void from_json(const json& j, TargetingData& td) {
+    j.at("type").get_to(td.type);
+    j.at("prompt").get_to(td.prompt);
+    j.at("numberOfClicks").get_to(td.numberOfClicks);
+}
+
 void from_json(const json& j, SecondaryGemTypeData& sgtd) {
     j.at("id").get_to(sgtd.id);
     j.at("name").get_to(sgtd.name);
@@ -86,8 +92,10 @@ void from_json(const json& j, Spell& s) {
     if (j.contains("description")) {
         j.at("description").get_to(s.description);
     }
-    if (j.contains("targeting_prompt")) {
-        j.at("targeting_prompt").get_to(s.targetingPrompt);
+    if (j.contains("targeting")) {
+        s.targeting = j.at("targeting").get<TargetingData>();
+    } else {
+        s.targeting = std::nullopt;
     }
     j.at("manaCost").get_to(s.manaCost);
     s.costType = stringToGemSubType(j.at("manaType").get<std::string>());

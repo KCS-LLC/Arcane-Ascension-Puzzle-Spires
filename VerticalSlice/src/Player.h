@@ -14,7 +14,7 @@ class DataManager;
 
 class Player {
 public:
-    Player(int initialHp, const std::vector<Spell>& initialSpells);
+    Player(int initialHp, const std::vector<Spell*>& initialSpells);
 
     void setAttunement(const Attunement& attunement, const DataManager& dataManager);
 
@@ -23,7 +23,7 @@ public:
     int getMana(GemSubType type) const;
     int getMaxMana() const;
     GemSubType getPrimaryManaType() const;
-    const std::vector<Spell>& getSpells() const;
+    const std::vector<Spell*>& getSpells() const;
     const std::vector<ActiveEffect>& getActiveEffects() const;
     const std::vector<GemSubType>& getManaTypes() const;
     const std::string& getAttunementId() const;
@@ -38,6 +38,7 @@ public:
     void heal(int amount);
     void addScore(int amount);
     void addMana(GemSubType type, int amount);
+    void spendMana(GemSubType type, int amount);
     const Spell* castSpell(int spellIndex);
 
     void addEffect(const ActiveEffect& effect);
@@ -53,9 +54,9 @@ private:
     int m_maxMana;
     int m_vigor = 0;
     float m_manaGainMultiplier = 1.0f;
-    std::vector<GemSubType> m_availableManaTypes; // Renamed to use m_ prefix
+    std::vector<GemSubType> m_availableManaTypes;
     std::map<GemSubType, int> mana;
-    std::vector<Spell> spells;
+    std::vector<Spell*> spells; // Changed to vector of pointers
     std::vector<ActiveEffect> m_activeEffects;
     std::string m_attunementId;
     int m_score = 0;

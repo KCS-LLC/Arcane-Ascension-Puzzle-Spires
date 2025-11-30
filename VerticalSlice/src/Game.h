@@ -32,14 +32,16 @@ public:
     Board& getBoard();
     GemFactory& getGemFactory();
     TimeManager& getTimeManager();
-    void startTargeting(TargetingRequest request);
+    void startTargeting(const TargetingData& targetingData);
     void startTransformAnimation(const std::vector<sf::Vector2i>& gemsToTransform);
 private:
     PlayMode m_playMode = PlayMode::Normal;
+    const Spell* m_pendingSpell = nullptr;
     TargetingRequest m_targetingRequest;
     std::vector<sf::Vector2i> m_targetingSelections;
 
     void resolveTargeting();
+    void cancelTargeting();
     bool m_boardStateDirty = false;
     void processEvents();
     void update(sf::Time deltaTime);

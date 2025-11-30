@@ -242,6 +242,8 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
 
         float monsterHpPercent = static_cast<float>(monster.getCurrentHp()) / monster.getMaxHp();
         monsterHpBarFront.setSize(sf::Vector2f{monsterHpBarBack.getSize().x * monsterHpPercent, monsterHpBarBack.getSize().y});
+        
+        monsterNameText.setString(monster.getName());
         monsterHpText.setString(std::to_string(monster.getCurrentHp()) + "/" + std::to_string(monster.getMaxHp()));
 
         // Update Monster Speed Gauge
@@ -286,28 +288,35 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
             yOffset += 25.f;
         }
 
-        // --- Refactored Spell Buttons at Bottom ---
-        spellButtons.clear();
-        spellButtonTexts.clear();
-        const auto& spells = player.getSpells();
-        float ySpellOffset = WINDOW_HEIGHT - 50.f; // Start from the bottom and build up
-        for (const auto& spell : spells) {
-            sf::RectangleShape button({210, 40});
-            button.setPosition(sf::Vector2f(20, ySpellOffset));
-            if (player.getMana(spell.costType) >= spell.manaCost) {
-                button.setFillColor(sf::Color(100, 100, 180)); // Ready color
-            } else {
-                button.setFillColor(sf::Color(50, 50, 80));  // Not enough mana color
-            }
-            spellButtons.push_back(button);
-
+                    // --- Refactored Spell Buttons at Bottom ---
+                spellButtons.clear();
+                spellButtonTexts.clear();
+                const auto& spells = player.getSpells();
+                float ySpellOffset = WINDOW_HEIGHT - 50.f; // Start from the bottom and build up
+                for (const auto& spell : spells) {
+                    sf::RectangleShape button({210, 40});
+                    button.setPosition(sf::Vector2f(20, ySpellOffset));
+                    if (player.getMana(spell->costType) >= spell->manaCost) {
+                        button.setFillColor(sf::Color(100, 100, 180)); // Ready color
+                    } else {
+                        button.setFillColor(sf::Color(50, 50, 80));  // Not enough mana color
+                    }
+                    // Add outline for the active targeting spell
+                    if (playMode == PlayMode::Targeting && spell->id == m_activeTargetingSpellId) {
+                        button.setOutlineThickness(3);
+                        button.setOutlineColor(sf::Color::Yellow);
+                    } else {
+                        button.setOutlineThickness(1);
+                        button.setOutlineColor(sf::Color(100, 100, 100));
+                    }
+                    spellButtons.push_back(button);
             // Spell Name (left-aligned)
-            sf::Text nameText(font, spell.name, 16);
+            sf::Text nameText(font, spell->name, 16);
             nameText.setPosition(sf::Vector2f(30, ySpellOffset + 10));
             spellButtonTexts.push_back(nameText);
 
             // Spell Cost (right-aligned)
-            std::string costStr = "M:" + std::to_string(spell.manaCost) + " S:" + std::to_string(spell.speedCost);
+            std::string costStr = "M:" + std::to_string(spell->manaCost) + " S:" + std::to_string(spell->speedCost);
             sf::Text costText(font, costStr, 14);
             sf::FloatRect textBounds = costText.getLocalBounds();
             costText.setOrigin(sf::Vector2f(textBounds.position.x + textBounds.size.x, 0));
@@ -321,8 +330,8 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
 
     if (playMode == PlayMode::Targeting) {
         const Spell* spell = dataManager.getSpellById(targetingRequest.abilityId);
-        if (spell) {
-            m_targetingPromptText.setString(wordWrap(spell->targetingPrompt, 50));
+        if (spell && spell->targeting.has_value()) {
+            m_targetingPromptText.setString(wordWrap(spell->targeting->prompt, 50));
         }
     }
 
@@ -473,6 +482,7 @@ void UIManager::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin
             window.draw(rightPanel);
             window.draw(playerPanelTitle);
             window.draw(monsterPanelTitle);
+            window.draw(monsterNameText);
             window.draw(playerHpBarBack);
             window.draw(playerHpBarFront);
             window.draw(monsterHpBarBack);

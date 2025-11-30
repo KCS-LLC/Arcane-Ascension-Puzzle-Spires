@@ -21,7 +21,7 @@ Game::Game()
       m_uiManager(dataManager.getFont()),
       m_gemFactory(dataManager),
       m_board(BOARD_WIDTH, BOARD_HEIGHT, m_gemFactory),
-      m_player(100, {}),
+      m_player(100, {}), // Pass empty vector of Spell* now
       m_monster(MonsterData{}), // Initialize with default MonsterData, will be overridden in moveToRoom
       m_gameMode(GameMode::JUDGEMENT),
       m_gameState(GameState::Intro),
@@ -256,13 +256,27 @@ void Game::handleInput(sf::Event event) {
         } else if (action.type == UIActionType::ChangeRoom) {
             moveToRoom(action.destinationRoomId);
         } else if (action.type == UIActionType::CastSpell) {
-            m_board.clearActionStates(); // Clear hints on new action
-            const Spell* spell = m_player.castSpell(action.spellIndex);
-            if (spell) {
-                m_playerActionPerformedThisTurn = true;
+            const Spell* spell = m_player.getSpells()[action.spellIndex];
+            if (!spell) return;
+
+            if (m_playMode == PlayMode::Targeting && m_pendingSpell == spell) {
+                cancelTargeting();
+                return;
+            }
+
+            if (m_player.getMana(spell->costType) < spell->manaCost) {
+                return;
+            }
+
+            if (spell->targeting.has_value()) {
+                m_pendingSpell = spell;
+                startTargeting(spell->targeting.value());
+            } else {
+                m_player.spendMana(spell->costType, spell->manaCost);
                 m_timeManager.advanceTime(spell->speedCost, *this);
+                m_playerActionPerformedThisTurn = true;
+
                 std::vector<sf::Vector2i> gemsToRemove;
-                // The spell was successfully cast. Process its effects.
                 for (const auto& effect : spell->effects) {
                     auto removed = m_effectProcessor.processEffect(*spell, effect, *this);
                     gemsToRemove.insert(gemsToRemove.end(), removed.begin(), removed.end());
@@ -275,7 +289,6 @@ void Game::handleInput(sf::Event event) {
                     m_animationClock.restart();
                 }
 
-                // Now check if the monster gets a turn.
                 if (m_monster.isTurnReady(spell->speedCost)) {
                     m_player.takeDamage(m_monster.getAttackDamage());
                     showPlayerDamageEffect = true;
@@ -800,52 +813,72 @@ void Game::handleTimeEvent(const TimeEvent& event) {
     }
 }
 
-void Game::startTargeting(TargetingRequest request) {
+void Game::startTargeting(const TargetingData& targetingData) {
     m_playMode = PlayMode::Targeting;
-    m_targetingRequest = request;
+    m_targetingRequest.numberOfClicks = targetingData.numberOfClicks;
+    m_targetingRequest.abilityId = m_pendingSpell->id; // Use pending spell for ID in request
     m_targetingSelections.clear();
+    m_uiManager.m_activeTargetingSpellId = m_pendingSpell->id; // Set active spell for UI highlight
 }
 
 void Game::resolveTargeting() {
-    if (m_targetingRequest.abilityId == "gust_of_wind") {
-        if (m_targetingSelections.size() == 2) {
-            sf::Vector2i firstClick = m_targetingSelections[0];
-            sf::Vector2i secondClick = m_targetingSelections[1];
+    if (!m_pendingSpell) {
+        cancelTargeting();
+        return;
+    }
 
-            int dx = secondClick.x - firstClick.x;
-            int dy = secondClick.y - firstClick.y;
+    // Validate targeting based on pending spell's targeting data
+    if (m_pendingSpell->targeting.has_value()) {
+        const auto& targetingData = m_pendingSpell->targeting.value();
 
-            if (abs(dx) > abs(dy)) { // Horizontal rotation
-                m_isAnimating = true;
-                m_isAnimatingRowRotation = true;
-                m_rotatingRow = firstClick.y;
-                m_rotationDirection = (dx > 0) ? 1 : -1;
-                m_animationClock.restart();
-            } else { // Vertical rotation
-                m_isAnimating = true;
-                m_isAnimatingColumnRotation = true;
-                m_rotatingColumn = firstClick.x;
-                m_rotationDirection = (dy > 0) ? 1 : -1;
-                m_animationClock.restart();
+        if (targetingData.type == "2_adjacent" && m_targetingSelections.size() == 2) {
+            if (!m_board.isAdjacent({m_targetingSelections[0].y, m_targetingSelections[0].x}, {m_targetingSelections[1].y, m_targetingSelections[1].x})) {
+                cancelTargeting();
+                return;
             }
-        }
-    } else if (m_targetingRequest.abilityId == "quick_swap_transference") {
-        if (m_targetingSelections.size() == 2) {
-            sf::Vector2i firstClick = m_targetingSelections[0];
-            sf::Vector2i secondClick = m_targetingSelections[1];
-
-            m_isAnimating = true;
-            m_isAnimatingSwap = true;
-            // Note: The click coordinates are (col, row), but m_animatingGems expects (x, y) which corresponds to (col, row)
-            m_animatingGems = { {firstClick.x, firstClick.y}, {secondClick.x, secondClick.y} };
-            m_animationClock.restart();
+        } else if (targetingData.type == "2_any" && m_targetingSelections.size() == 2) {
+            // No special validation needed for 2_any other than count.
         }
     }
 
-    // Reset targeting state
-    m_playMode = PlayMode::Normal;
-    m_targetingRequest = {};
-    m_targetingSelections.clear();
+    m_player.spendMana(m_pendingSpell->costType, m_pendingSpell->manaCost);
+    m_timeManager.advanceTime(m_pendingSpell->speedCost, *this);
+    m_playerActionPerformedThisTurn = true;
+
+    // Process effects now that targeting is successful
+    for (const auto& effect : m_pendingSpell->effects) {
+        if (effect.type == "ROTATE_ROW_COLUMN") {
+            if (m_targetingSelections.size() == 2) {
+                sf::Vector2i firstClick = {m_targetingSelections[0].y, m_targetingSelections[0].x};
+                sf::Vector2i secondClick = {m_targetingSelections[1].y, m_targetingSelections[1].x};
+                int dx = secondClick.y - firstClick.y;
+                int dy = secondClick.x - firstClick.x;
+
+                if (abs(dx) > abs(dy)) {
+                    m_isAnimating = true;
+                    m_isAnimatingRowRotation = true;
+                    m_rotatingRow = firstClick.x;
+                    m_rotationDirection = (dx > 0) ? 1 : -1;
+                    m_animationClock.restart();
+                } else {
+                    m_isAnimating = true;
+                    m_isAnimatingColumnRotation = true;
+                    m_rotatingColumn = firstClick.y;
+                    m_rotationDirection = (dy > 0) ? 1 : -1;
+                    m_animationClock.restart();
+                }
+            }
+        } else if (effect.type == "FREE_SWAP") {
+             if (m_targetingSelections.size() == 2) {
+                m_isAnimating = true;
+                m_isAnimatingSwap = true;
+                m_animatingGems = { {m_targetingSelections[0].x, m_targetingSelections[0].y}, {m_targetingSelections[1].x, m_targetingSelections[1].y} };
+                m_animationClock.restart();
+            }
+        }
+    }
+
+    cancelTargeting(); // Clean up state after resolving
 }
 
 void Game::startTransformAnimation(const std::vector<sf::Vector2i>& gemsToTransform) {
@@ -853,4 +886,13 @@ void Game::startTransformAnimation(const std::vector<sf::Vector2i>& gemsToTransf
     m_isAnimating = true;
     m_isAnimatingTransform = true;
     m_animationClock.restart();
+}
+
+void Game::cancelTargeting() {
+    m_playMode = PlayMode::Normal;
+    m_pendingSpell = nullptr;
+    m_targetingRequest = {};
+    m_targetingSelections.clear();
+    m_board.clearActionStates();
+    m_uiManager.m_activeTargetingSpellId = ""; // Clear active spell for UI highlight
 }

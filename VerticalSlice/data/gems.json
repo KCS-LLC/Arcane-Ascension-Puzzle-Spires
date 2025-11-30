@@ -17,7 +17,7 @@
   { "id": 15, "name": "Skull Gem", "secondaryTypeId": 1001, "level": 1, "texturePath": "assets/fist.png" },
   { "id": 16, "name": "Sword Gem", "secondaryTypeId": 1002, "level": 1, "texturePath": null },
   { "id": 17, "name": "Coin Gem", "secondaryTypeId": 3001, "level": 1, "texturePath": "assets/gem_coin.png" },
-  { "id": 18, "name": "Grey Gem", "secondaryTypeId": 2014, "level": 1, "texturePath": null },
+  { "id": 18, "name": "Grey Gem", "secondaryTypeId": 2014, "level": 1, "texturePath": "assets/gem_grey.png" },
   { "id": 19, "name": "CoinPile", "secondaryTypeId": 3002, "level": 2, "texturePath": "assets/gem_coin_pile.png" },
   { "id": 20, "name": "CoinBag", "secondaryTypeId": 3003, "level": 3, "texturePath": "assets/gem_coin_bag.png" },
   { "id": 21, "name": "CoinBagBundle", "secondaryTypeId": 3004, "level": 4, "texturePath": "assets/gem_coin_bag_bundle.png" },

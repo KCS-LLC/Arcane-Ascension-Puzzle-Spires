@@ -39,6 +39,8 @@ public:
 
     const std::vector<sf::RectangleShape>& getSpellButtons() const;
 
+    std::string m_activeTargetingSpellId; // Tracks the ID of the spell currently in targeting mode.
+
 private:
     sf::Font font;
     sf::Clock m_pulseClock;

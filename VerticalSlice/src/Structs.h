@@ -27,11 +27,17 @@ struct Effect {
     std::map<std::string, nlohmann::json> params;
 };
 
+struct TargetingData {
+    std::string type; // e.g., "2_adjacent", "2_any", "single"
+    std::string prompt;
+    int numberOfClicks;
+};
+
 struct Spell {
     std::string id;
     std::string name;
     std::string description;
-    std::string targetingPrompt;
+    std::optional<TargetingData> targeting;
     GemSubType costType;
     int manaCost;
     int speedCost;
