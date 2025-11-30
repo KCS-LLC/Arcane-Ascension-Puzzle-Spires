@@ -33,6 +33,7 @@ public:
     GemFactory& getGemFactory();
     TimeManager& getTimeManager();
     void startTargeting(TargetingRequest request);
+    void startTransformAnimation(const std::vector<sf::Vector2i>& gemsToTransform);
 private:
     PlayMode m_playMode = PlayMode::Normal;
     TargetingRequest m_targetingRequest;
@@ -97,6 +98,7 @@ private:
     bool m_isAnimatingRefill = false;
     bool m_isAnimatingRowRotation = false;
     bool m_isAnimatingColumnRotation = false;
+    bool m_isAnimatingTransform = false;
     int m_rotatingRow;
     int m_rotatingColumn;
     int m_rotationDirection;
@@ -104,6 +106,7 @@ private:
     std::pair<sf::Vector2i, sf::Vector2i> m_animatingGems;
     std::set<sf::Vector2i, Vector2iCompare> m_destroyingGems;
     std::vector<Board::FallInfo> m_fallInfo;
+    std::vector<sf::Vector2i> m_transformingGems;
 
     // Combat UI state
     bool showPlayerDamageEffect = false;

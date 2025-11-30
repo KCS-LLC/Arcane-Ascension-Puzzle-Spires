@@ -36,12 +36,8 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
             GemSubType toType = stringToGemSubType(toTypeStr);
             
             std::vector<sf::Vector2i> coords = game.getBoard().getRandomGemCoords(amount, true);
-            for (const auto& coord : coords) {
-                if (gemTextures.count(toType) != 0) {
-                    game.getBoard().setGemAt(coord.x, coord.y, game.getGemFactory().createGem(toType, gemTextures.at(toType)));
-                }
-            }
-            game.setBoardStateDirty(true);
+            game.startTransformAnimation(coords); // Start the animation
+            // The actual transformation will happen in Game::update after the animation
         }
     } else if (effect.type == "MODIFY_ATTACK_GEM") {
         std::vector<sf::Vector2i> attackGemCoords = game.getBoard().getRandomGemCoords(1, false, GemSubType::Skull); // Get 1 random Skull gem

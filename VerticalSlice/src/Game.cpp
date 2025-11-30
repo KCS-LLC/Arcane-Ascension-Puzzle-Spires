@@ -488,6 +488,21 @@ void Game::update(sf::Time deltaTime) {
                 m_board.rotateColumn(m_rotatingColumn, m_rotationDirection);
                 m_boardStateDirty = true;
             }
+        } else if (m_isAnimatingTransform) {
+            const float transformAnimationDuration = 0.3f; // Or your desired duration
+            if (m_animationClock.getElapsedTime().asSeconds() >= transformAnimationDuration) {
+                m_isAnimating = false;
+                m_isAnimatingTransform = false;
+
+                // Perform the actual transformation
+                for (const auto& coord : m_transformingGems) {
+                    if (gemTextures.count(GemSubType::Skull)) {
+                        m_board.setGemAt(coord.x, coord.y, m_gemFactory.createGem(GemSubType::Skull, gemTextures.at(GemSubType::Skull)));
+                    }
+                }
+                m_transformingGems.clear();
+                m_boardStateDirty = true;
+            }
         }
         return; 
     }
@@ -675,6 +690,28 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                         m_window.draw(sprite);
                     }
                 }
+            } else if (m_isAnimatingTransform) {
+                const float transformAnimationDuration = 0.3f;
+                float animProgress = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / transformAnimationDuration);
+                // Create a "pop" effect: scale up then back down.
+                float scale = 1.0f + 0.5f * std::sin(animProgress * 3.14159f); 
+
+                for (const auto& pos : m_transformingGems) {
+                    BaseGem* gem = m_board.getGemAt(pos.x, pos.y);
+                    if (gem) {
+                        sf::Sprite sprite = gem->getSprite();
+                        const sf::Texture* tex = &sprite.getTexture();
+                        sf::Vector2u texSize = tex->getSize();
+                        sprite.setOrigin({texSize.x / 2.f, texSize.y / 2.f});
+                        
+                        float baseScaleX = static_cast<float>(TILE_SIZE) / texSize.x;
+                        float baseScaleY = static_cast<float>(TILE_SIZE) / texSize.y;
+                        sprite.setScale({baseScaleX * scale, baseScaleY * scale});
+                        
+                        sprite.setPosition({pos.y * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.x, pos.x * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.y});
+                        m_window.draw(sprite);
+                    }
+                }
             }
         }
     }
@@ -783,4 +820,11 @@ void Game::resolveTargeting() {
     m_playMode = PlayMode::Normal;
     m_targetingRequest = {};
     m_targetingSelections.clear();
+}
+
+void Game::startTransformAnimation(const std::vector<sf::Vector2i>& gemsToTransform) {
+    m_transformingGems = gemsToTransform;
+    m_isAnimating = true;
+    m_isAnimatingTransform = true;
+    m_animationClock.restart();
 }
