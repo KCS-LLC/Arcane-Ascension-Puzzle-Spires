@@ -54,18 +54,18 @@ This document tracks the current implementation status of each Quartz-Rank Abili
     *   **To Reach 100:** (Already at 100)
 
 *   **Minor Heal**
-    *   **Score:** 100/100
-    *   **Reasoning:** The spell correctly calls the `player.heal()` method with the specified amount. The player's HP is updated, and this is reflected in the UI.
-    *   **To Reach 100:** (Already at 100)
+    *   **Score:** 90/100
+    *   **Reasoning:** The spell correctly calls the `player.heal()` method, but no visual animation or effect is triggered to provide feedback that healing occurred. The existing player damage effect provides a template for implementation.
+    *   **To Reach 100:** Implement a visual effect (e.g., a green screen flash, floating numbers) triggered when the `HEAL_PLAYER` effect is processed.
 
 ---
 
 ## Mender
 
 *   **Minor Heal**
-    *   **Score:** 100/100
-    *   **Reasoning:** (Same as Guardian's Minor Heal) The spell correctly calls the `player.heal()` method with the specified amount. The player's HP is updated, and this is reflected in the UI.
-    *   **To Reach 100:** (Already at 100)
+    *   **Score:** 90/100
+    *   **Reasoning:** (Same as Guardian's Minor Heal) The spell correctly calls the `player.heal()` method, but no visual animation or effect is triggered to provide feedback that healing occurred.
+    *   **To Reach 100:** Implement a visual effect (e.g., a green screen flash, floating numbers) triggered when the `HEAL_PLAYER` effect is processed.
 
 *   **Chaotic Shift**
     *   **Score:** 100/100
@@ -77,9 +77,9 @@ This document tracks the current implementation status of each Quartz-Rank Abili
 ## Shadow
 
 *   **Shadow Strike**
-    *   **Score:** 100/100
-    *   **Reasoning:** The spell correctly calls the `monster.takeDamage()` method with the specified amount. The monster's HP is updated, and this is reflected in the UI.
-    *   **To Reach 100:** (Already at 100)
+    *   **Score:** 90/100
+    *   **Reasoning:** The spell correctly calls the `monster.takeDamage()` method, but no visual animation or effect is triggered to provide feedback that damage was dealt.
+    *   **To Reach 100:** Implement a visual effect (e.g., a screen flash, particle effect on the monster) that is triggered when the `DEAL_DAMAGE` effect is processed.
 
 *   **Empower Weapon**
     *   **Score:** 100/100
