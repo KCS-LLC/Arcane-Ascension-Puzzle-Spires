@@ -121,31 +121,31 @@ void from_json(const json& j, Floor& f) {
 
 DataManager::DataManager() {
     if (!m_font.openFromFile("assets/OpenSans-Regular.ttf")) {
-        std::cerr << "Failed to load font." << std::endl;
+        std::cerr << "Failed to load font." << '\n';
     }
     if (!loadPrimaryGemTypes("data/primary_gem_types.json")) {
-        std::cerr << "Failed to load primary gem types." << std::endl;
+        std::cerr << "Failed to load primary gem types." << '\n';
     }
     if (!loadSecondaryGemTypes("data/secondary_gem_types.json")) {
-        std::cerr << "Failed to load secondary gem types." << std::endl;
+        std::cerr << "Failed to load secondary gem types." << '\n';
     }
     if (!loadGemCatalog("data/gems.json")) {
-        std::cerr << "Failed to load gem catalog." << std::endl;
+        std::cerr << "Failed to load gem catalog." << '\n';
     }
     if (!loadAttunements("data/attunements.json")) {
-        std::cerr << "Failed to load attunements." << std::endl;
+        std::cerr << "Failed to load attunements." << '\n';
     }
     if (!loadSpells("data/spells.json")) {
-        std::cerr << "Failed to load spells." << std::endl;
+        std::cerr << "Failed to load spells." << '\n';
     }
     if (!loadMonsterData("data/monster.json")) {
-        std::cerr << "Failed to load monster data." << std::endl;
+        std::cerr << "Failed to load monster data." << '\n';
     }
     if (!loadFloor("data/floor1.json")) {
-        std::cerr << "Failed to load floor data." << std::endl;
+        std::cerr << "Failed to load floor data." << '\n';
     }
     if (!loadJudgementTrials()) {
-        std::cerr << "Failed to load judgement trials." << std::endl;
+        std::cerr << "Failed to load judgement trials." << '\n';
     }
 }
 
@@ -158,7 +158,7 @@ bool DataManager::loadPrimaryGemTypes(const std::string& path) {
             m_primaryGemTypes[static_cast<PrimaryGemType>(item.at("id").get<int>())] = item.at("name").get<std::string>();
         }
     } catch (const json::exception& e) {
-        std::cerr << "JSON error in primary gem types: " << e.what() << std::endl;
+        std::cerr << "JSON error in primary gem types: " << e.what() << '\n';
         return false;
     }
     return true;
@@ -173,7 +173,7 @@ bool DataManager::loadSecondaryGemTypes(const std::string& path) {
             m_secondaryGemTypes[item.at("id").get<int>()] = item.get<SecondaryGemTypeData>();
         }
     } catch (const json::exception& e) {
-        std::cerr << "JSON error in secondary gem types: " << e.what() << std::endl;
+        std::cerr << "JSON error in secondary gem types: " << e.what() << '\n';
         return false;
     }
     return true;
@@ -188,7 +188,7 @@ bool DataManager::loadGemCatalog(const std::string& path) {
             m_gemCatalog[static_cast<GemSubType>(item.at("id").get<int>())] = item.get<GemCatalogEntry>();
         }
     } catch (const json::exception& e) {
-        std::cerr << "JSON error in gem catalog: " << e.what() << std::endl;
+        std::cerr << "JSON error in gem catalog: " << e.what() << '\n';
         return false;
     }
     return true;
@@ -201,7 +201,7 @@ bool DataManager::loadAttunements(const std::string& path) {
         json data = json::parse(f);
         attunements = data.get<std::vector<Attunement>>();
     } catch (const json::exception& e) {
-        std::cerr << "JSON error in attunements: " << e.what() << std::endl;
+        std::cerr << "JSON error in attunements: " << e.what() << '\n';
         return false;
     }
     return true;
@@ -213,7 +213,7 @@ bool DataManager::loadSpells(const std::string& path) {
         json data = json::parse(f);
         spells = data.get<std::vector<Spell>>();
     } catch (const json::exception& e) {
-        std::cerr << "JSON error in spells: " << e.what() << std::endl;
+        std::cerr << "JSON error in spells: " << e.what() << '\n';
         return false;
     }
     return true;
@@ -221,14 +221,14 @@ bool DataManager::loadSpells(const std::string& path) {
 bool DataManager::loadMonsterData(const std::string& path) {
     std::ifstream f(path);
     if (!f.is_open()) {
-        std::cerr << "Could not open monster file: " << path << std::endl;
+        std::cerr << "Could not open monster file: " << path << '\n';
         return false;
     }
     try {
         json data = json::parse(f);
         m_monsterData = data.get<MonsterData>();
     } catch (const json::exception& e) {
-        std::cerr << "JSON error in monster data: " << e.what() << std::endl;
+        std::cerr << "JSON error in monster data: " << e.what() << '\n';
         return false;
     }
     return true;
@@ -240,7 +240,7 @@ bool DataManager::loadFloor(const std::string& path) {
         json data = json::parse(f);
         currentFloor = data.get<Floor>();
     } catch (const json::exception& e) {
-        std::cerr << "JSON error in floor data: " << e.what() << std::endl;
+        std::cerr << "JSON error in floor data: " << e.what() << '\n';
         return false;
     }
     return true;
@@ -255,14 +255,14 @@ bool DataManager::loadJudgementTrials() {
     for (const auto& filePath : trialFiles) {
         std::ifstream f(filePath);
         if (!f.is_open()) {
-            std::cerr << "Failed to open trial file: " << filePath << std::endl;
+            std::cerr << "Failed to open trial file: " << filePath << '\n';
             return false;
         }
         try {
             json data = json::parse(f);
             m_judgementTrials.push_back(data.get<JudgementTrial>());
         } catch (const json::exception& e) {
-            std::cerr << "JSON error in " << filePath << ": " << e.what() << std::endl;
+            std::cerr << "JSON error in " << filePath << ": " << e.what() << '\n';
             return false;
         }
     }

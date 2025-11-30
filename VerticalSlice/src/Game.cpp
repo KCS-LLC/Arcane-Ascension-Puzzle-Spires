@@ -48,7 +48,7 @@ Game::Game()
     if (defaultAttunement) {
         m_player.setAttunement(*defaultAttunement, dataManager);
     } else {
-        std::cerr << "Error: Could not find default attunement 'adept'." << std::endl;
+        std::cerr << "Error: Could not find default attunement 'adept'." << '\n';
     }
     m_judgementTrials = dataManager.getJudgementTrials();
     if (!m_judgementTrials.empty()) {
@@ -71,15 +71,15 @@ void Game::loadTextures() {
         if (!entry.texturePath.empty()) {
             if (!gemTextures[pair.first].loadFromFile(entry.texturePath)) {
                 std::cerr << "Failed to load texture for " << entry.name 
-                          << " from " << entry.texturePath << std::endl;
+                          << " from " << entry.texturePath << '\n';
             }
         }
     }
     if (!m_effectIconTextures["burning_tile_effect"].loadFromFile("assets/effect_burning.png")) {
-        std::cerr << "Failed to load burning tile effect icon" << std::endl;
+        std::cerr << "Failed to load burning tile effect icon" << '\n';
     }
     if (!m_effectIconTextures["mana_surge_enhancement"].loadFromFile("assets/gem_enhancement.png")) {
-        std::cerr << "Failed to load mana surge icon" << std::endl;
+        std::cerr << "Failed to load mana surge icon" << '\n';
     }
 }
 
@@ -123,7 +123,7 @@ void Game::moveToRoom(int destinationRoomId) {
     if (destination) {
         m_currentRoom = destination;
         m_visitedRoomIds.insert(destinationRoomId);
-        std::cout << "Moving to room " << destinationRoomId << " (" << roomTypeToString(m_currentRoom->type) << ")" << std::endl;
+        std::cout << "Moving to room " << destinationRoomId << " (" << roomTypeToString(m_currentRoom->type) << ")" << '\n';
         
         // If room is already cleared, just explore it.
         // if (clearedRoomIds.count(destination->id)) {
@@ -183,7 +183,7 @@ void Game::moveToRoom(int destinationRoomId) {
                 break;
         }
     } else {
-        std::cerr << "Error: Tried to move to a non-existent room ID: " << destinationRoomId << std::endl;
+        std::cerr << "Error: Tried to move to a non-existent room ID: " << destinationRoomId << '\n';
     }
 }
 
@@ -404,7 +404,7 @@ void Game::handleMatches(bool isPlayerMove) {
     if (totalSkullDamageThisTurn > 0.0f) {
         int finalDamage = static_cast<int>(totalSkullDamageThisTurn);
         m_monster.takeDamage(finalDamage);
-        std::cout << "[COMBAT TURN] Total Damage Applied: " << finalDamage << ". Monster HP after: " << m_monster.getCurrentHp() << std::endl;
+        std::cout << "[COMBAT TURN] Total Damage Applied: " << finalDamage << ". Monster HP after: " << m_monster.getCurrentHp() << '\n';
     }
 
     if (allRemovedGems.empty()) {
@@ -531,7 +531,7 @@ void Game::update(sf::Time deltaTime) {
                 }
             }
         }
-        std::cout << "Final Treasure Value: " << finalTreasureValue << std::endl;
+        std::cout << "Final Treasure Value: " << finalTreasureValue << '\n';
 
         // Transition to the attunement selection screen
         m_gameState = GameState::Judgement_AttunementSelection;
@@ -715,7 +715,7 @@ void Game::handleTimeEvent(const TimeEvent& event) {
             if (gem && gem->getStatusEffect() == StatusEffect::Burning) {
                 float damage = (m_player.getMaxMana() * 0.10f) * gem->getLevel();
                 m_monster.takeDamage(static_cast<int>(damage));
-                std::cout << "[EVENT] Burning tile dealt " << static_cast<int>(damage) << " damage. Monster HP: " << m_monster.getCurrentHp() << std::endl;
+                std::cout << "[EVENT] Burning tile dealt " << static_cast<int>(damage) << " damage. Monster HP: " << m_monster.getCurrentHp() << '\n';
             }
             break;
         }
@@ -724,7 +724,7 @@ void Game::handleTimeEvent(const TimeEvent& event) {
             if (gem && gem->getStatusEffect() == StatusEffect::Burning) {
                 float damage = (m_player.getMaxMana() * 0.10f) * gem->getLevel();
                 m_monster.takeDamage(static_cast<int>(damage));
-                std::cout << "[EVENT] Burning tile dealt final " << static_cast<int>(damage) << " damage and expired. Monster HP: " << m_monster.getCurrentHp() << std::endl;
+                std::cout << "[EVENT] Burning tile dealt final " << static_cast<int>(damage) << " damage and expired. Monster HP: " << m_monster.getCurrentHp() << '\n';
                 
                 // Add the gem to be destroyed
                 m_destroyingGems.insert(event.coordinates);

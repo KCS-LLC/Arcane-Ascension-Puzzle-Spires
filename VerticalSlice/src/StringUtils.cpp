@@ -15,27 +15,27 @@ std::string gemSubtypeToString(GemSubType type) {
     }
 }
 
-GemSubType stringToGemSubType(const std::string& s) {
-    std::string lower_s = s;
-    std::transform(lower_s.begin(), lower_s.end(), lower_s.begin(),
+GemSubType stringToGemSubType(const std::string& str) {
+    std::string lowerStr = str;
+    std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(),
                    [](unsigned char c){ return std::tolower(c); });
 
-    if (lower_s == "fire") return GemSubType::Fire;
-    if (lower_s == "water") return GemSubType::Water;
-    if (lower_s == "earth") return GemSubType::Earth;
-    if (lower_s == "air") return GemSubType::Air;
-    if (lower_s == "light") return GemSubType::Light;
-    if (lower_s == "life") return GemSubType::Life;
-    if (lower_s == "enhancement") return GemSubType::Enhancement;
-    if (lower_s == "transference") return GemSubType::Transference;
-    if (lower_s == "death") return GemSubType::Death;
-    if (lower_s == "umbral") return GemSubType::Umbral;
-    if (lower_s == "mental") return GemSubType::Mental;
-    if (lower_s == "perception") return GemSubType::Perception;
-    if (lower_s == "coin") return GemSubType::Coin;
-    if (lower_s == "skull" || lower_s == "attack") return GemSubType::Skull;
-    if (lower_s == "raw") return GemSubType::Raw;
-    if (lower_s == "grey") return GemSubType::Grey;
+    if (lowerStr == "fire") { return GemSubType::Fire; }
+    if (lowerStr == "water") { return GemSubType::Water; }
+    if (lowerStr == "earth") { return GemSubType::Earth; }
+    if (lowerStr == "air") { return GemSubType::Air; }
+    if (lowerStr == "light") { return GemSubType::Light; }
+    if (lowerStr == "life") { return GemSubType::Life; }
+    if (lowerStr == "enhancement") { return GemSubType::Enhancement; }
+    if (lowerStr == "transference") { return GemSubType::Transference; }
+    if (lowerStr == "death") { return GemSubType::Death; }
+    if (lowerStr == "umbral") { return GemSubType::Umbral; }
+    if (lowerStr == "mental") { return GemSubType::Mental; }
+    if (lowerStr == "perception") { return GemSubType::Perception; }
+    if (lowerStr == "coin") { return GemSubType::Coin; }
+    if (lowerStr == "skull" || lowerStr == "attack") { return GemSubType::Skull; }
+    if (lowerStr == "raw") { return GemSubType::Raw; }
+    if (lowerStr == "grey") { return GemSubType::Grey; }
     return GemSubType::Empty; // Default case
 }
 
@@ -76,15 +76,15 @@ std::string doorColorToString(DoorColor color) {
 sf::Color doorColorToSfColor(DoorColor color) {
     switch (color) {
         case DoorColor::Red: return sf::Color::Red;
-        case DoorColor::Orange: return sf::Color(255, 165, 0);
+        case DoorColor::Orange: return {255, 165, 0};
         case DoorColor::Yellow: return sf::Color::Yellow;
         case DoorColor::Green: return sf::Color::Green;
         case DoorColor::Blue: return sf::Color::Blue;
-        case DoorColor::Indigo: return sf::Color(75, 0, 130);
-        case DoorColor::Violet: return sf::Color(238, 130, 238);
-        case DoorColor::Copper: return sf::Color(184, 115, 51);
-        case DoorColor::Silver: return sf::Color(192, 192, 192);
-        case DoorColor::Gold: return sf::Color(255, 215, 0);
+        case DoorColor::Indigo: return {75, 0, 130};
+        case DoorColor::Violet: return {238, 130, 238};
+        case DoorColor::Copper: return {184, 115, 51};
+        case DoorColor::Silver: return {192, 192, 192};
+        case DoorColor::Gold: return {255, 215, 0};
         case DoorColor::White: return sf::Color::White;
         default: return sf::Color::Black;
     }
@@ -93,26 +93,26 @@ sf::Color doorColorToSfColor(DoorColor color) {
 sf::Color getSfColorForRoomType(RoomType type) {
     switch (type) {
         case RoomType::Combat:
-            return sf::Color(139, 0, 0); // Dark Red
+            return {139, 0, 0}; // Dark Red
         case RoomType::AgilityChallenge:
-            return sf::Color(255, 140, 0); // Dark Orange
+            return {255, 140, 0}; // Dark Orange
         case RoomType::Trap:
-            return sf::Color(255, 215, 0); // Gold (Yellow)
+            return {255, 215, 0}; // Gold (Yellow)
         case RoomType::EnduranceChallenge:
-            return sf::Color(0, 100, 0); // Dark Green
+            return {0, 100, 0}; // Dark Green
         case RoomType::Puzzle:
-            return sf::Color(0, 0, 205); // Medium Blue
+            return {0, 0, 205}; // Medium Blue
         case RoomType::MagicChallenge:
-            return sf::Color(75, 0, 130); // Indigo
+            return {75, 0, 130}; // Indigo
         case RoomType::Special:
-            return sf::Color(148, 0, 211); // Dark Violet
+            return {148, 0, 211}; // Dark Violet
         case RoomType::Treasure:
-            return sf::Color(184, 115, 51); // Copper
+            return {184, 115, 51}; // Copper
         case RoomType::Sanctuary:
         case RoomType::Boss:
-            return sf::Color(245, 245, 245); // White Smoke
+            return {245, 245, 245}; // White Smoke
         case RoomType::Entrance:
-            return sf::Color(128, 128, 128); // Grey
+            return {128, 128, 128}; // Grey
         default:
             return sf::Color::Black;
     }
@@ -120,19 +120,19 @@ sf::Color getSfColorForRoomType(RoomType type) {
 
 sf::Color getSfColorForGemType(GemSubType type) {
     switch (type) {
-        case GemSubType::Fire: return sf::Color(255, 50, 50);
-        case GemSubType::Water: return sf::Color(50, 50, 255);
-        case GemSubType::Earth: return sf::Color(139, 69, 19);
-        case GemSubType::Air: return sf::Color(173, 216, 230);
-        case GemSubType::Light: return sf::Color(255, 255, 150);
-        case GemSubType::Umbral: return sf::Color(100, 100, 100);
-        case GemSubType::Life: return sf::Color(50, 205, 50);
-        case GemSubType::Death: return sf::Color(138, 43, 226);
-        case GemSubType::Mental: return sf::Color(218, 112, 214);
-        case GemSubType::Perception: return sf::Color(0, 191, 255);
-        case GemSubType::Enhancement: return sf::Color(255, 165, 0);
-        case GemSubType::Transference: return sf::Color(64, 224, 208);
-        default: return sf::Color(128, 128, 128);
+        case GemSubType::Fire: return {255, 50, 50};
+        case GemSubType::Water: return {50, 50, 255};
+        case GemSubType::Earth: return {139, 69, 19};
+        case GemSubType::Air: return {173, 216, 230};
+        case GemSubType::Light: return {255, 255, 150};
+        case GemSubType::Umbral: return {100, 100, 100};
+        case GemSubType::Life: return {50, 205, 50};
+        case GemSubType::Death: return {138, 43, 226};
+        case GemSubType::Mental: return {218, 112, 214};
+        case GemSubType::Perception: return {0, 191, 255};
+        case GemSubType::Enhancement: return {255, 165, 0};
+        case GemSubType::Transference: return {64, 224, 208};
+        default: return {128, 128, 128};
     }
 }
 
@@ -141,13 +141,13 @@ sf::Color gemLevelToColor(int level) {
         case 1: return sf::Color::Transparent; // Level 1: Transparent/Black
         case 2: return sf::Color::White;     // Level 2: White/Clear
         case 3: return sf::Color::Red;
-        case 4: return sf::Color(255, 165, 0); // Orange
+        case 4: return {255, 165, 0}; // Orange
         case 5: return sf::Color::Yellow;
         case 6: return sf::Color::Green;
         case 7: return sf::Color::Blue;
-        case 8: return sf::Color(75, 0, 130);  // Indigo
-        case 9: return sf::Color(148, 0, 211); // Violet
-        default: return sf::Color(148, 0, 211); // Default to Violet for levels beyond 9
+        case 8: return {75, 0, 130};  // Indigo
+        case 9: return {148, 0, 211}; // Violet
+        default: return {148, 0, 211}; // Default to Violet for levels beyond 9
     }
 }
 
@@ -171,33 +171,33 @@ std::string wordWrap(const std::string& text, unsigned int lineLength) {
     return result;
 }
 
-DoorColor stringToDoorColor(const std::string& s) {
-    if (s == "Red")    return DoorColor::Red;
-    if (s == "Orange") return DoorColor::Orange;
-    if (s == "Yellow") return DoorColor::Yellow;
-    if (s == "Green")  return DoorColor::Green;
-    if (s == "Blue")   return DoorColor::Blue;
-    if (s == "Indigo") return DoorColor::Indigo;
-    if (s == "Violet") return DoorColor::Violet;
-    if (s == "Copper") return DoorColor::Copper;
-    if (s == "Silver") return DoorColor::Silver;
-    if (s == "Gold")   return DoorColor::Gold;
-    if (s == "White")  return DoorColor::White;
+DoorColor stringToDoorColor(const std::string& str) {
+    if (str == "Red") { return DoorColor::Red; }
+    if (str == "Orange") { return DoorColor::Orange; }
+    if (str == "Yellow") { return DoorColor::Yellow; }
+    if (str == "Green") { return DoorColor::Green; }
+    if (str == "Blue") { return DoorColor::Blue; }
+    if (str == "Indigo") { return DoorColor::Indigo; }
+    if (str == "Violet") { return DoorColor::Violet; }
+    if (str == "Copper") { return DoorColor::Copper; }
+    if (str == "Silver") { return DoorColor::Silver; }
+    if (str == "Gold") { return DoorColor::Gold; }
+    if (str == "White") { return DoorColor::White; }
     return DoorColor::Unknown;
 }
 
-RoomType stringToRoomType(const std::string& s) {
-    if (s == "Entrance")  return RoomType::Entrance;
-    if (s == "Combat")    return RoomType::Combat;
-    if (s == "Treasure")  return RoomType::Treasure;
-    if (s == "Boss")      return RoomType::Boss;
-    if (s == "Sanctuary") return RoomType::Sanctuary;
-    if (s == "Special")   return RoomType::Special;
-    if (s == "Puzzle")    return RoomType::Puzzle;
-    if (s == "Trap")      return RoomType::Trap;
-    if (s == "AgilityChallenge") return RoomType::AgilityChallenge;
-    if (s == "EnduranceChallenge") return RoomType::EnduranceChallenge;
-    if (s == "MagicChallenge") return RoomType::MagicChallenge;
+RoomType stringToRoomType(const std::string& str) {
+    if (str == "Entrance") { return RoomType::Entrance; }
+    if (str == "Combat") { return RoomType::Combat; }
+    if (str == "Treasure") { return RoomType::Treasure; }
+    if (str == "Boss") { return RoomType::Boss; }
+    if (str == "Sanctuary") { return RoomType::Sanctuary; }
+    if (str == "Special") { return RoomType::Special; }
+    if (str == "Puzzle") { return RoomType::Puzzle; }
+    if (str == "Trap") { return RoomType::Trap; }
+    if (str == "AgilityChallenge") { return RoomType::AgilityChallenge; }
+    if (str == "EnduranceChallenge") { return RoomType::EnduranceChallenge; }
+    if (str == "MagicChallenge") { return RoomType::MagicChallenge; }
     return RoomType::Unknown;
 }
 

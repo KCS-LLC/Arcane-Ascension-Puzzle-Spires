@@ -49,7 +49,7 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
             BaseGem* gem = game.getBoard().getGemAt(attackGemCoords[0].x, attackGemCoords[0].y);
             if (gem != nullptr) { // The gem is guaranteed to be a Skull gem, so no need to check again
                 gem->levelUp();
-                std::cout << "[EFFECT] Sharpened a Skull gem to level " << gem->getLevel() << std::endl;
+                std::cout << "[EFFECT] Sharpened a Skull gem to level " << gem->getLevel() << '\n';
             }
         }
     } else if (effect.type == "HIGHLIGHT_MOVE") {

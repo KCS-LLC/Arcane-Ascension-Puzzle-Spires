@@ -69,7 +69,7 @@ void Player::addMana(GemSubType type, int amount) {
         if (it->second > m_maxMana) {
             it->second = m_maxMana;
         }
-        std::cout << "[MANA GAIN] Gained " << amount << " " << gemSubtypeToString(type) << " mana." << std::endl;
+        std::cout << "[MANA GAIN] Gained " << amount << " " << gemSubtypeToString(type) << " mana." << '\n';
     }
 }
 
@@ -116,7 +116,7 @@ void Player::finalizeJudgement(const JudgementResults& results, const DataManage
     if (finalAttunement != nullptr) {
         setAttunement(*finalAttunement, dataManager);
     } else {
-        std::cerr << "Could not find final attunement with id: " << m_attunementId << std::endl;
+        std::cerr << "Could not find final attunement with id: " << m_attunementId << '\n';
         const Attunement* fallback = dataManager.getAttunementById("adept");
             if (fallback != nullptr) {
                     setAttunement(*fallback, dataManager);
