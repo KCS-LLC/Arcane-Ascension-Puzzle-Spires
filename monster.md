@@ -70,3 +70,26 @@ Monsters are classified into different categories based on their role and threat
     *   **Reflective Shroud:** Reflects the first spell of each turn back at the caster for 50% damage.
     *   **Make a Match:** Can choose to make a match on the board to gather Light or Enhancement mana.
     *   **Purifying Beam:** A powerful spell that deals high Light damage.
+
+---
+
+## 4. Spire Bestiary
+
+This list serves as a working checklist for the monsters to be implemented in the game.
+
+### Normal Monsters
+- [ ] Barghensi
+- [ ] Delsys
+- [ ] Gargoyles
+- [ ] Goblin
+- [ ] Imp
+- [ ] Karvensi
+- [ ] Ogre
+- [ ] Slimes
+- [ ] Tavare
+- [ ] Urgoyles
+- [ ] Kobolds
+- [ ] Hydra
+- [ ] Dragon
+- [ ] Serpent
+
