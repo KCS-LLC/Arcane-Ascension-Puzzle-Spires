@@ -24,6 +24,7 @@ public:
 
     void initialize(const std::vector<GemSubType>& possibleGems);
     void initializeForPowerTrial();
+    void unloadBoard();
 
     void render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, const sf::Font& font, sf::Clock& pulseClock, const TimeManager& timeManager, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo, const std::map<std::string, sf::Texture>& effectIconTextures, bool isAnimatingRowRotation, int rotatingRow, bool isAnimatingColumnRotation, int rotatingColumn);
     BaseGem* getGemAt(int r, int c) const;

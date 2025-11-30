@@ -2,6 +2,7 @@
 #include "DataManager.h"
 #include "StringUtils.h"
 
+
 // =================================================================================
 // JSON Conversion Implementations
 // =================================================================================
@@ -97,15 +98,35 @@ void from_json(const json& j, Spell& s) {
 }
 
 void from_json(const json& j, MonsterData& md) {
+    j.at("id").get_to(md.id);
     j.at("name").get_to(md.name);
-    j.at("hp").get_to(md.hp);
-    j.at("speed").get_to(md.speed);
-    j.at("attackDamage").get_to(md.attack);
-    if (j.contains("manaAffinities")) {
-        md.manaAffinities.clear();
-        for (int type_id : j.at("manaAffinities")) {
-            md.manaAffinities.push_back(static_cast<GemSubType>(type_id));
-        }
+    j.at("rank").get_to(md.rank);
+    j.at("isBoss").get_to(md.isBoss);
+    j.at("stats").at("hp").get_to(md.stats.hp);
+    j.at("stats").at("speed").get_to(md.stats.speed);
+    j.at("stats").at("vigor").get_to(md.stats.vigor);
+    j.at("stats").at("wit").get_to(md.stats.wit);
+    j.at("stats").at("attackDamage").get_to(md.stats.attackDamage);
+
+    // Parse manaAffinities from string to GemSubType
+    md.manaAffinities.clear();
+    for (const auto& affinity_str : j.at("manaAffinities")) {
+        md.manaAffinities.push_back(stringToGemSubType(affinity_str.get<std::string>()));
+    }
+
+    // Parse abilities
+    if (j.contains("abilities")) {
+        j.at("abilities").get_to(md.abilities);
+    }
+
+    // Parse resistances
+    if (j.contains("resistances")) {
+        j.at("resistances").get_to(md.resistances);
+    }
+
+    // Parse vulnerabilities
+    if (j.contains("vulnerabilities")) {
+        j.at("vulnerabilities").get_to(md.vulnerabilities);
     }
 }
 
@@ -138,8 +159,8 @@ DataManager::DataManager() {
     if (!loadSpells("data/spells.json")) {
         std::cerr << "Failed to load spells." << '\n';
     }
-    if (!loadMonsterData("data/monster.json")) {
-        std::cerr << "Failed to load monster data." << '\n';
+    if (!loadAllMonsters("data/monster_templates.json")) { // Changed to loadAllMonsters and new path
+        std::cerr << "Failed to load all monster data." << '\n';
     }
     if (!loadFloor("data/floor1.json")) {
         std::cerr << "Failed to load floor data." << '\n';
@@ -218,7 +239,7 @@ bool DataManager::loadSpells(const std::string& path) {
     }
     return true;
 }
-bool DataManager::loadMonsterData(const std::string& path) {
+bool DataManager::loadAllMonsters(const std::string& path) { // Renamed from loadMonsterData
     std::ifstream f(path);
     if (!f.is_open()) {
         std::cerr << "Could not open monster file: " << path << '\n';
@@ -226,7 +247,7 @@ bool DataManager::loadMonsterData(const std::string& path) {
     }
     try {
         json data = json::parse(f);
-        m_monsterData = data.get<MonsterData>();
+        m_allMonsters = data.get<std::vector<MonsterData>>(); // Load all monsters into the vector
     } catch (const json::exception& e) {
         std::cerr << "JSON error in monster data: " << e.what() << '\n';
         return false;
@@ -316,13 +337,35 @@ const Spell* DataManager::getSpellById(const std::string& id) const {
     }
     return nullptr;
 }
-const MonsterData& DataManager::getMonsterData() const { return m_monsterData; }
-int DataManager::getMonsterHP() const { return m_monsterData.hp; }
-int DataManager::getMonsterSpeed() const { return m_monsterData.speed; }
-int DataManager::getMonsterAttackDamage() const { return m_monsterData.attack; }
-std::string DataManager::getMonsterName() const { return m_monsterData.name; }
-const std::vector<GemSubType>& DataManager::getMonsterManaAffinities() const { return m_monsterData.manaAffinities; }
+
+const MonsterData* DataManager::getRandomMonsterByRank(int rank, bool isBoss) const {
+    std::vector<const MonsterData*> candidates;
+    for (const auto& monster : m_allMonsters) {
+        if (monster.rank == rank && monster.isBoss == isBoss) {
+            candidates.push_back(&monster);
+        }
+    }
+
+    if (candidates.empty()) {
+        std::cerr << "No monster found for rank " << rank << " and isBoss " << (isBoss ? "true" : "false") << '\n';
+        return nullptr; // No matching monster found
+    }
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distrib(0, static_cast<int>(candidates.size() - 1));
+    
+    return candidates[distrib(gen)];
+}
+
 const Floor& DataManager::getFloor() const { return currentFloor; }
-const Room* DataManager::getRoomById(int roomId) const { return nullptr; }
+const Room* DataManager::getRoomById(int roomId) const {
+    auto it = std::find_if(currentFloor.rooms.begin(), currentFloor.rooms.end(), 
+                           [roomId](const Room& r) { return r.id == roomId; });
+    if (it != currentFloor.rooms.end()) {
+        return &(*it);
+    }
+    return nullptr;
+}
 const std::vector<JudgementTrial>& DataManager::getJudgementTrials() const { return m_judgementTrials; }
 const sf::Font& DataManager::getFont() const { return m_font; }

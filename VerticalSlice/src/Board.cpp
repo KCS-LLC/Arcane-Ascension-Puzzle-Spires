@@ -60,9 +60,13 @@ void Board::initializeForPowerTrial() {
     }
 }
 
-
-
-
+void Board::unloadBoard() {
+    m_grid.clear();
+    m_grid.resize(m_height);
+    for (int r = 0; r < m_height; ++r) {
+        m_grid[r].resize(m_width);
+    }
+}
 
 void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, const sf::Font& font, sf::Clock& pulseClock, const TimeManager& timeManager, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo, const std::map<std::string, sf::Texture>& effectIconTextures, bool isAnimatingRowRotation, int rotatingRow, bool isAnimatingColumnRotation, int rotatingColumn) {
     sf::RectangleShape background(sf::Vector2f(TILE_SIZE, TILE_SIZE));

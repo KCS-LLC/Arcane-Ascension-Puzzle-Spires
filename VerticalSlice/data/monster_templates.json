@@ -1,0 +1,74 @@
+[
+  {
+    "id": "goblin_grunt",
+    "name": "Goblin Grunt",
+    "rank": 1,
+    "isBoss": false,
+    "stats": { 
+      "hp": 30, 
+      "speed": 50, 
+      "vigor": 10, 
+      "wit": 20,
+      "attackDamage": 10
+    },
+    "manaAffinities": ["Earth","Fire"],
+    "abilities": ["Monster_ability_1"],
+    "resistances": {},
+    "vulnerabilities": {}
+  },
+  {
+    "id": "spire_slime",
+    "name": "Spire Slime",
+    "rank": 1,
+    "isBoss": false,
+    "stats": { 
+      "hp": 100, 
+      "speed": 80, 
+      "vigor": 20, 
+      "wit": 10,
+      "attackDamage": 10
+    },
+    "manaAffinities": ["Grey"],
+    "abilities": ["Monster_ability_2"],
+    "resistances": {},
+    "vulnerabilities": {}
+  },
+  {
+    "id": "cave_ogre",
+    "name": "Cave Ogre",
+    "rank": 1,
+    "isBoss": false,
+    "stats": { 
+      "hp": 150, 
+      "speed": 110, 
+      "vigor": 30, 
+      "wit": 25,
+      "attackDamage": 10
+    },
+    "manaAffinities": ["Life", "Earth"],
+    "abilities": ["Monster_ability_3"],
+    "resistances": {},
+    "vulnerabilities": {}
+  },
+  {
+    "id": "stone_gargoyle",
+    "name": "Stone Gargoyle",
+    "rank": 1,
+    "isBoss": true,
+    "stats": {
+      "hp": 200,
+      "speed": 90,
+      "vigor": 50,
+      "wit": 30,
+      "attackDamage": 10
+    },
+    "manaAffinities": ["Earth", "Enhancement"],
+    "abilities": ["monster_ability_stone_skin", "monster_ability_shatter"],
+    "resistances": {
+      "Skull": 0.25
+    },
+    "vulnerabilities": {
+      "Air": 0.25
+    }
+  }
+]

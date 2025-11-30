@@ -53,6 +53,7 @@ private:
     void setupTreasureRound();
     bool processTreasureMerges();
     void moveToRoom(int destinationRoomId);
+    void unloadBoard();
 
     sf::RenderWindow m_window;
     DataManager dataManager; // Must be initialized before managers that use it.

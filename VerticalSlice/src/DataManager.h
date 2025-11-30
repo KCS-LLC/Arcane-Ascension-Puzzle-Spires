@@ -19,7 +19,7 @@ public:
     bool loadGemCatalog(const std::string& path);
     bool loadAttunements(const std::string& path);
     bool loadSpells(const std::string& path);
-    bool loadMonsterData(const std::string& path);
+    bool loadAllMonsters(const std::string& path);
     bool loadFloor(const std::string& path);
 
     // Getters
@@ -31,12 +31,7 @@ public:
     const Attunement* getAttunementById(const std::string& id) const;
     const std::vector<Spell>& getAllSpells() const;
     const Spell* getSpellById(const std::string& id) const;
-    const MonsterData& getMonsterData() const;
-    int getMonsterHP() const;
-    int getMonsterSpeed() const;
-    int getMonsterAttackDamage() const;
-    std::string getMonsterName() const;
-    const std::vector<GemSubType>& getMonsterManaAffinities() const;
+    const MonsterData* getRandomMonsterByRank(int rank, bool isBoss = false) const;
     const Floor& getFloor() const;
     const Room* getRoomById(int roomId) const;
     const std::vector<JudgementTrial>& getJudgementTrials() const;
@@ -53,7 +48,7 @@ private:
     // Other Data Members
     std::vector<Attunement> attunements;
     std::vector<Spell> spells;
-    MonsterData m_monsterData;
+    std::vector<MonsterData> m_allMonsters;
     Floor currentFloor;
     std::vector<JudgementTrial> m_judgementTrials;
     sf::Font m_font;

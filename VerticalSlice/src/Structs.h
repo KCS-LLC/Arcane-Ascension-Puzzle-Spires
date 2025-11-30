@@ -75,11 +75,21 @@ struct GemCatalogEntry {
 };
 
 struct MonsterData {
+    std::string id;
     std::string name;
-    int hp;
-    int speed;
-    int attack;
+    int rank;
+    bool isBoss;
+    struct {
+        int hp;
+        int speed;
+        int vigor;
+        int wit;
+        int attackDamage; // Combined attackDamage into stats
+    } stats;
     std::vector<GemSubType> manaAffinities;
+    std::vector<std::string> abilities; // IDs of spells the monster can use
+    std::map<std::string, float> resistances; // Element string to float multiplier (e.g., "Fire": 0.5)
+    std::map<std::string, float> vulnerabilities; // Element string to float multiplier (e.g., "Water": 1.5)
 };
 
 struct Teleporter {

@@ -22,7 +22,7 @@ Game::Game()
       m_gemFactory(dataManager),
       m_board(BOARD_WIDTH, BOARD_HEIGHT, m_gemFactory),
       m_player(100, {}),
-      m_monster(dataManager.getMonsterData()),
+      m_monster(MonsterData{}), // Initialize with default MonsterData, will be overridden in moveToRoom
       m_gameMode(GameMode::JUDGEMENT),
       m_gameState(GameState::Intro),
       m_currentTrialOrderIndex(0),
@@ -134,8 +134,21 @@ void Game::moveToRoom(int destinationRoomId) {
         switch (m_currentRoom->type) {
             case RoomType::Combat:
             case RoomType::Boss:
-                // TODO: Load the correct monster for this room
-                m_monster = Monster(dataManager.getMonsterData());
+                {
+                    // Determine monster rank based on floor number (for now, 1 for all first floor rooms)
+                    int monsterRank = m_currentFloor.floorNumber; 
+                    bool isBossRoom = (m_currentRoom->type == RoomType::Boss);
+                    const MonsterData* newMonsterData = dataManager.getRandomMonsterByRank(monsterRank, isBossRoom);
+
+                    if (newMonsterData) {
+                        m_monster = Monster(*newMonsterData); // Construct new monster from loaded data
+                    } else {
+                        std::cerr << "Error: No monster found for Rank " << monsterRank 
+                                  << " (Boss: " << (isBossRoom ? "true" : "false") << "). Using default MonsterData." << '\n';
+                        // Fallback to a default constructed monster if no match is found
+                        m_monster = Monster(MonsterData{});
+                    }
+                }
 
                 // Create the dynamic gem pool for combat
                 {
@@ -154,37 +167,50 @@ void Game::moveToRoom(int destinationRoomId) {
                 m_gameState = GameState::Playing;
                 break;
             case RoomType::Treasure:
+                unloadBoard();
                 m_gameState = GameState::Treasure;
                 break;
             case RoomType::Special:
+                unloadBoard();
                 m_gameState = GameState::Special;
                 break;
             case RoomType::Puzzle:
+                unloadBoard();
                 m_gameState = GameState::Puzzle;
                 break;
             case RoomType::Trap:
+                unloadBoard();
                 m_gameState = GameState::Trap;
                 break;
             case RoomType::Sanctuary: 
+                unloadBoard();
                 m_gameState = GameState::Sanctuary; 
                 break;
             case RoomType::AgilityChallenge: 
+                unloadBoard();
                 m_gameState = GameState::AgilityChallenge; 
                 break;
             case RoomType::EnduranceChallenge: 
+                unloadBoard();
                 m_gameState = GameState::EnduranceChallenge; 
                 break;
             case RoomType::MagicChallenge: 
+                unloadBoard();
                 m_gameState = GameState::MagicChallenge; 
                 break;
             default:
                 // For any other room type, just go back to exploration for now
+                unloadBoard();
                 m_gameState = GameState::Exploration;
                 break;
         }
     } else {
         std::cerr << "Error: Tried to move to a non-existent room ID: " << destinationRoomId << '\n';
     }
+}
+
+void Game::unloadBoard() {
+    m_board.unloadBoard();
 }
 
 void Game::run() {
@@ -251,7 +277,7 @@ void Game::handleInput(sf::Event event) {
 
                 // Now check if the monster gets a turn.
                 if (m_monster.isTurnReady(spell->speedCost)) {
-                    m_player.takeDamage(dataManager.getMonsterAttackDamage());
+                    m_player.takeDamage(m_monster.getAttackDamage());
                     showPlayerDamageEffect = true;
                     playerDamageClock.restart();
                 }
@@ -362,7 +388,7 @@ void Game::handleMatches(bool isPlayerMove) {
         m_timeManager.advanceTime(BASE_SWAP_SPEED, *this);
 
         if (m_gameMode == GameMode::TOWER_CLIMB && m_monster.isTurnReady(30)) { // Placeholder speed cost for a match
-            m_player.takeDamage(dataManager.getMonsterAttackDamage());
+            m_player.takeDamage(m_monster.getAttackDamage());
             showPlayerDamageEffect = true;
             playerDamageClock.restart();
         }

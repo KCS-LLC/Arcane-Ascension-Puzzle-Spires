@@ -26,6 +26,7 @@
     - **[TODO]** **Create Floor/Room Structure:** Design and implement the basic C++ classes for `Room` (to hold encounters) and `Floor` (a collection of rooms).
     - **[TODO]** **Implement Linear Floor Progression:** For the initial implementation, create a static, non-random sequence of rooms (e.g., Combat Room -> Combat Room -> Boss Room) to test the mechanics of moving between encounters.
     - **[TODO]** **Integrate into Game Loop:** Modify the main `Game` class to manage the current floor and transition the player to the next room upon winning a combat encounter.
+    - **[TODO]** **Refactor/Integrate Floor Generation:** Address the current reliance on an external tool for `floor1.json` generation. Either refactor the external tool for better integration or integrate floor generation logic directly into the game engine for dynamic floor creation.
 
 ### Phase 4: Core Gameplay Refinements
 - **Objective:** Refine fundamental gameplay mechanics for accuracy and depth.

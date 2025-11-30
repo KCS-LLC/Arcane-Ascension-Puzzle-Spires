@@ -1,0 +1,19 @@
+# This is a development configuration for clang-tidy.
+# Stricter checks are temporarily disabled to reduce noise during active feature development.
+# Re-enable all checks for dedicated code cleanup phases.
+Checks: >
+  -*
+  ,bugprone-*
+  ,clang-analyzer-*
+  ,modernize-use-equals-default
+  ,modernize-use-emplace
+  ,performance-avoid-endl
+  ,readability-braces-around-statements
+  ,readability-implicit-bool-conversion
+  ,-modernize-use-trailing-return-type
+  ,-modernize-use-nodiscard
+  ,-readability-identifier-naming
+  ,-readability-magic-numbers
+  ,-bugprone-easily-swappable-parameters
+  ,-readability-redundant-member-init
+  ,-modernize-use-default-member-init
