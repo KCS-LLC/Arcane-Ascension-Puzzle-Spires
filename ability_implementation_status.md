@@ -8,8 +8,8 @@ This document tracks the current implementation status of each Quartz-Rank Abili
 
 *   **Insight**
     *   **Score:** 70/100
-    *   **Reasoning:** The core logic to find and highlight a single move is implemented. However, your new description specifies that multiple castings should highlight *additional* moves or notify the player if all are revealed. This extended logic is missing.
-    *   **To Reach 100:** Implement tracking for already-revealed moves to allow the spell to find and highlight new ones on subsequent casts. Add a UI notification when no more unique moves can be found.
+    *   **Reasoning:** The effect correctly finds and highlights one valid move. However, the core logic is incomplete as it does not handle multiple casts. The `Board::findValidMove` function only finds the *first* available move, not all of them, and there is no system to track which moves have already been shown to the player.
+    *   **To Reach 100:** 1) Implement a new `Board::findAllValidMoves` method. 2) Add state management to the `Game` or `Player` class to store the list of found moves and track which have been revealed. 3) Update the `HIGHLIGHT_MOVE` effect in `EffectProcessor` to use this state, showing a new move on each cast and notifying the player when all are revealed.
 
 *   **Mana Surge**
     *   **Score:** 100/100
@@ -26,9 +26,9 @@ This document tracks the current implementation status of each Quartz-Rank Abili
     *   **To Reach 100:** (Already at 100)
 
 *   **Gust of Wind**
-    *   **Score:** 50/100
-    *   **Reasoning:** The core unified targeting system has been implemented and is functional. The "Gust of Wind" ability now correctly initiates targeting mode and processes a selected row for rotation. The next steps involve refining the UI feedback and refactoring "Quick Swap" to use this new system.
-    *   **To Reach 100:** Refine UI feedback for targeting (e.g., visual selection of row/column). Refactor "Quick Swap" to utilize the new unified targeting system.
+    *   **Score:** 100/100
+    *   **Reasoning:** The ability is fully implemented. It correctly uses the unified targeting system to get two clicks from the player, determines the direction, and performs the row/column rotation. UI prompts, animations, and the final board state change are all functional.
+    *   **To Reach 100:** (Already at 100)
 
 ---
 
@@ -41,8 +41,8 @@ This document tracks the current implementation status of each Quartz-Rank Abili
 
 *   **Insight**
     *   **Score:** 70/100
-    *   **Reasoning:** (Same as Diviner's Insight) The core logic to find and highlight a single move is implemented. However, your new description specifies that multiple castings should highlight *additional* moves or notify the player if all are revealed. This logic is missing.
-    *   **To Reach 100:** Implement tracking for already-revealed moves to allow the spell to find and highlight new ones on subsequent casts. Add a UI notification when no more unique moves can be found.
+    *   **Reasoning:** (Same as Diviner's Insight) The effect correctly finds and highlights one valid move. However, the core logic is incomplete as it does not handle multiple casts. The `Board::findValidMove` function only finds the *first* available move, not all of them, and there is no system to track which moves have already been shown to the player.
+    *   **To Reach 100:** 1) Implement a new `Board::findAllValidMoves` method. 2) Add state management to the `Game` or `Player` class to store the list of found moves and track which have been revealed. 3) Update the `HIGHLIGHT_MOVE` effect in `EffectProcessor` to use this state, showing a new move on each cast and notifying the player when all are revealed.
 
 ---
 
@@ -92,22 +92,22 @@ This document tracks the current implementation status of each Quartz-Rank Abili
 
 *   **Create Weapon**
     *   **Score:** 90/100
-    *   **Reasoning:** The core logic is functional. The `TRANSFORM_RANDOM_GEMS` effect correctly identifies random non-attack gems and converts them into Skull gems. The only missing piece is an animation or visual effect to clearly show the transformation happening, rather than the gems just instantly changing.
-    *   **To Reach 100:** Implement a brief "transformation" animation (e.g., a flash or particle effect) at the coordinates of the changed gems.
+    *   **Reasoning:** The core logic is functional. The `TRANSFORM_RANDOM_GEMS` effect correctly identifies random non-attack gems and converts them into Skull gems. The only missing piece is a visual effect for the transformation; the gems currently change instantly.
+    *   **To Reach 100:** Add a new animation state (e.g., `m_isAnimatingTransform`) to the state machine in `Game.cpp`/`Game.h`. The effect should trigger this animation, and the actual gem transformation should occur in the `update` loop after the animation timer completes.
 
 *   **Sharpen Weapon**
-    *   **Score:** 0/100
-    *   **Reasoning:** The effect type `MODIFY_ATTACK_GEM` exists in `spells.json`, but there is no corresponding logic in `EffectProcessor.cpp` to handle it. The concept of an individual gem having a modified damage value is not yet implemented.
-    *   **To Reach 100:** Add a damage modifier member variable to the `AttackGem` class. Implement the `MODIFY_ATTACK_GEM` case in `EffectProcessor.cpp` to select a random Skull gem and increase its damage modifier. Update the `AttackGem::onMatch` method to incorporate this modifier into its damage calculation. Add a visual indicator to the gem on the board.
+    *   **Score:** 100/100
+    *   **Reasoning:** The `MODIFY_ATTACK_GEM` effect is now fully implemented. The logic correctly selects a random Skull gem and increases its level. The `AttackGem::onMatch` method correctly incorporates this level into its damage calculation, and the level is visually represented on the board.
+    *   **To Reach 100:** (Already at 100)
 
 ---
 
 ## Summoner
 
 *   **Gust of Wind**
-    *   **Score:** 10/100
-    *   **Reasoning:** Architectural planning for a unified, scalable targeting system is complete. Implementation of this central system has begun, starting with "Gust of Wind" as the first use case.
-    *   **To Reach 100:** Complete the implementation of the unified targeting system, including the UI prompts and board rotation logic. Then, refactor "Quick Swap" to use the same system.
+    *   **Score:** 100/100
+    *   **Reasoning:** (Same as Elementalist's Gust of Wind) The ability is fully implemented. It correctly uses the unified targeting system to get two clicks from the player, determines the direction, and performs the row/column rotation. UI prompts, animations, and the final board state change are all functional.
+    *   **To Reach 100:** (Already at 100)
 
 *   **Quick Swap**
     *   **Score:** 100/100

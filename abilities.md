@@ -4,7 +4,7 @@ This document outlines the two proposed starting (`Quartz`-rank) abilities for e
 
 | Attunement | Ability Name | Mana Type | Mana Cost | Speed Cost | Description |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-Highlights a random valid move on the board. Multiple castings in a row will highlight additional moves, or notify if all have been revealed. |
+| **Diviner** | Insight | Perception | 15 | 20 | Highlights a random valid move on the board. Multiple castings in a row will highlight additional moves, or notify if all have been revealed. |
 | | Mana Surge | Enhancement | 25 | 40 | Temporarily increases mana gain/damage from all matches. |
 | **Elementalist**| Create Burning Tile | Fire | 25 | 40 | Creates a Static Effect Tile that deals fire damage over time. |
 | | Gust of Wind | Air | 20 | 30 | Performs a full row/column rotation, shifting all gems in the targeted row/column. |
