@@ -17,6 +17,16 @@
 ### Phase 2: Player Experience & Visual Polish
 - **Objective:** Enhance the user's experience with better feedback, smoother interactions, and more engaging visual elements.
 - **Key Tasks:**
+    - **[IN PROGRESS] Implement Unified Animation System:** Create a central, non-blocking system to handle cosmetic UI and game event animations.
+        - **Phase 1: Core Framework:**
+            - **[TODO]** Create `Animation.h` with `Animation`, `AnimationType`, and `AnimationTarget` structs.
+            - **[TODO]** Integrate an `m_activeAnimations` vector into `Game.h`.
+            - **[TODO]** Implement `startAnimation()` and the animation lifecycle (removal after lifetime) in `Game.cpp`.
+        - **Phase 2: Event Triggers:**
+            - **[TODO]** In `EffectProcessor.cpp`, trigger `HpSweep` animations for `HEAL` and `DEAL_DAMAGE` effects, capturing health before and after.
+        - **Phase 3: Rendering:**
+            - **[TODO]** Add `renderAnimations()` to `UIManager` to draw animation effects.
+            - **[TODO]** Implement the HP sweep visual: a fading overlay on the changed portion of the HP bar.
     - **[TODO]** **UI Animations:** Add subtle animations and feedback to other UI elements, such as mana gains.
     - **[TODO]** **Visual Effects:** Implement particle effects or other animations for events like gem matches and taking damage.
 
