@@ -289,7 +289,7 @@ void Board::setGemAt(int r, int c, std::unique_ptr<BaseGem> gem) {
 }
 
 void Board::rotateRow(int rowIndex, int direction) {
-    if (rowIndex < 0 || rowIndex >= m_height) return;
+    if (rowIndex < 0 || rowIndex >= m_height) { return; }
 
     auto& row = m_grid[rowIndex];
     if (direction > 0) { // Rotate right
@@ -300,7 +300,7 @@ void Board::rotateRow(int rowIndex, int direction) {
 }
 
 void Board::rotateColumn(int colIndex, int direction) {
-    if (colIndex < 0 || colIndex >= m_width) return;
+    if (colIndex < 0 || colIndex >= m_width) { return; }
 
     // Since grid is row-major, we have to copy to a temp vector
     std::vector<std::unique_ptr<BaseGem>> column;

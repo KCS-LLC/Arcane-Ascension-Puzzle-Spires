@@ -232,7 +232,7 @@ void Game::run() {
 
 void Game::processEvents() {
     for (auto event = m_window.pollEvent(); event; event = m_window.pollEvent()) {
-        if (m_isAnimating) continue; // Ignore input during animations
+        if (m_isAnimating) { continue; } // Ignore input during animations
         handleInput(*event);
     }
 }
@@ -264,7 +264,7 @@ void Game::handleInput(sf::Event event) {
             moveToRoom(action.destinationRoomId);
         } else if (action.type == UIActionType::CastSpell) {
             const Spell* spell = m_player.getSpells()[action.spellIndex];
-            if (!spell) return;
+            if (!spell) { return; }
 
             if (m_playMode == PlayMode::Targeting && m_pendingSpell == spell) {
                 cancelTargeting();
@@ -732,8 +732,8 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                             if (gem) {
                                 sf::Sprite sprite = gem->getSprite();
                                 float newX = (c + anim.direction * p);
-                                if (newX < 0) newX += m_board.getWidth();
-                                if (newX >= m_board.getWidth()) newX -= m_board.getWidth();
+                                if (newX < 0) { newX += m_board.getWidth(); }
+                                if (newX >= m_board.getWidth()) { newX -= m_board.getWidth(); }
                                 sprite.setPosition(sf::Vector2f(newX * TILE_SIZE + m_boardOrigin.x, anim.index * TILE_SIZE + m_boardOrigin.y));
                                 m_window.draw(sprite);
                             }
@@ -746,8 +746,8 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                             if (gem) {
                                 sf::Sprite sprite = gem->getSprite();
                                 float newY = (r + anim.direction * p);
-                                if (newY < 0) newY += m_board.getHeight();
-                                if (newY >= m_board.getHeight()) newY -= m_board.getHeight();
+                                if (newY < 0) { newY += m_board.getHeight(); }
+                                if (newY >= m_board.getHeight()) { newY -= m_board.getHeight(); }
                                 sprite.setPosition(sf::Vector2f(anim.index * TILE_SIZE + m_boardOrigin.x, newY * TILE_SIZE + m_boardOrigin.y));
                                 m_window.draw(sprite);
                             }

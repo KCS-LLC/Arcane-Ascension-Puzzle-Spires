@@ -183,7 +183,7 @@ DataManager::DataManager() {
 
 bool DataManager::loadConfig(const std::string& path) {
     std::ifstream f(path);
-    if (!f.is_open()) return false;
+    if (!f.is_open()) { return false; }
     try {
         json data = json::parse(f);
         const auto& timings = data.at("animation_timings");
@@ -200,7 +200,7 @@ bool DataManager::loadConfig(const std::string& path) {
 
 bool DataManager::loadPrimaryGemTypes(const std::string& path) {
     std::ifstream f(path);
-    if (!f.is_open()) return false;
+    if (!f.is_open()) { return false; }
     try {
         json data = json::parse(f);
         for (const auto& item : data) {
@@ -215,7 +215,7 @@ bool DataManager::loadPrimaryGemTypes(const std::string& path) {
 
 bool DataManager::loadSecondaryGemTypes(const std::string& path) {
     std::ifstream f(path);
-    if (!f.is_open()) return false;
+    if (!f.is_open()) { return false; }
     try {
         json data = json::parse(f);
         for (const auto& item : data) {
@@ -230,7 +230,7 @@ bool DataManager::loadSecondaryGemTypes(const std::string& path) {
 
 bool DataManager::loadGemCatalog(const std::string& path) {
     std::ifstream f(path);
-    if (!f.is_open()) return false;
+    if (!f.is_open()) { return false; }
     try {
         json data = json::parse(f);
         for (const auto& item : data) {
@@ -245,7 +245,7 @@ bool DataManager::loadGemCatalog(const std::string& path) {
 
 bool DataManager::loadAttunements(const std::string& path) {
     std::ifstream f(path);
-    if (!f.is_open()) return false;
+    if (!f.is_open()) { return false; }
     try {
         json data = json::parse(f);
         attunements = data.get<std::vector<Attunement>>();
@@ -257,7 +257,7 @@ bool DataManager::loadAttunements(const std::string& path) {
 }
 bool DataManager::loadSpells(const std::string& path) {
     std::ifstream f(path);
-    if (!f.is_open()) return false;
+    if (!f.is_open()) { return false; }
     try {
         json data = json::parse(f);
         spells = data.get<std::vector<Spell>>();
@@ -284,7 +284,7 @@ bool DataManager::loadAllMonsters(const std::string& path) { // Renamed from loa
 }
 bool DataManager::loadFloor(const std::string& path) {
     std::ifstream f(path);
-    if (!f.is_open()) return false;
+    if (!f.is_open()) { return false; }
     try {
         json data = json::parse(f);
         currentFloor = data.get<Floor>();

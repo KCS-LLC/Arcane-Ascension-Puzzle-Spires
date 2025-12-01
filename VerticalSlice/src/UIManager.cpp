@@ -581,7 +581,7 @@ void UIManager::renderAnimations(sf::RenderWindow& window, const std::vector<Ani
                 baseBar = &monsterHpBarBack;
             }
 
-            if (baseBar == nullptr) continue;
+            if (baseBar == nullptr) { continue; }
 
             float progress = animation.clock.getElapsedTime().asSeconds() / animation.lifetime.asSeconds();
             std::uint8_t alpha = static_cast<std::uint8_t>(255.f * (1.f - progress));

@@ -10,8 +10,8 @@
 
 // Custom comparator for sorting gem coordinates (bottom-most, then left-most)
 bool compareCoords(const sf::Vector2i& a, const sf::Vector2i& b) {
-    if (a.x > b.x) return true; // Higher row index (further down) comes first
-    if (a.x < b.x) return false;
+    if (a.x > b.x) { return true; } // Higher row index (further down) comes first
+    if (a.x < b.x) { return false; }
     return a.y < b.y; // Lower column index (further left) comes first
 }
 
@@ -22,13 +22,13 @@ bool TreasureMergeRule::appliesTo(const std::vector<sf::Vector2i>& match, const 
 
     // First, get the subtype of the first gem to use as the reference for the whole match.
     const BaseGem* firstGem = board.getGemAt(match[0].x, match[0].y);
-    if (!firstGem) return false;
+    if (!firstGem) { return false; }
     GemSubType referenceSubType = firstGem->getSubType();
 
     // Now, iterate through ALL gems in the match, including the first one.
     for (const auto& coord : match) {
         const BaseGem* gem = board.getGemAt(coord.x, coord.y);
-        if (!gem) return false; // A gem in the match group must exist.
+        if (!gem) { return false; } // A gem in the match group must exist.
 
         // Check 1: Ensure all gems in the match have the same subtype.
         if (gem->getSubType() != referenceSubType) {
@@ -37,7 +37,7 @@ bool TreasureMergeRule::appliesTo(const std::vector<sf::Vector2i>& match, const 
 
         // Check 2: Ensure the gem is actually a Treasure gem.
         const GemCatalogEntry* catalogEntry = gem->getCatalogEntry();
-        if (!catalogEntry) return false;
+        if (!catalogEntry) { return false; }
         
         const SecondaryGemTypeData* secondaryData = dataManager.getSecondaryGemTypeData(catalogEntry->secondaryTypeId);
         if (!secondaryData || secondaryData->primaryType != PrimaryGemType::Treasure) {
@@ -51,14 +51,14 @@ bool TreasureMergeRule::appliesTo(const std::vector<sf::Vector2i>& match, const 
 
 std::unique_ptr<MatchResolution> TreasureMergeRule::execute(const std::vector<sf::Vector2i>& match, Board& board, GemFactory& gemFactory, const DataManager& dataManager, const std::map<GemSubType, sf::Texture>& gemTextures) const {
     auto resolution = std::make_unique<MatchResolution>();
-    if (match.empty()) return resolution;
+    if (match.empty()) { return resolution; }
 
     // Sort coordinates to get a predictable gem to upgrade (bottom-most, then left-most)
     std::vector<sf::Vector2i> sortedMatch = match;
     std::sort(sortedMatch.begin(), sortedMatch.end(), compareCoords);
 
     const BaseGem* firstGem = board.getGemAt(sortedMatch[0].x, sortedMatch[0].y);
-    if (!firstGem) return resolution;
+    if (!firstGem) { return resolution; }
 
     GemSubType currentSubType = firstGem->getSubType();
     GemSubType nextSubType;

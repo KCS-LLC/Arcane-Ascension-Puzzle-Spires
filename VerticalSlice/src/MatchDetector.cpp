@@ -83,11 +83,11 @@ std::vector<std::vector<sf::Vector2i>> MatchDetector::findAllMatches(const Board
 
     // --- Stage 2: Merge overlapping runs into groups ---
     std::vector<std::vector<sf::Vector2i>> mergedGroups;
-    if (simpleRuns.empty()) return mergedGroups;
+    if (simpleRuns.empty()) { return mergedGroups; }
 
     std::vector<bool> processed(simpleRuns.size(), false);
     for (size_t i = 0; i < simpleRuns.size(); ++i) {
-        if (processed[i]) continue;
+        if (processed[i]) { continue; }
 
         // Use a set to automatically handle duplicates from overlapping runs
         std::set<sf::Vector2i, Vector2iCompare> currentGroupSet;
@@ -107,7 +107,7 @@ std::vector<std::vector<sf::Vector2i>> MatchDetector::findAllMatches(const Board
 
             // Check for overlaps with all other unprocessed runs
             for (size_t j = 0; j < simpleRuns.size(); ++j) {
-                if (processed[j]) continue;
+                if (processed[j]) { continue; }
 
                 bool overlaps = false;
                 for (const auto& coord1 : simpleRuns[currentIndex]) {
@@ -117,7 +117,7 @@ std::vector<std::vector<sf::Vector2i>> MatchDetector::findAllMatches(const Board
                             break;
                         }
                     }
-                    if (overlaps) break;
+                    if (overlaps) { break; }
                 }
 
                 if (overlaps) {
