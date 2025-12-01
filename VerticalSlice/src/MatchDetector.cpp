@@ -30,7 +30,7 @@ std::vector<std::vector<sf::Vector2i>> MatchDetector::findAllMatches(const Board
             while (runner < board.getWidth()) {
                 const BaseGem* nextGem = board.getGemAt(r, runner);
                 if (nextGem != nullptr && nextGem->getSubType() == type) {
-                    currentRun.push_back({r, runner});
+                    currentRun.emplace_back(r, runner);
                     runner++;
                 } else {
                     break;
@@ -63,7 +63,7 @@ std::vector<std::vector<sf::Vector2i>> MatchDetector::findAllMatches(const Board
             while (runner < board.getHeight()) {
                 const BaseGem* nextGem = board.getGemAt(runner, c);
                 if (nextGem != nullptr && nextGem->getSubType() == type) {
-                    currentRun.push_back({runner, c});
+                    currentRun.emplace_back(runner, c);
                     runner++;
                 } else {
                     break;

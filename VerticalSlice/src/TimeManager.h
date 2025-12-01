@@ -27,7 +27,7 @@ struct TimeEvent {
 
 class TimeManager {
 public:
-    TimeManager();
+    TimeManager() = default;
 
     // Advances the game time by a given number of time units (seconds)
     void advanceTime(int timeUnits, Game& game); // Pass game object for callbacks

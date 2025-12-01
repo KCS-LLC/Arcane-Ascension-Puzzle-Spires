@@ -5,9 +5,7 @@
 #include <sstream>
 #include <algorithm> // For std::sort and std::remove_if
 
-TimeManager::TimeManager() {
-    // The GameTime struct's default constructor already initializes time to the start of the game.
-}
+
 
 void TimeManager::advanceTime(int timeUnits, Game& game) {
     if (timeUnits <= 0) {

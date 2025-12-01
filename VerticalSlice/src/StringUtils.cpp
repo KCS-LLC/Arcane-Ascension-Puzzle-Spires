@@ -146,7 +146,7 @@ sf::Color gemLevelToColor(int level) {
         case 6: return sf::Color::Green;
         case 7: return sf::Color::Blue;
         case 8: return {75, 0, 130};  // Indigo
-        case 9: return {148, 0, 211}; // Violet
+
         default: return {148, 0, 211}; // Default to Violet for levels beyond 9
     }
 }

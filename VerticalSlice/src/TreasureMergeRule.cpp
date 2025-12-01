@@ -68,7 +68,7 @@ std::unique_ptr<MatchResolution> TreasureMergeRule::execute(const std::vector<sf
         case GemSubType::Coin:          nextSubType = GemSubType::CoinPile;       break;
         case GemSubType::CoinPile:      nextSubType = GemSubType::CoinBag;        break;
         case GemSubType::CoinBag:       nextSubType = GemSubType::CoinBagBundle;  break;
-        case GemSubType::CoinBagBundle: nextSubType = GemSubType::TreasureChest;  break;
+
         case GemSubType::TreasureChest: nextSubType = GemSubType::TreasureChest;  break; // Already max tier
         default: return resolution; // Not a treasure type we can upgrade
     }
@@ -93,7 +93,7 @@ std::unique_ptr<MatchResolution> TreasureMergeRule::execute(const std::vector<sf
     for (int i = 0; i < sortedMatch.size(); ++i) {
         if (i < gemsToTransformCount) {
             // These gems will be transformed
-            resolution->gemsToTransform.push_back({sortedMatch[i], nextSubType});
+            resolution->gemsToTransform.emplace_back(sortedMatch[i], nextSubType);
         } else {
             // The rest will be removed
             resolution->gemsToRemove.push_back(sortedMatch[i]);

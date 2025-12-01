@@ -217,7 +217,7 @@ void Game::startAnimation(const Animation& animation) {
 
 void Game::startBoardAnimation(const BoardAnimation& animation) {
     m_activeBoardAnimations.push_back(animation);
-    std::cout << "[LOG] Game::startBoardAnimation - Animation added. New vector size: " << m_activeBoardAnimations.size() << std::endl;
+    std::cout << "[LOG] Game::startBoardAnimation - Animation added. New vector size: " << m_activeBoardAnimations.size() << '\n';
 }
 
 void Game::run() {
@@ -350,7 +350,7 @@ void Game::handleInput(sf::Event event) {
                 if (m_targetingSelections.empty()) {
                     m_board.getGemAt(row, col)->setActionState(ActionState::Selected);
                 }
-                m_targetingSelections.push_back({col, row});
+                m_targetingSelections.emplace_back(col, row);
                 if (m_targetingSelections.size() >= m_targetingRequest.numberOfClicks) {
                     resolveTargeting();
                 }
@@ -377,7 +377,7 @@ void Game::handleInput(sf::Event event) {
                             m_board.swapGems(firstGem.y, firstGem.x, secondGem.y, secondGem.x);
                             handleMatches(true);
                         };
-                        std::cout << "[LOG] Game::handleInput - Attaching onComplete to Swap animation." << std::endl;
+                        std::cout << "[LOG] Game::handleInput - Attaching onComplete to Swap animation." << '\n';
                         startBoardAnimation({BoardAnimationType::Swap, sf::Clock(), sf::milliseconds(m_animationTimings.swap_duration_ms), firstGem, secondGem, {}, GemSubType::None, {}, {}, 0, 0, onSwapComplete});
                         startBoardAnimation({BoardAnimationType::Swap, sf::Clock(), sf::milliseconds(m_animationTimings.swap_duration_ms), secondGem, firstGem, {}, GemSubType::None});
                         m_animationClock.restart();
@@ -395,13 +395,13 @@ void Game::handleInput(sf::Event event) {
 
 
 void Game::handleMatches(bool isPlayerMove) {
-    std::cout << "[LOG] Game::handleMatches - Entered." << std::endl;
+    std::cout << "[LOG] Game::handleMatches - Entered." << '\n';
     auto matchGroups = m_matchDetector.findAllMatches(m_board);
 
     if (matchGroups.empty()) {
         return;
     }
-    std::cout << "[LOG] Game::handleMatches - Found " << matchGroups.size() << " match groups." << std::endl;
+    std::cout << "[LOG] Game::handleMatches - Found " << matchGroups.size() << " match groups." << '\n';
 
     m_playerActionPerformedThisTurn = true;
     m_insightMoves.clear();
@@ -474,7 +474,7 @@ void Game::handleMatches(bool isPlayerMove) {
         return;
     }
 
-    m_currentScore += (allRemovedGems.size() * 100);
+    m_currentScore += (static_cast<int>(allRemovedGems.size()) * 100);
 
     // --- Create Destroy Animations ---
     // First, record the subtypes of the gems about to be destroyed.
@@ -491,14 +491,14 @@ void Game::handleMatches(bool isPlayerMove) {
         m_board.removeGem(pos.x, pos.y);
     }
 
-    std::cout << "[LOG] Game::handleMatches - Adding Destroy animations..." << std::endl;
+    std::cout << "[LOG] Game::handleMatches - Adding Destroy animations..." << '\n';
     for (const auto& pos : allRemovedGems) {
         GemSubType type = destroyedGemTypes.count(pos) != 0u ? destroyedGemTypes.at(pos) : GemSubType::None;
         startBoardAnimation({BoardAnimationType::Destroy, sf::Clock(), sf::milliseconds(m_animationTimings.destroy_duration_ms), {}, {}, pos, type});
     }
 
     // Refill logic
-    std::cout << "[LOG] Game::handleMatches - Adding Fall animations..." << std::endl;
+    std::cout << "[LOG] Game::handleMatches - Adding Fall animations..." << '\n';
     std::vector<Board::FallInfo> fallInfo;
     if (m_gameState == GameState::Judgement_TreasureRound) {
         fallInfo = m_board.applyGravityAndRefill(m_treasureRoundGems);
@@ -577,10 +577,8 @@ void Game::update(sf::Time deltaTime) {
     if (!m_isAnimating) {
         // Check for Judgement trial win/loss conditions only if not animating AND in a trial
         if (m_gameMode == GameMode::JUDGEMENT && m_gameState == GameState::Trial) {
-            if (m_currentScore >= m_currentJudgementTrial.scoreGoal) {
-                m_gameState = GameState::Summary; // Win condition
-            } else if (m_currentTurn >= m_currentJudgementTrial.turnLimit) {
-                m_gameState = GameState::Summary; // Loss condition
+            if (m_currentScore >= m_currentJudgementTrial.scoreGoal || m_currentTurn >= m_currentJudgementTrial.turnLimit) {
+                m_gameState = GameState::Summary; // Win/Loss condition
             }
         }
 
@@ -701,11 +699,11 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                             sf::Sprite sprite(gemTextures.at(anim.destroyedGemType));
                             const sf::Texture* tex = &sprite.getTexture();
                             sf::Vector2u texSize = tex->getSize();
-                            sprite.setOrigin({texSize.x / 2.f, texSize.y / 2.f});
-                            float baseScaleX = static_cast<float>(TILE_SIZE) / texSize.x;
-                            float baseScaleY = static_cast<float>(TILE_SIZE) / texSize.y;
+                            sprite.setOrigin({static_cast<float>(texSize.x) / 2.f, static_cast<float>(texSize.y) / 2.f});
+                            float baseScaleX = static_cast<float>(TILE_SIZE) / static_cast<float>(texSize.x);
+                            float baseScaleY = static_cast<float>(TILE_SIZE) / static_cast<float>(texSize.y);
                             sprite.setScale({baseScaleX * scale, baseScaleY * scale});
-                            sprite.setPosition({anim.position.y * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.x, anim.position.x * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.y});
+                            sprite.setPosition({static_cast<float>(anim.position.y) * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.x, static_cast<float>(anim.position.x) * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.y});
                             m_window.draw(sprite);
                         }
                         break;
@@ -717,11 +715,10 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                              sf::Sprite sprite = gem->getSprite();
                             const sf::Texture* tex = &sprite.getTexture();
                             sf::Vector2u texSize = tex->getSize();
-                            sprite.setOrigin({texSize.x / 2.f, texSize.y / 2.f});
-                            float baseScaleX = static_cast<float>(TILE_SIZE) / texSize.x;
-                            float baseScaleY = static_cast<float>(TILE_SIZE) / texSize.y;
+                            float baseScaleX = static_cast<float>(TILE_SIZE) / static_cast<float>(texSize.x);
+                            float baseScaleY = static_cast<float>(TILE_SIZE) / static_cast<float>(texSize.y);
                             sprite.setScale({baseScaleX * scale, baseScaleY * scale});
-                            sprite.setPosition({anim.position.y * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.x, anim.position.x * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.y});
+                            sprite.setPosition({static_cast<float>(anim.position.y) * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.x, static_cast<float>(anim.position.x) * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.y});
                             m_window.draw(sprite);
                         }
                         break;
@@ -731,10 +728,10 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                             BaseGem* gem = m_board.getGemAt(anim.index, c);
                             if (gem != nullptr) {
                                 sf::Sprite sprite = gem->getSprite();
-                                float newX = (c + anim.direction * p);
-                                if (newX < 0) { newX += m_board.getWidth(); }
-                                if (newX >= m_board.getWidth()) { newX -= m_board.getWidth(); }
-                                sprite.setPosition(sf::Vector2f(newX * TILE_SIZE + m_boardOrigin.x, anim.index * TILE_SIZE + m_boardOrigin.y));
+                                float newX = (static_cast<float>(c) + static_cast<float>(anim.direction) * p);
+                                if (newX < 0) { newX += static_cast<float>(m_board.getWidth()); }
+                                if (newX >= static_cast<float>(m_board.getWidth())) { newX -= static_cast<float>(m_board.getWidth()); }
+                                sprite.setPosition(sf::Vector2f(newX * TILE_SIZE + m_boardOrigin.x, static_cast<float>(anim.index) * TILE_SIZE + m_boardOrigin.y));
                                 m_window.draw(sprite);
                             }
                         }
@@ -745,10 +742,10 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                             BaseGem* gem = m_board.getGemAt(r, anim.index);
                             if (gem != nullptr) {
                                 sf::Sprite sprite = gem->getSprite();
-                                float newY = (r + anim.direction * p);
-                                if (newY < 0) { newY += m_board.getHeight(); }
-                                if (newY >= m_board.getHeight()) { newY -= m_board.getHeight(); }
-                                sprite.setPosition(sf::Vector2f(anim.index * TILE_SIZE + m_boardOrigin.x, newY * TILE_SIZE + m_boardOrigin.y));
+                                float newY = (static_cast<float>(r) + static_cast<float>(anim.direction) * p);
+                                if (newY < 0) { newY += static_cast<float>(m_board.getHeight()); }
+                                if (newY >= static_cast<float>(m_board.getHeight())) { newY -= static_cast<float>(m_board.getHeight()); }
+                                sprite.setPosition(sf::Vector2f(static_cast<float>(anim.index) * TILE_SIZE + m_boardOrigin.x, newY * TILE_SIZE + m_boardOrigin.y));
                                 m_window.draw(sprite);
                             }
                         }
@@ -796,7 +793,7 @@ void Game::handleTimeEvent(const TimeEvent& event) {
         case TimeEventType::BurningTile_Activation: {
             BaseGem* gem = m_board.getGemAt(event.coordinates.x, event.coordinates.y);
             if (gem != nullptr && gem->getStatusEffect() == StatusEffect::Burning) {
-                float damage = (m_player.getMaxMana() * 0.10f) * gem->getLevel();
+                float damage = (static_cast<float>(m_player.getMaxMana()) * 0.10f) * static_cast<float>(gem->getLevel());
                 m_monster.takeDamage(static_cast<int>(damage));
                 std::cout << "[EVENT] Burning tile dealt " << static_cast<int>(damage) << " damage. Monster HP: " << m_monster.getCurrentHp() << '\n';
             }
@@ -805,7 +802,7 @@ void Game::handleTimeEvent(const TimeEvent& event) {
         case TimeEventType::BurningTile_Expire: {
             BaseGem* gem = m_board.getGemAt(event.coordinates.x, event.coordinates.y);
             if (gem != nullptr && gem->getStatusEffect() == StatusEffect::Burning) {
-                float damage = (m_player.getMaxMana() * 0.10f) * gem->getLevel();
+                float damage = (static_cast<float>(m_player.getMaxMana()) * 0.10f) * static_cast<float>(gem->getLevel());
                 m_monster.takeDamage(static_cast<int>(damage));
                 std::cout << "[EVENT] Burning tile dealt final " << static_cast<int>(damage) << " damage and expired. Monster HP: " << m_monster.getCurrentHp() << '\n';
                 

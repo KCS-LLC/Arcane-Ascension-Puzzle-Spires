@@ -122,7 +122,7 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
                 
                 // Schedule activation events
                 for (int i = 1; i <= (BURNING_TILE_DURATION / tickInterval) -1; ++i) {
-                     game.getTimeManager().addEvent({currentTime + (i * tickInterval), TimeEventType::BurningTile_Activation, coord});
+                     game.getTimeManager().addEvent({currentTime + static_cast<long long>(i) * tickInterval, TimeEventType::BurningTile_Activation, coord});
                 }
 
                 // Schedule expiration event

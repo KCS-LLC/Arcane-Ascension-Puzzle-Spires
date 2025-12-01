@@ -20,13 +20,13 @@ Board::Board(int width, int height, GemFactory& factory)
 
 void Board::initialize(const std::vector<GemSubType>& gemTypes) {
     if (gemTypes.empty()) {
-        std::cerr << "Board::initialize - Error: gemTypes vector is empty." << std::endl;
+        std::cerr << "Board::initialize - Error: gemTypes vector is empty." << '\n';
         return;
     }
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(0, gemTypes.size() - 1);
+    std::uniform_int_distribution<> distrib(0, static_cast<int>(gemTypes.size()) - 1);
 
     for (int r = 0; r < m_height; ++r) {
         for (int c = 0; c < m_width; ++c) {
@@ -47,7 +47,7 @@ void Board::initializeForPowerTrial() {
     
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(0, allowedGems.size() - 1);
+    std::uniform_int_distribution<> distrib(0, static_cast<int>(allowedGems.size()) - 1);
 
     for (int r = 0; r < m_height; ++r) {
         for (int c = 0; c < m_width; ++c) {
@@ -90,13 +90,9 @@ void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, co
                         isAnimating = true;
                         break;
                     }
-                } else if (anim.type == BoardAnimationType::Destroy && anim.position.x == r && anim.position.y == c) {
-                    isAnimating = true;
-                    break;
-                } else if (anim.type == BoardAnimationType::RotateRow && anim.index == r) {
-                    isAnimating = true;
-                    break;
-                } else if (anim.type == BoardAnimationType::RotateColumn && anim.index == c) {
+                } else if ((anim.type == BoardAnimationType::Destroy && anim.position.x == r && anim.position.y == c) ||
+                           (anim.type == BoardAnimationType::RotateRow && anim.index == r) ||
+                           (anim.type == BoardAnimationType::RotateColumn && anim.index == c)) {
                     isAnimating = true;
                     break;
                 }
@@ -107,7 +103,7 @@ void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, co
             }
 
             if (m_grid[r][c]) {
-                sf::Vector2f tilePosition(boardOrigin.x + c * TILE_SIZE, boardOrigin.y + r * TILE_SIZE);
+                sf::Vector2f tilePosition(boardOrigin.x + static_cast<float>(c) * TILE_SIZE, boardOrigin.y + static_cast<float>(r) * TILE_SIZE);
 
                 // 1. Draw Background Layer
                 background.setFillColor(gemLevelToColor(m_grid[r][c]->getLevel()));
@@ -127,7 +123,7 @@ void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, co
                         
                         // Scale the icon to fit the tile
                         sf::Vector2u textureSize = it->second.getSize();
-                        effectSprite.setScale(sf::Vector2f(static_cast<float>(TILE_SIZE) / textureSize.x, static_cast<float>(TILE_SIZE) / textureSize.y));
+                        effectSprite.setScale(sf::Vector2f(static_cast<float>(TILE_SIZE) / static_cast<float>(textureSize.x), static_cast<float>(TILE_SIZE) / static_cast<float>(textureSize.y)));
                         
                         effectSprite.setPosition(tilePosition);
                         window.draw(effectSprite);
@@ -191,10 +187,10 @@ bool Board::canSwap(int r1, int c1, int r2, int c2) {
 void Board::swapGems(int r1, int c1, int r2, int c2) {
     m_grid[r1][c1].swap(m_grid[r2][c2]);
     if (m_grid[r1][c1]) {
-        m_grid[r1][c1]->setPosition(c1 * TILE_SIZE, r1 * TILE_SIZE);
+        m_grid[r1][c1]->setPosition(static_cast<float>(c1 * TILE_SIZE), static_cast<float>(r1 * TILE_SIZE));
     }
     if (m_grid[r2][c2]) {
-        m_grid[r2][c2]->setPosition(c2 * TILE_SIZE, r2 * TILE_SIZE);
+        m_grid[r2][c2]->setPosition(static_cast<float>(c2 * TILE_SIZE), static_cast<float>(r2 * TILE_SIZE));
     }
 }
 
@@ -206,7 +202,7 @@ std::set<std::pair<int, int>> Board::findMatches() {
             BaseGem* gem1 = getGemAt(r, c);
             BaseGem* gem2 = getGemAt(r, c + 1);
             BaseGem* gem3 = getGemAt(r, c + 2);
-            if (gem1 && gem2 && gem3 && gem1->getSubType() == gem2->getSubType() && gem2->getSubType() == gem3->getSubType()) {
+            if (gem1 != nullptr && gem2 != nullptr && gem3 != nullptr && gem1->getSubType() == gem2->getSubType() && gem2->getSubType() == gem3->getSubType()) {
                 matches.insert({r, c});
                 matches.insert({r, c + 1});
                 matches.insert({r, c + 2});
@@ -219,7 +215,7 @@ std::set<std::pair<int, int>> Board::findMatches() {
              BaseGem* gem1 = getGemAt(r, c);
              BaseGem* gem2 = getGemAt(r + 1, c);
              BaseGem* gem3 = getGemAt(r + 2, c);
-             if (gem1 && gem2 && gem3 && gem1->getSubType() == gem2->getSubType() && gem2->getSubType() == gem3->getSubType()) {
+             if (gem1 != nullptr && gem2 != nullptr && gem3 != nullptr && gem1->getSubType() == gem2->getSubType() && gem2->getSubType() == gem3->getSubType()) {
                 matches.insert({r, c});
                 matches.insert({r + 1, c});
                 matches.insert({r + 2, c});
@@ -245,7 +241,7 @@ std::vector<Board::FallInfo> Board::applyGravityAndRefill(const std::vector<GemS
     std::vector<FallInfo> fallInfo;
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(0, possibleGems.size() - 1);
+    std::uniform_int_distribution<> distrib(0, static_cast<int>(possibleGems.size()) - 1);
 
     // Gravity for existing gems
     for (int c = 0; c < m_width; ++c) {
@@ -257,7 +253,7 @@ std::vector<Board::FallInfo> Board::applyGravityAndRefill(const std::vector<GemS
             if (m_grid[r][c] && emptyRow != -1) {
                 m_grid[emptyRow][c] = std::move(m_grid[r][c]);
                 fallInfo.push_back({r, c, emptyRow, m_grid[emptyRow][c]->getSubType()});
-                m_grid[emptyRow][c]->setPosition(c * TILE_SIZE, emptyRow * TILE_SIZE);
+                m_grid[emptyRow][c]->setPosition(static_cast<float>(c * TILE_SIZE), static_cast<float>(emptyRow * TILE_SIZE));
                 emptyRow--;
             }
         }
@@ -272,7 +268,7 @@ std::vector<Board::FallInfo> Board::applyGravityAndRefill(const std::vector<GemS
                 GemSubType type = possibleGems[distrib(gen)];
                 m_grid[r][c] = m_gemFactory.createGem(type, gemTextures.at(type));
                 if (m_grid[r][c]) {
-                    m_grid[r][c]->setPosition(c * TILE_SIZE, r * TILE_SIZE);
+                    m_grid[r][c]->setPosition(static_cast<float>(c * TILE_SIZE), static_cast<float>(r * TILE_SIZE));
                     fallInfo.push_back({-newGems, c, r, type});
                 }
             }
@@ -327,15 +323,15 @@ std::vector<sf::Vector2i> Board::getRandomGemCoords(int count, bool nonAttackGem
             if (m_grid[r][c]) { // Ensure there's a gem at the position
                 if (specificType) {
                     if (m_grid[r][c]->getSubType() == *specificType) {
-                        filteredCoords.push_back({r, c});
+                        filteredCoords.emplace_back(r, c);
                     }
                 } else if (nonAttackGemsOnly) {
                     const GemCatalogEntry* entry = m_grid[r][c]->getCatalogEntry();
-                    if (entry && entry->secondaryTypeId != 1001) { // 1001 is Skull
-                        filteredCoords.push_back({r, c});
+                    if (entry != nullptr && entry->secondaryTypeId != 1001) { // 1001 is Skull
+                        filteredCoords.emplace_back(r, c);
                     }
                 } else {
-                    filteredCoords.push_back({r, c});
+                    filteredCoords.emplace_back(r, c);
                 }
             }
         }
@@ -419,7 +415,7 @@ std::vector<std::pair<sf::Vector2i, sf::Vector2i>> Board::findAllValidMoves() co
         for (int c = 0; c < m_width - 1; ++c) {
             mutableThis->swapGems(r, c, r, c + 1);
             if (mutableThis->findMatches().size() > 0) {
-                validMoves.push_back({sf::Vector2i(c, r), sf::Vector2i(c + 1, r)});
+                validMoves.emplace_back(sf::Vector2i(c, r), sf::Vector2i(c + 1, r));
             }
             mutableThis->swapGems(r, c, r, c + 1); // Swap back
         }
@@ -430,7 +426,7 @@ std::vector<std::pair<sf::Vector2i, sf::Vector2i>> Board::findAllValidMoves() co
         for (int c = 0; c < m_width; ++c) {
             mutableThis->swapGems(r, c, r + 1, c);
             if (mutableThis->findMatches().size() > 0) {
-                validMoves.push_back({sf::Vector2i(c, r), sf::Vector2i(c, r + 1)});
+                validMoves.emplace_back(sf::Vector2i(c, r), sf::Vector2i(c, r + 1));
             }
             mutableThis->swapGems(r, c, r + 1, c); // Swap back
         }

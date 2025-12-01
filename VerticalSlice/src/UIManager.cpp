@@ -137,7 +137,7 @@ bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState
                     for (size_t i = 0; i < spellButtons.size(); ++i) {
                         if (spellButtons[i].getGlobalBounds().contains(sf::Vector2f(mb->position))) {
                             outAction.type = UIActionType::CastSpell;
-                            outAction.spellIndex = i;
+                            outAction.spellIndex = static_cast<int>(i);
                             return true;
                         }
                     }
@@ -170,9 +170,9 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     rightPanel.setFillColor(sf::Color(50, 50, 50, 200));
 
     playerPanelTitle.setPosition(sf::Vector2f{20, 20});
-    monsterPanelTitle.setPosition(sf::Vector2f{windowSize.x - rightPanel.getSize().x + 20, 20});
-    monsterNameText.setPosition(sf::Vector2f{windowSize.x - rightPanel.getSize().x + 20, 50});
-    monsterHpText.setPosition(sf::Vector2f{windowSize.x - rightPanel.getSize().x + 20, 70});
+    monsterPanelTitle.setPosition(sf::Vector2f{static_cast<float>(windowSize.x) - rightPanel.getSize().x + 20, 20});
+    monsterNameText.setPosition(sf::Vector2f{static_cast<float>(windowSize.x) - rightPanel.getSize().x + 20, 50});
+    monsterHpText.setPosition(sf::Vector2f{static_cast<float>(windowSize.x) - rightPanel.getSize().x + 20, 70});
 
     // --- HP Bars ---
     playerHpBarBack.setSize(sf::Vector2f{210, 20});
@@ -182,7 +182,7 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     playerHpBarFront.setFillColor(sf::Color(220, 0, 0));
 
     monsterHpBarBack.setSize(sf::Vector2f{210, 20});
-    monsterHpBarBack.setPosition(sf::Vector2f{windowSize.x - rightPanel.getSize().x + 20, 90});
+    monsterHpBarBack.setPosition(sf::Vector2f{static_cast<float>(windowSize.x) - rightPanel.getSize().x + 20, 90});
     monsterHpBarBack.setFillColor(sf::Color(100, 0, 0));
     monsterHpBarFront = monsterHpBarBack; // Copy size and position
     monsterHpBarFront.setFillColor(sf::Color(220, 0, 0));
@@ -191,7 +191,7 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     manaTitle.setPosition(sf::Vector2f{20, 120});
 
     monsterSpeedGaugeBackground.setSize(sf::Vector2f{210, 10});
-    monsterSpeedGaugeBackground.setPosition(sf::Vector2f{windowSize.x - rightPanel.getSize().x + 20, 120});
+    monsterSpeedGaugeBackground.setPosition(sf::Vector2f{static_cast<float>(windowSize.x) - rightPanel.getSize().x + 20, 120});
     monsterSpeedGaugeBackground.setFillColor(sf::Color(40, 40, 40));
     monsterSpeedGaugeForeground = monsterSpeedGaugeBackground;
     monsterSpeedGaugeForeground.setFillColor(sf::Color(200, 200, 0));
@@ -200,7 +200,7 @@ void UIManager::setup(const Player& player, const sf::Vector2u& windowSize, cons
     gameOverText.setFillColor(sf::Color::Red);
     sf::FloatRect textRect = gameOverText.getLocalBounds();
     gameOverText.setOrigin(sf::Vector2f(textRect.position.x + textRect.size.x / 2.f, textRect.position.y + textRect.size.y / 2.f));
-    gameOverText.setPosition(sf::Vector2f(windowSize.x / 2.f, windowSize.y / 2.f));
+    gameOverText.setPosition(sf::Vector2f(static_cast<float>(windowSize.x) / 2.f, static_cast<float>(windowSize.y) / 2.f));
 }
 void UIManager::setupTrial(const JudgementTrial& trial) {
     std::string trialTypeStr;
@@ -237,17 +237,17 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
 
     if (currentState == GameState::Playing || currentState == GameState::Trial) {
         // Update HP Bars
-        float playerHpPercent = static_cast<float>(player.getHp()) / player.getMaxHp();
+        float playerHpPercent = static_cast<float>(player.getHp()) / static_cast<float>(player.getMaxHp());
         playerHpBarFront.setSize(sf::Vector2f{playerHpBarBack.getSize().x * playerHpPercent, playerHpBarBack.getSize().y});
 
-        float monsterHpPercent = static_cast<float>(monster.getCurrentHp()) / monster.getMaxHp();
+        float monsterHpPercent = static_cast<float>(monster.getCurrentHp()) / static_cast<float>(monster.getMaxHp());
         monsterHpBarFront.setSize(sf::Vector2f{monsterHpBarBack.getSize().x * monsterHpPercent, monsterHpBarBack.getSize().y});
         
         monsterNameText.setString(monster.getName());
         monsterHpText.setString(std::to_string(monster.getCurrentHp()) + "/" + std::to_string(monster.getMaxHp()));
 
         // Update Monster Speed Gauge
-        float speedPercent = static_cast<float>(monster.getActionCounter()) / monster.getSpeed();
+        float speedPercent = static_cast<float>(monster.getActionCounter()) / static_cast<float>(monster.getSpeed());
         monsterSpeedGaugeForeground.setSize(sf::Vector2f{monsterSpeedGaugeBackground.getSize().x * speedPercent, monsterSpeedGaugeBackground.getSize().y});
 
         // Update Mana Bars
@@ -275,7 +275,7 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
             back.setFillColor(sf::Color(50, 50, 50));
             manaBarBacks[type] = back;
 
-            float manaPercent = (maxMana > 0) ? static_cast<float>(currentMana) / maxMana : 0.f;
+            float manaPercent = (maxMana > 0) ? static_cast<float>(currentMana) / static_cast<float>(maxMana) : 0.f;
             sf::RectangleShape front({150 * manaPercent, 15});
             front.setPosition(sf::Vector2f(20, yOffset));
             front.setFillColor(getSfColorForGemType(type));
@@ -348,8 +348,8 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
             const float buttonWidth = 220.f;
             const float buttonHeight = 50.f;
             const float buttonSpacing = 20.f;
-            const int numButtons = m_currentConnections.size();
-            const float totalHeight = (numButtons * buttonHeight) + ((numButtons - 1) * buttonSpacing);
+            const int numButtons = static_cast<int>(m_currentConnections.size());
+            const float totalHeight = (static_cast<float>(numButtons) * buttonHeight) + ((static_cast<float>(numButtons) - 1) * buttonSpacing);
             float startY = (WINDOW_HEIGHT - totalHeight) / 2.f;
 
             for (size_t i = 0; i < m_currentConnections.size(); ++i) {
@@ -364,7 +364,7 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
 
                 if (destinationRoom != nullptr) {
                     sf::RectangleShape button({buttonWidth, buttonHeight});
-                    button.setPosition(sf::Vector2f((WINDOW_WIDTH - buttonWidth) / 2.f, startY + i * (buttonHeight + buttonSpacing)));
+                    button.setPosition(sf::Vector2f((WINDOW_WIDTH - buttonWidth) / 2.f, startY + static_cast<float>(i) * (buttonHeight + buttonSpacing)));
                     button.setFillColor(getSfColorForRoomType(destinationRoom->type));
                     button.setOutlineColor(sf::Color(200, 200, 200));
                     button.setOutlineThickness(1.f);
@@ -408,11 +408,11 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
         for (size_t i = 0; i < allAttunements.size(); ++i) {
             const auto& attunement = allAttunements[i];
             
-            int row = i / buttonsPerRow;
-            int col = i % buttonsPerRow;
+            int row = static_cast<int>(i) / buttonsPerRow;
+            int col = static_cast<int>(i) % buttonsPerRow;
 
-            float posX = startX + col * (buttonWidth + horizontalSpacing);
-            float posY = startY + row * (buttonHeight + verticalSpacing);
+            float posX = startX + static_cast<float>(col) * (buttonWidth + horizontalSpacing);
+            float posY = startY + static_cast<float>(row) * (buttonHeight + verticalSpacing);
 
             sf::RectangleShape button({buttonWidth, buttonHeight});
             button.setPosition(sf::Vector2f(posX, posY));
@@ -529,11 +529,11 @@ void UIManager::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin
                         
                         const sf::Texture& texture = it->second;
                         float desiredHeight = TILE_SIZE / 3.0f;
-                        float scale = desiredHeight / texture.getSize().y;
+                        float scale = desiredHeight / static_cast<float>(texture.getSize().y);
                         icon.setScale(sf::Vector2f(scale, scale));
                         icon.setPosition(sf::Vector2f(xOffset, yOffset));
                         
-                        float iconWidth = texture.getSize().x * scale;
+                        float iconWidth = static_cast<float>(texture.getSize().x) * scale;
                         
                         window.draw(icon);
 
