@@ -3,6 +3,7 @@
 #include "Game.h" // For gemTextures
 #include "StringUtils.h"
 #include "TimeManager.h" // Include for TimeManager
+#include "BoardAnimation.h"
 #include <cstdint> // For std::uint8_t
 #include <random>
 #include <iostream>
@@ -68,7 +69,7 @@ void Board::unloadBoard() {
     }
 }
 
-void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, const sf::Font& font, sf::Clock& pulseClock, const TimeManager& timeManager, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo, const std::map<std::string, sf::Texture>& effectIconTextures, bool isAnimatingRowRotation, int rotatingRow, bool isAnimatingColumnRotation, int rotatingColumn) {
+void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, const sf::Font& font, sf::Clock& pulseClock, const TimeManager& timeManager, const std::map<std::string, sf::Texture>& effectIconTextures, const std::vector<BoardAnimation>& activeAnimations) {
     sf::RectangleShape background(sf::Vector2f(TILE_SIZE, TILE_SIZE));
     sf::Text counterText(font, "", 18);
     counterText.setFillColor(sf::Color::White);
@@ -79,34 +80,33 @@ void Board::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, co
 
     for (int r = 0; r < m_height; ++r) {
         for (int c = 0; c < m_width; ++c) {
-            bool shouldDraw = true;
-
-            if (isAnimatingDestruction && destroyingGems.count({r, c})) {
-                shouldDraw = false;
-            }
-            
-            if (isAnimatingSwap && ((r == animatingGems.first.y && c == animatingGems.first.x) || (r == animatingGems.second.y && c == animatingGems.second.x))) {
-                shouldDraw = false;
-            }
-
-            if (isAnimatingRefill) {
-                for (const auto& info : fallInfo) {
-                    if (info.col == c && info.fallToRow == r) {
-                        shouldDraw = false;
+            // Check if the gem at (r, c) is currently involved in an animation.
+            bool isAnimating = false;
+            for (const auto& anim : activeAnimations) {
+                if (anim.type == BoardAnimationType::Swap || anim.type == BoardAnimationType::Fall) {
+                    // In a swap, the gem at startPos is moving. In a fall, the gem that will end up at endPos is moving.
+                    // The logic in Game::render handles drawing them from their startPos.
+                    if ((anim.startPos.y == r && anim.startPos.x == c) || (anim.endPos.y == r && anim.endPos.x == c)) {
+                        isAnimating = true;
                         break;
                     }
+                } else if (anim.type == BoardAnimationType::Destroy && anim.position.x == r && anim.position.y == c) {
+                    isAnimating = true;
+                    break;
+                } else if (anim.type == BoardAnimationType::RotateRow && anim.index == r) {
+                    isAnimating = true;
+                    break;
+                } else if (anim.type == BoardAnimationType::RotateColumn && anim.index == c) {
+                    isAnimating = true;
+                    break;
                 }
             }
 
-            // NEW: Rotation animation check
-            if (isAnimatingRowRotation && r == rotatingRow) {
-                shouldDraw = false;
-            }
-            if (isAnimatingColumnRotation && c == rotatingColumn) {
-                shouldDraw = false;
+            if (isAnimating) {
+                continue; // Skip drawing this gem; the Game::render loop will handle it.
             }
 
-            if (m_grid[r][c] && shouldDraw) {
+            if (m_grid[r][c]) {
                 sf::Vector2f tilePosition(boardOrigin.x + c * TILE_SIZE, boardOrigin.y + r * TILE_SIZE);
 
                 // 1. Draw Background Layer
@@ -232,6 +232,12 @@ std::set<std::pair<int, int>> Board::findMatches() {
 void Board::removeGems(const std::set<sf::Vector2i, Vector2iCompare>& matches) {
     for (const auto& pos : matches) {
         m_grid[pos.x][pos.y].reset(); // unique_ptr reset() deletes the object
+    }
+}
+
+void Board::removeGem(int r, int c) {
+    if (isInBounds(r, c)) {
+        m_grid[r][c].reset();
     }
 }
 

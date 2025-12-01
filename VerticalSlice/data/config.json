@@ -1,0 +1,8 @@
+{
+  "animation_timings": {
+    "swap_duration_ms": 200,
+    "destroy_duration_ms": 300,
+    "fall_duration_ms": 300,
+    "rotate_duration_ms": 300
+  }
+}

@@ -1,6 +1,7 @@
 #pragma once
 
 enum class GemSubType {
+    None = -1,
     Empty = 0,
     Generic = 1,
     Fire = 2,

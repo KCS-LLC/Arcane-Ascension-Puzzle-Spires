@@ -28,7 +28,19 @@
             - **[TODO]** Add `renderAnimations()` to `UIManager` to draw animation effects.
             - **[TODO]** Implement the HP sweep visual: a fading overlay on the changed portion of the HP bar.
     - **[TODO]** **UI Animations:** Add subtle animations and feedback to other UI elements, such as mana gains.
-    - **[TODO]** **Visual Effects:** Implement particle effects or other animations for events like gem matches and taking damage.
+    - **[COMPLETED] Refactor to Unified Board Animation System:** Replace the multiple `m_isAnimating...` flags with a single, unified, and scalable animation handler for all blocking board animations (swaps, destruction, falls, etc.).
+        - **[COMPLETED] Phase 1: Core Framework:**
+            - **[COMPLETED]** Create `BoardAnimation.h` with a `BoardAnimation` struct and enums for `BoardAnimationType`.
+            - **[COMPLETED]** Refactor `Game.h` to remove all individual `m_isAnimating...` flags and animation-specific data members.
+            - **[COMPLETED]** Add `std::vector<BoardAnimation> m_activeBoardAnimations;` to `Game.h`.
+            - **[COMPLETED]** Implement `startBoardAnimation()` and the animation lifecycle management in `Game.cpp`.
+        - **[COMPLETED] Phase 2: Refactor Triggers:**
+            - **[COMPLETED]** Update `Game::handleInput` to trigger `Swap` animations instead of setting a flag.
+            - **[COMPLETED]** Update `Game::handleMatches` to trigger `Destroy` and `Fall` animations.
+            - **[COMPLETED]** Update `EffectProcessor.cpp` to trigger `Transform` and `Rotate` animations.
+        - **[COMPLETED] Phase 3: Unify Rendering:**
+            - **[COMPLETED]** Replace the `if/else if` chain in `Game::render` with a single loop over `m_activeBoardAnimations`.
+            - **[COMPLETED]** Implement a `switch` statement within the render loop to handle the drawing logic for each animation type.
 
 ### Phase 3: Procedural Spire Generation
 - **Objective:** Build the core roguelike loop by creating a multi-room spire for the player to ascend.

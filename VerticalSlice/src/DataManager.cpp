@@ -176,6 +176,26 @@ DataManager::DataManager() {
     if (!loadJudgementTrials()) {
         std::cerr << "Failed to load judgement trials." << '\n';
     }
+    if (!loadConfig("data/config.json")) {
+        std::cerr << "Failed to load config." << '\n';
+    }
+}
+
+bool DataManager::loadConfig(const std::string& path) {
+    std::ifstream f(path);
+    if (!f.is_open()) return false;
+    try {
+        json data = json::parse(f);
+        const auto& timings = data.at("animation_timings");
+        timings.at("swap_duration_ms").get_to(m_animationTimings.swap_duration_ms);
+        timings.at("destroy_duration_ms").get_to(m_animationTimings.destroy_duration_ms);
+        timings.at("fall_duration_ms").get_to(m_animationTimings.fall_duration_ms);
+        timings.at("rotate_duration_ms").get_to(m_animationTimings.rotate_duration_ms);
+    } catch (const json::exception& e) {
+        std::cerr << "JSON error in config: " << e.what() << '\n';
+        return false;
+    }
+    return true;
 }
 
 bool DataManager::loadPrimaryGemTypes(const std::string& path) {
@@ -377,3 +397,4 @@ const Room* DataManager::getRoomById(int roomId) const {
 }
 const std::vector<JudgementTrial>& DataManager::getJudgementTrials() const { return m_judgementTrials; }
 const sf::Font& DataManager::getFont() const { return m_font; }
+const AnimationTimings& DataManager::getAnimationTimings() const { return m_animationTimings; }

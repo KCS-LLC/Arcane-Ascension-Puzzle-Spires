@@ -16,6 +16,7 @@
 #include "EffectProcessor.h"
 #include "TimeManager.h"
 #include "Animation.h"
+#include "BoardAnimation.h"
 
 // Forward-declaration of the global texture map
 extern std::map<GemSubType, sf::Texture> gemTextures;
@@ -27,6 +28,7 @@ public:
     void handleTimeEvent(const TimeEvent& event);
     void setBoardStateDirty(bool isDirty);
     void startAnimation(const Animation& animation);
+    void startBoardAnimation(const BoardAnimation& animation);
 
     // Getters for game components
     Player& getPlayer();
@@ -35,7 +37,6 @@ public:
     GemFactory& getGemFactory();
     TimeManager& getTimeManager();
     void startTargeting(const TargetingData& targetingData);
-    void startTransformAnimation(const std::vector<sf::Vector2i>& gemsToTransform);
 
     // Insight spell state management
     const std::vector<std::pair<sf::Vector2i, sf::Vector2i>>& getInsightMoves() const;
@@ -48,8 +49,10 @@ private:
     TargetingRequest m_targetingRequest;
     std::vector<sf::Vector2i> m_targetingSelections;
     std::vector<Animation> m_activeAnimations;
+    std::vector<BoardAnimation> m_activeBoardAnimations;
     std::vector<std::pair<sf::Vector2i, sf::Vector2i>> m_insightMoves;
     int m_insightMovesIndex = 0;
+    AnimationTimings m_animationTimings;
 
 
     void resolveTargeting();
@@ -107,21 +110,7 @@ private:
 
     // Animation state
     bool m_isAnimating = false;
-    bool m_isAnimatingSwap = false;
-    bool m_isSwappingBack = false; // Flag for the reverse animation
-    bool m_isAnimatingDestruction = false;
-    bool m_isAnimatingRefill = false;
-    bool m_isAnimatingRowRotation = false;
-    bool m_isAnimatingColumnRotation = false;
-    bool m_isAnimatingTransform = false;
-    int m_rotatingRow;
-    int m_rotatingColumn;
-    int m_rotationDirection;
     sf::Clock m_animationClock;
-    std::pair<sf::Vector2i, sf::Vector2i> m_animatingGems;
-    std::set<sf::Vector2i, Vector2iCompare> m_destroyingGems;
-    std::vector<Board::FallInfo> m_fallInfo;
-    std::vector<sf::Vector2i> m_transformingGems;
 
     // Combat UI state
     bool showPlayerDamageEffect = false;

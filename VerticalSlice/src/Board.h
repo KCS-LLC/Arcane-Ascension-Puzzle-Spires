@@ -10,6 +10,7 @@
 class Player; 
 class Monster;
 class TimeManager;
+struct BoardAnimation;
 
 class Board {
 public:
@@ -26,7 +27,7 @@ public:
     void initializeForPowerTrial();
     void unloadBoard();
 
-    void render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, const sf::Font& font, sf::Clock& pulseClock, const TimeManager& timeManager, bool isAnimatingSwap, const std::pair<sf::Vector2i, sf::Vector2i>& animatingGems, bool isAnimatingDestruction, const std::set<sf::Vector2i, Vector2iCompare>& destroyingGems, bool isAnimatingRefill, const std::vector<Board::FallInfo>& fallInfo, const std::map<std::string, sf::Texture>& effectIconTextures, bool isAnimatingRowRotation, int rotatingRow, bool isAnimatingColumnRotation, int rotatingColumn);
+    void render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, const sf::Font& font, sf::Clock& pulseClock, const TimeManager& timeManager, const std::map<std::string, sf::Texture>& effectIconTextures, const std::vector<BoardAnimation>& activeAnimations);
     BaseGem* getGemAt(int r, int c) const;
     int getWidth() const;
     int getHeight() const;
@@ -37,6 +38,7 @@ public:
     void swapGems(int r1, int c1, int r2, int c2);
     std::set<std::pair<int, int>> findMatches();
     void removeGems(const std::set<sf::Vector2i, Vector2iCompare>& matches);
+    void removeGem(int r, int c);
     void setGemAt(int r, int c, std::unique_ptr<BaseGem> gem);
     void rotateRow(int rowIndex, int direction);
     void rotateColumn(int colIndex, int direction);

@@ -27,13 +27,11 @@ Game::Game()
       m_gameState(GameState::Intro),
       m_currentTrialOrderIndex(0),
       m_isAnimating(false),
-      m_isAnimatingSwap(false),
-      m_isAnimatingDestruction(false),
-      m_isAnimatingRefill(false),
       m_currentTurn(0),
       m_currentScore(0)
 {
     m_window.setFramerateLimit(60);
+    m_animationTimings = dataManager.getAnimationTimings();
     loadTextures();
 
     const int boardPixelWidth = BOARD_WIDTH * TILE_SIZE;
@@ -217,6 +215,11 @@ void Game::startAnimation(const Animation& animation) {
     m_activeAnimations.push_back(animation);
 }
 
+void Game::startBoardAnimation(const BoardAnimation& animation) {
+    m_activeBoardAnimations.push_back(animation);
+    std::cout << "[LOG] Game::startBoardAnimation - Animation added. New vector size: " << m_activeBoardAnimations.size() << std::endl;
+}
+
 void Game::run() {
     sf::Clock clock;
     while (m_window.isOpen()) {
@@ -287,9 +290,7 @@ void Game::handleInput(sf::Event event) {
                 }
 
                 if (!gemsToRemove.empty()) {
-                    m_destroyingGems.insert(gemsToRemove.begin(), gemsToRemove.end());
                     m_isAnimating = true;
-                    m_isAnimatingDestruction = true;
                     m_animationClock.restart();
                 }
 
@@ -369,8 +370,16 @@ void Game::handleInput(sf::Event event) {
                 if (m_board.isAdjacent(sf::Vector2i(m_selectedGem.y, m_selectedGem.x), sf::Vector2i(row, col))) {
                     if (m_board.canSwap(m_selectedGem.y, m_selectedGem.x, row, col)) {
                         m_isAnimating = true;
-                        m_isAnimatingSwap = true;
-                        m_animatingGems = { m_selectedGem, sf::Vector2i(col, row) };
+                        sf::Vector2i firstGem = m_selectedGem;
+                        sf::Vector2i secondGem = sf::Vector2i(col, row);
+                        
+                        auto onSwapComplete = [this, firstGem, secondGem]() {
+                            m_board.swapGems(firstGem.y, firstGem.x, secondGem.y, secondGem.x);
+                            handleMatches(true);
+                        };
+                        std::cout << "[LOG] Game::handleInput - Attaching onComplete to Swap animation." << std::endl;
+                        startBoardAnimation({BoardAnimationType::Swap, sf::Clock(), sf::milliseconds(m_animationTimings.swap_duration_ms), firstGem, secondGem, {}, GemSubType::None, {}, {}, 0, 0, onSwapComplete});
+                        startBoardAnimation({BoardAnimationType::Swap, sf::Clock(), sf::milliseconds(m_animationTimings.swap_duration_ms), secondGem, firstGem, {}, GemSubType::None});
                         m_animationClock.restart();
                     }
                 }
@@ -386,17 +395,13 @@ void Game::handleInput(sf::Event event) {
 
 
 void Game::handleMatches(bool isPlayerMove) {
+    std::cout << "[LOG] Game::handleMatches - Entered." << std::endl;
     auto matchGroups = m_matchDetector.findAllMatches(m_board);
 
     if (matchGroups.empty()) {
-        if (isPlayerMove && !m_isSwappingBack) {
-            m_isSwappingBack = true;
-            m_animatingGems = { m_animatingGems.second, m_animatingGems.first };
-            m_animationClock.restart();
-            m_board.swapGems(m_animatingGems.first.y, m_animatingGems.first.x, m_animatingGems.second.y, m_animatingGems.second.x);
-        }
         return;
     }
+    std::cout << "[LOG] Game::handleMatches - Found " << matchGroups.size() << " match groups." << std::endl;
 
     m_playerActionPerformedThisTurn = true;
     m_insightMoves.clear();
@@ -471,10 +476,49 @@ void Game::handleMatches(bool isPlayerMove) {
 
     m_currentScore += (allRemovedGems.size() * 100);
 
-    m_isAnimatingSwap = false;
-    m_isAnimatingDestruction = true;
-    m_isAnimating = true;
-    m_destroyingGems = allRemovedGems;
+    // --- Create Destroy Animations ---
+    // First, record the subtypes of the gems about to be destroyed.
+    std::map<sf::Vector2i, GemSubType, Vector2iCompare> destroyedGemTypes;
+    for (const auto& pos : allRemovedGems) {
+        BaseGem* gem = m_board.getGemAt(pos.x, pos.y);
+        if (gem) {
+            destroyedGemTypes[pos] = gem->getSubType();
+        }
+    }
+
+    // Now, actually remove the gems from the logical board.
+    for (const auto& pos : allRemovedGems) {
+        m_board.removeGem(pos.x, pos.y);
+    }
+
+    std::cout << "[LOG] Game::handleMatches - Adding Destroy animations..." << std::endl;
+    for (const auto& pos : allRemovedGems) {
+        GemSubType type = destroyedGemTypes.count(pos) ? destroyedGemTypes.at(pos) : GemSubType::None;
+        startBoardAnimation({BoardAnimationType::Destroy, sf::Clock(), sf::milliseconds(m_animationTimings.destroy_duration_ms), {}, {}, pos, type});
+    }
+
+    // Refill logic
+    std::cout << "[LOG] Game::handleMatches - Adding Fall animations..." << std::endl;
+    std::vector<Board::FallInfo> fallInfo;
+    if (m_gameState == GameState::Judgement_TreasureRound) {
+        fallInfo = m_board.applyGravityAndRefill(m_treasureRoundGems);
+    } else if (m_gameMode == GameMode::TOWER_CLIMB) {
+        fallInfo = m_board.applyGravityAndRefill(m_combatGemPool);
+    } else if (m_gameState == GameState::Trial) {
+        fallInfo = m_board.applyGravityAndRefill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air});
+    }
+
+    for (const auto& info : fallInfo) {
+        startBoardAnimation({BoardAnimationType::Fall, sf::Clock(), sf::milliseconds(m_animationTimings.fall_duration_ms), {info.col, info.startRow}, {info.col, info.fallToRow}});
+    }
+
+    // After adding all destroy and fall animations, find the last one and attach the recursive callback.
+    if (!m_activeBoardAnimations.empty()) {
+        m_activeBoardAnimations.back().onComplete = [this]() {
+            handleMatches(false);
+        };
+    }
+
     m_animationClock.restart();
 }
 
@@ -488,81 +532,35 @@ void Game::update(sf::Time deltaTime) {
         handleMatches(false);
     }
 
-    if (m_isAnimating) {
-        if (m_isAnimatingSwap) {
-            if (m_animationClock.getElapsedTime().asSeconds() >= swapAnimationDuration) {
-                if (!m_isSwappingBack) {
-                    sf::Vector2i p1 = {m_animatingGems.first.y, m_animatingGems.first.x};
-                    sf::Vector2i p2 = {m_animatingGems.second.y, m_animatingGems.second.x};
+    // Update board animations
+    if (!m_activeBoardAnimations.empty()) {
+        m_isAnimating = true;
+        std::vector<std::function<void()>> deferredCallbacks;
 
-                    m_board.swapGems(p1.x, p1.y, p2.x, p2.y);
-                    handleMatches(true); // Player-initiated move
-                } else {
-                    // Swap-back animation finished
-                    m_isAnimating = false;
-                    m_isAnimatingSwap = false;
-                    m_isSwappingBack = false;
-                }
-            }
-        } else if (m_isAnimatingDestruction) {
-            if (m_animationClock.getElapsedTime().asSeconds() >= destructionAnimationDuration) {
-                m_isAnimatingDestruction = false;
-                
-                m_board.removeGems(m_destroyingGems);
-
-                // Corrected Refill Logic
-                if (m_gameState == GameState::Judgement_TreasureRound) {
-                    m_fallInfo = m_board.applyGravityAndRefill(m_treasureRoundGems);
-                } else if (m_gameMode == GameMode::TOWER_CLIMB) {
-                    m_fallInfo = m_board.applyGravityAndRefill(m_combatGemPool);
-                } else if (m_gameState == GameState::Trial) {
-                    // This is the default for the initial Judgement trials (Power, Haste, etc.)
-                    m_fallInfo = m_board.applyGravityAndRefill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air});
-                }
-
-                m_isAnimatingRefill = true;
-                m_animationClock.restart();
-            }
-        } else if (m_isAnimatingRefill) {
-             if (m_animationClock.getElapsedTime().asSeconds() >= refillAnimationDuration) {
-                m_isAnimatingRefill = false;
-                handleMatches(false); // Cascade-initiated move
-                
-                if (!m_isAnimatingDestruction) {
-                    m_isAnimating = false;
-                }
-            }
-        } else if (m_isAnimatingRowRotation) {
-            if (m_animationClock.getElapsedTime().asSeconds() >= 0.3f) {
-                m_isAnimating = false;
-                m_isAnimatingRowRotation = false;
-                m_board.rotateRow(m_rotatingRow, m_rotationDirection);
-                m_boardStateDirty = true;
-            }
-        } else if (m_isAnimatingColumnRotation) {
-            if (m_animationClock.getElapsedTime().asSeconds() >= 0.3f) {
-                m_isAnimating = false;
-                m_isAnimatingColumnRotation = false;
-                m_board.rotateColumn(m_rotatingColumn, m_rotationDirection);
-                m_boardStateDirty = true;
-            }
-        } else if (m_isAnimatingTransform) {
-            const float transformAnimationDuration = 0.3f; // Or your desired duration
-            if (m_animationClock.getElapsedTime().asSeconds() >= transformAnimationDuration) {
-                m_isAnimating = false;
-                m_isAnimatingTransform = false;
-
-                // Perform the actual transformation
-                for (const auto& coord : m_transformingGems) {
-                    if (gemTextures.count(GemSubType::Skull)) {
-                        m_board.setGemAt(coord.x, coord.y, m_gemFactory.createGem(GemSubType::Skull, gemTextures.at(GemSubType::Skull)));
+        m_activeBoardAnimations.erase(
+            std::remove_if(
+                m_activeBoardAnimations.begin(),
+                m_activeBoardAnimations.end(),
+                [this, &deferredCallbacks](BoardAnimation& anim) {
+                    if (anim.clock.getElapsedTime() >= anim.duration) {
+                        if (anim.onComplete) {
+                            deferredCallbacks.push_back(std::move(anim.onComplete));
+                        }
+                        return true;
                     }
+                    return false;
                 }
-                m_transformingGems.clear();
-                m_boardStateDirty = true;
-            }
+            ),
+            m_activeBoardAnimations.end()
+        );
+
+        // Execute deferred callbacks AFTER iterating and erasing.
+        for (const auto& callback : deferredCallbacks) {
+            callback();
         }
-        return; 
+
+    } else {
+        m_isAnimating = false;
     }
 
     if (!m_isAnimating && m_playerActionPerformedThisTurn) {
@@ -574,52 +572,53 @@ void Game::update(sf::Time deltaTime) {
         showPlayerDamageEffect = false;
     }
 
-    // Check for Judgement trial win/loss conditions only if not animating AND in a trial
-    if (m_gameMode == GameMode::JUDGEMENT && m_gameState == GameState::Trial) {
-        if (m_currentScore >= m_currentJudgementTrial.scoreGoal) {
-            m_gameState = GameState::Summary; // Win condition
-        } else if (m_currentTurn >= m_currentJudgementTrial.turnLimit) {
-            m_gameState = GameState::Summary; // Loss condition
+    // --- Game State Transition Checks ---
+    // Only check for win/loss or other state transitions if the board is stable.
+    if (!m_isAnimating) {
+        // Check for Judgement trial win/loss conditions only if not animating AND in a trial
+        if (m_gameMode == GameMode::JUDGEMENT && m_gameState == GameState::Trial) {
+            if (m_currentScore >= m_currentJudgementTrial.scoreGoal) {
+                m_gameState = GameState::Summary; // Win condition
+            } else if (m_currentTurn >= m_currentJudgementTrial.turnLimit) {
+                m_gameState = GameState::Summary; // Loss condition
+            }
         }
-    }
 
-    // Check for Treasure Round end condition
-    // TODO: Restore this to a higher value (e.g., 20) for the final game.
-    if (m_gameState == GameState::Judgement_TreasureRound && m_currentTurn >= 5) {
-        int finalTreasureValue = 0;
-        for (int r = 0; r < BOARD_HEIGHT; ++r) {
-            for (int c = 0; c < BOARD_WIDTH; ++c) {
-                BaseGem* gem = m_board.getGemAt(r, c);
-                if (gem) {
-                    // This is a simplified scoring logic. A more robust solution
-                    // would involve checking the gem's catalog entry for its value.
-                    switch (gem->getSubType()) {
-                        case GemSubType::Coin: finalTreasureValue += 1; break;
-                        case GemSubType::CoinPile: finalTreasureValue += 5; break;
-                        case GemSubType::CoinBag: finalTreasureValue += 25; break;
-                        case GemSubType::CoinBagBundle: finalTreasureValue += 100; break;
-                        case GemSubType::TreasureChest: finalTreasureValue += 500; break;
-                        default: break;
+        // Check for Treasure Round end condition
+        if (m_gameState == GameState::Judgement_TreasureRound && m_currentTurn >= 5) { // TODO: Restore this to a higher value
+            int finalTreasureValue = 0;
+            for (int r = 0; r < BOARD_HEIGHT; ++r) {
+                for (int c = 0; c < BOARD_WIDTH; ++c) {
+                    BaseGem* gem = m_board.getGemAt(r, c);
+                    if (gem) {
+                        switch (gem->getSubType()) {
+                            case GemSubType::Coin: finalTreasureValue += 1; break;
+                            case GemSubType::CoinPile: finalTreasureValue += 5; break;
+                            case GemSubType::CoinBag: finalTreasureValue += 25; break;
+                            case GemSubType::CoinBagBundle: finalTreasureValue += 100; break;
+                            case GemSubType::TreasureChest: finalTreasureValue += 500; break;
+                            default: break;
+                        }
                     }
                 }
             }
+            std::cout << "Final Treasure Value: " << finalTreasureValue << '\n';
+            m_gameState = GameState::Judgement_AttunementSelection;
         }
-        std::cout << "Final Treasure Value: " << finalTreasureValue << '\n';
 
-        // Transition to the attunement selection screen
-        m_gameState = GameState::Judgement_AttunementSelection;
-    }
-
-    if (m_gameMode == GameMode::TOWER_CLIMB && (m_gameState == GameState::Playing || m_gameState == GameState::CombatVictory)) {
-        if (m_player.getHp() <= 0) {
-            m_gameState = GameState::GameOver;
-        } else if (m_monster.getCurrentHp() <= 0) {
-            m_gameState = GameState::CombatVictory;
+        // Check for combat win/loss in Tower Climb mode
+        if (m_gameMode == GameMode::TOWER_CLIMB && (m_gameState == GameState::Playing || m_gameState == GameState::CombatVictory)) {
+            if (m_player.getHp() <= 0) {
+                m_gameState = GameState::GameOver;
+            } else if (m_monster.getCurrentHp() <= 0) {
+                m_gameState = GameState::CombatVictory;
+            }
         }
-    }
 
-    if (m_gameState == GameState::CombatVictory && !m_isAnimating && !m_boardStateDirty) {
-        m_gameState = GameState::Exploration;
+        // Transition from victory screen back to exploration
+        if (m_gameState == GameState::CombatVictory && !m_boardStateDirty) {
+            m_gameState = GameState::Exploration;
+        }
     }
 
     // Main game logic updates
@@ -667,119 +666,93 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
     if (m_gameState == GameState::Playing || m_gameState == GameState::Trial || m_isAnimating || m_gameState == GameState::GameOver || m_gameState == GameState::Judgement_TreasureRound) {
         // Do not render the board or animations if the trial is over
         if (m_gameState != GameState::Summary && m_gameState != GameState::AttunementReveal) {
-            m_board.render(m_window, m_boardOrigin, font, highlightClock, m_timeManager, m_isAnimatingSwap, m_animatingGems, m_isAnimatingDestruction, m_destroyingGems, m_isAnimatingRefill, m_fallInfo, m_effectIconTextures, m_isAnimatingRowRotation, m_rotatingRow, m_isAnimatingColumnRotation, m_rotatingColumn);
+            m_board.render(m_window, m_boardOrigin, font, highlightClock, m_timeManager, m_effectIconTextures, m_activeBoardAnimations);
 
-            const float swapAnimationDuration = 0.2f;
-            const float destructionAnimationDuration = 0.3f;
-            const float refillAnimationDuration = 0.3f;
-            float p = 0.0f;
-
-            // Render swap animation
-            if (m_isAnimatingSwap) {
-                p = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / swapAnimationDuration);
-                sf::Vector2f p1_local((float)m_animatingGems.first.x * TILE_SIZE, (float)m_animatingGems.first.y * TILE_SIZE);
-                sf::Vector2f p2_local((float)m_animatingGems.second.x * TILE_SIZE, (float)m_animatingGems.second.y * TILE_SIZE);
-
-                BaseGem* g1 = m_board.getGemAt(m_animatingGems.first.y, m_animatingGems.first.x);
-                if (g1) {
-                    sf::Sprite s1 = g1->getSprite();
-                    s1.setPosition(p1_local + (p2_local - p1_local) * p + m_boardOrigin);
-                    m_window.draw(s1);
-                }
-
-                BaseGem* g2 = m_board.getGemAt(m_animatingGems.second.y, m_animatingGems.second.x);
-                if (g2) {
-                    sf::Sprite s2 = g2->getSprite();
-                    s2.setPosition(p2_local + (p1_local - p2_local) * p + m_boardOrigin);
-                    m_window.draw(s2);
-                }
-            }
-
-            // Render destruction animation
-            if (m_isAnimatingDestruction) {
-                float animProgress = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / destructionAnimationDuration);
-                float scale = 1.f - animProgress;
-                for (const auto& pos : m_destroyingGems) {
-                    BaseGem* gem = m_board.getGemAt(pos.x, pos.y);
-                    if (gem) {
-                        sf::Sprite sprite = gem->getSprite();
-                        const sf::Texture* tex = &sprite.getTexture();
-                        sf::Vector2u texSize = tex->getSize();
-                        sprite.setOrigin({texSize.x / 2.f, texSize.y / 2.f});
-                        
-                        float baseScaleX = static_cast<float>(TILE_SIZE) / texSize.x;
-                        float baseScaleY = static_cast<float>(TILE_SIZE) / texSize.y;
-                        sprite.setScale({baseScaleX * scale, baseScaleY * scale});
-                        
-                        sprite.setPosition({pos.y * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.x, pos.x * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.y});
-                        m_window.draw(sprite);
+            for (const auto& anim : m_activeBoardAnimations) {
+                float p = std::min(1.f, anim.clock.getElapsedTime().asSeconds() / anim.duration.asSeconds());
+                switch (anim.type) {
+                    case BoardAnimationType::Swap: {
+                        sf::Vector2f p1_local((float)anim.startPos.x * TILE_SIZE, (float)anim.startPos.y * TILE_SIZE);
+                        sf::Vector2f p2_local((float)anim.endPos.x * TILE_SIZE, (float)anim.endPos.y * TILE_SIZE);
+                        // During a swap, the gem is logically still at its start position.
+                        BaseGem* gem = m_board.getGemAt(anim.startPos.y, anim.startPos.x);
+                        if (gem) {
+                            sf::Sprite sprite = gem->getSprite();
+                            sprite.setPosition(p1_local + (p2_local - p1_local) * p + m_boardOrigin);
+                            m_window.draw(sprite);
+                        }
+                        break;
                     }
-                }
-            }
-
-            // Render refill animation (falling gems)
-            if (m_isAnimatingRefill) {
-                p = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / refillAnimationDuration);
-                for (const auto& info : m_fallInfo) {
-                    BaseGem* gem = m_board.getGemAt(info.fallToRow, info.col);
-                    if (gem) {
-                        sf::Vector2f start_local((float)info.col * TILE_SIZE, (float)info.startRow * TILE_SIZE);
-                        sf::Vector2f end_local((float)info.col * TILE_SIZE, (float)info.fallToRow * TILE_SIZE);
-                        
-                        sf::Sprite sprite = gem->getSprite();
-                        sprite.setPosition(start_local + (end_local - start_local) * p + m_boardOrigin);
-                        m_window.draw(sprite);
+                    case BoardAnimationType::Fall: {
+                        sf::Vector2f p1_local((float)anim.startPos.x * TILE_SIZE, (float)anim.startPos.y * TILE_SIZE);
+                        sf::Vector2f p2_local((float)anim.endPos.x * TILE_SIZE, (float)anim.endPos.y * TILE_SIZE);
+                        // After gravity, the gem is logically at its end position.
+                        BaseGem* gem = m_board.getGemAt(anim.endPos.y, anim.endPos.x);
+                        if (gem) {
+                            sf::Sprite sprite = gem->getSprite();
+                            sprite.setPosition(p1_local + (p2_local - p1_local) * p + m_boardOrigin);
+                            m_window.draw(sprite);
+                        }
+                        break;
                     }
-                }
-            }
-
-            // Render rotation animation
-            if (m_isAnimatingRowRotation) {
-                p = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / 0.3f);
-                for (int c = 0; c < BOARD_WIDTH; ++c) {
-                    BaseGem* gem = m_board.getGemAt(m_rotatingRow, c);
-                    if (gem) {
-                        sf::Sprite sprite = gem->getSprite();
-                        float newX = (c + m_rotationDirection * p);
-                        if (newX < 0) newX += BOARD_WIDTH;
-                        if (newX >= BOARD_WIDTH) newX -= BOARD_WIDTH;
-                        sprite.setPosition(sf::Vector2f(newX * TILE_SIZE + m_boardOrigin.x, m_rotatingRow * TILE_SIZE + m_boardOrigin.y));
-                        m_window.draw(sprite);
+                    case BoardAnimationType::Destroy: {
+                        if (anim.destroyedGemType != GemSubType::None) {
+                            float scale = 1.f - p;
+                            sf::Sprite sprite(gemTextures.at(anim.destroyedGemType));
+                            const sf::Texture* tex = &sprite.getTexture();
+                            sf::Vector2u texSize = tex->getSize();
+                            sprite.setOrigin({texSize.x / 2.f, texSize.y / 2.f});
+                            float baseScaleX = static_cast<float>(TILE_SIZE) / texSize.x;
+                            float baseScaleY = static_cast<float>(TILE_SIZE) / texSize.y;
+                            sprite.setScale({baseScaleX * scale, baseScaleY * scale});
+                            sprite.setPosition({anim.position.y * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.x, anim.position.x * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.y});
+                            m_window.draw(sprite);
+                        }
+                        break;
                     }
-                }
-            } else if (m_isAnimatingColumnRotation) {
-                p = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / 0.3f);
-                for (int r = 0; r < BOARD_HEIGHT; ++r) {
-                    BaseGem* gem = m_board.getGemAt(r, m_rotatingColumn);
-                    if (gem) {
-                        sf::Sprite sprite = gem->getSprite();
-                        float newY = (r + m_rotationDirection * p);
-                        if (newY < 0) newY += BOARD_HEIGHT;
-                        if (newY >= BOARD_HEIGHT) newY -= BOARD_HEIGHT;
-                        sprite.setPosition(sf::Vector2f(m_rotatingColumn * TILE_SIZE + m_boardOrigin.x, newY * TILE_SIZE + m_boardOrigin.y));
-                        m_window.draw(sprite);
+                    case BoardAnimationType::Transform: {
+                        float scale = 1.0f + 0.5f * std::sin(p * 3.14159f);
+                        BaseGem* gem = m_board.getGemAt(anim.position.x, anim.position.y);
+                        if (gem) {
+                             sf::Sprite sprite = gem->getSprite();
+                            const sf::Texture* tex = &sprite.getTexture();
+                            sf::Vector2u texSize = tex->getSize();
+                            sprite.setOrigin({texSize.x / 2.f, texSize.y / 2.f});
+                            float baseScaleX = static_cast<float>(TILE_SIZE) / texSize.x;
+                            float baseScaleY = static_cast<float>(TILE_SIZE) / texSize.y;
+                            sprite.setScale({baseScaleX * scale, baseScaleY * scale});
+                            sprite.setPosition({anim.position.y * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.x, anim.position.x * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.y});
+                            m_window.draw(sprite);
+                        }
+                        break;
                     }
-                }
-            } else if (m_isAnimatingTransform) {
-                const float transformAnimationDuration = 0.3f;
-                float animProgress = std::min(1.f, m_animationClock.getElapsedTime().asSeconds() / transformAnimationDuration);
-                // Create a "pop" effect: scale up then back down.
-                float scale = 1.0f + 0.5f * std::sin(animProgress * 3.14159f); 
-
-                for (const auto& pos : m_transformingGems) {
-                    BaseGem* gem = m_board.getGemAt(pos.x, pos.y);
-                    if (gem) {
-                        sf::Sprite sprite = gem->getSprite();
-                        const sf::Texture* tex = &sprite.getTexture();
-                        sf::Vector2u texSize = tex->getSize();
-                        sprite.setOrigin({texSize.x / 2.f, texSize.y / 2.f});
-                        
-                        float baseScaleX = static_cast<float>(TILE_SIZE) / texSize.x;
-                        float baseScaleY = static_cast<float>(TILE_SIZE) / texSize.y;
-                        sprite.setScale({baseScaleX * scale, baseScaleY * scale});
-                        
-                        sprite.setPosition({pos.y * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.x, pos.x * TILE_SIZE + TILE_SIZE / 2.f + m_boardOrigin.y});
-                        m_window.draw(sprite);
+                    case BoardAnimationType::RotateRow: {
+                        for (int c = 0; c < m_board.getWidth(); ++c) {
+                            BaseGem* gem = m_board.getGemAt(anim.index, c);
+                            if (gem) {
+                                sf::Sprite sprite = gem->getSprite();
+                                float newX = (c + anim.direction * p);
+                                if (newX < 0) newX += m_board.getWidth();
+                                if (newX >= m_board.getWidth()) newX -= m_board.getWidth();
+                                sprite.setPosition(sf::Vector2f(newX * TILE_SIZE + m_boardOrigin.x, anim.index * TILE_SIZE + m_boardOrigin.y));
+                                m_window.draw(sprite);
+                            }
+                        }
+                        break;
+                    }
+                    case BoardAnimationType::RotateColumn: {
+                        for (int r = 0; r < m_board.getHeight(); ++r) {
+                            BaseGem* gem = m_board.getGemAt(r, anim.index);
+                            if (gem) {
+                                sf::Sprite sprite = gem->getSprite();
+                                float newY = (r + anim.direction * p);
+                                if (newY < 0) newY += m_board.getHeight();
+                                if (newY >= m_board.getHeight()) newY -= m_board.getHeight();
+                                sprite.setPosition(sf::Vector2f(anim.index * TILE_SIZE + m_boardOrigin.x, newY * TILE_SIZE + m_boardOrigin.y));
+                                m_window.draw(sprite);
+                            }
+                        }
+                        break;
                     }
                 }
             }
@@ -837,9 +810,7 @@ void Game::handleTimeEvent(const TimeEvent& event) {
                 std::cout << "[EVENT] Burning tile dealt final " << static_cast<int>(damage) << " damage and expired. Monster HP: " << m_monster.getCurrentHp() << '\n';
                 
                 // Add the gem to be destroyed
-                m_destroyingGems.insert(event.coordinates);
                 m_isAnimating = true;
-                m_isAnimatingDestruction = true;
                 m_animationClock.restart();
             }
             break;
@@ -889,25 +860,27 @@ void Game::resolveTargeting() {
                 int dy = secondClick.x - firstClick.x;
 
                 if (abs(dx) > abs(dy)) {
-                    m_isAnimating = true;
-                    m_isAnimatingRowRotation = true;
-                    m_rotatingRow = firstClick.x;
-                    m_rotationDirection = (dx > 0) ? 1 : -1;
-                    m_animationClock.restart();
+                    int direction = (dx > 0) ? 1 : -1;
+                    auto onComplete = [this, firstClick, direction]() {
+                        m_board.rotateRow(firstClick.x, direction);
+                        handleMatches(false);
+                    };
+                    startBoardAnimation({BoardAnimationType::RotateRow, sf::Clock(), sf::milliseconds(m_animationTimings.rotate_duration_ms), {}, {}, {}, GemSubType::None, GemSubType::None, GemSubType::None, firstClick.x, direction, onComplete});
                 } else {
-                    m_isAnimating = true;
-                    m_isAnimatingColumnRotation = true;
-                    m_rotatingColumn = firstClick.y;
-                    m_rotationDirection = (dy > 0) ? 1 : -1;
-                    m_animationClock.restart();
+                    int direction = (dy > 0) ? 1 : -1;
+                    auto onComplete = [this, firstClick, direction]() {
+                        m_board.rotateColumn(firstClick.y, direction);
+                        handleMatches(false);
+                    };
+                    startBoardAnimation({BoardAnimationType::RotateColumn, sf::Clock(), sf::milliseconds(m_animationTimings.rotate_duration_ms), {}, {}, {}, GemSubType::None, GemSubType::None, GemSubType::None, firstClick.y, direction, onComplete});
                 }
             }
         } else if (effect.type == "FREE_SWAP") {
              if (m_targetingSelections.size() == 2) {
-                m_isAnimating = true;
-                m_isAnimatingSwap = true;
-                m_animatingGems = { {m_targetingSelections[0].x, m_targetingSelections[0].y}, {m_targetingSelections[1].x, m_targetingSelections[1].y} };
-                m_animationClock.restart();
+                sf::Vector2i firstGem = {m_targetingSelections[0].x, m_targetingSelections[0].y};
+                sf::Vector2i secondGem = {m_targetingSelections[1].x, m_targetingSelections[1].y};
+                startBoardAnimation({BoardAnimationType::Swap, sf::Clock(), sf::seconds(0.2f), firstGem, secondGem});
+                startBoardAnimation({BoardAnimationType::Swap, sf::Clock(), sf::seconds(0.2f), secondGem, firstGem});
             }
         }
     }
@@ -915,12 +888,6 @@ void Game::resolveTargeting() {
     cancelTargeting(); // Clean up state after resolving
 }
 
-void Game::startTransformAnimation(const std::vector<sf::Vector2i>& gemsToTransform) {
-    m_transformingGems = gemsToTransform;
-    m_isAnimating = true;
-    m_isAnimatingTransform = true;
-    m_animationClock.restart();
-}
 
 void Game::cancelTargeting() {
     m_playMode = PlayMode::Normal;
