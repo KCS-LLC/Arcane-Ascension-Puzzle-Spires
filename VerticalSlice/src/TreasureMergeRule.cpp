@@ -22,13 +22,13 @@ bool TreasureMergeRule::appliesTo(const std::vector<sf::Vector2i>& match, const 
 
     // First, get the subtype of the first gem to use as the reference for the whole match.
     const BaseGem* firstGem = board.getGemAt(match[0].x, match[0].y);
-    if (!firstGem) { return false; }
+    if (firstGem == nullptr) { return false; }
     GemSubType referenceSubType = firstGem->getSubType();
 
     // Now, iterate through ALL gems in the match, including the first one.
     for (const auto& coord : match) {
         const BaseGem* gem = board.getGemAt(coord.x, coord.y);
-        if (!gem) { return false; } // A gem in the match group must exist.
+        if (gem == nullptr) { return false; } // A gem in the match group must exist.
 
         // Check 1: Ensure all gems in the match have the same subtype.
         if (gem->getSubType() != referenceSubType) {
@@ -37,10 +37,10 @@ bool TreasureMergeRule::appliesTo(const std::vector<sf::Vector2i>& match, const 
 
         // Check 2: Ensure the gem is actually a Treasure gem.
         const GemCatalogEntry* catalogEntry = gem->getCatalogEntry();
-        if (!catalogEntry) { return false; }
+        if (catalogEntry == nullptr) { return false; }
         
         const SecondaryGemTypeData* secondaryData = dataManager.getSecondaryGemTypeData(catalogEntry->secondaryTypeId);
-        if (!secondaryData || secondaryData->primaryType != PrimaryGemType::Treasure) {
+        if (secondaryData == nullptr || secondaryData->primaryType != PrimaryGemType::Treasure) {
             return false;
         }
     }
@@ -58,7 +58,7 @@ std::unique_ptr<MatchResolution> TreasureMergeRule::execute(const std::vector<sf
     std::sort(sortedMatch.begin(), sortedMatch.end(), compareCoords);
 
     const BaseGem* firstGem = board.getGemAt(sortedMatch[0].x, sortedMatch[0].y);
-    if (!firstGem) { return resolution; }
+    if (firstGem == nullptr) { return resolution; }
 
     GemSubType currentSubType = firstGem->getSubType();
     GemSubType nextSubType;

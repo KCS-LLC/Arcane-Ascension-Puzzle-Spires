@@ -43,7 +43,7 @@ Game::Game()
 
     dataManager.loadAttunements("data/attunements.json");
     const Attunement* defaultAttunement = dataManager.getAttunementById("diviner");
-    if (defaultAttunement) {
+    if (defaultAttunement != nullptr) {
         m_player.setAttunement(*defaultAttunement, dataManager);
     } else {
         std::cerr << "Error: Could not find default attunement 'adept'." << '\n';
@@ -102,7 +102,7 @@ void Game::startTowerClimb() {
     m_gameState = GameState::Exploration;
     m_currentFloor = dataManager.getFloor();
     m_currentRoom = &m_currentFloor.rooms[0];
-    if (m_currentRoom) {
+    if (m_currentRoom != nullptr) {
         m_visitedRoomIds.insert(m_currentRoom->id);
     }
     // TODO: Potentially load monster data for the first room here if it's a combat room
@@ -118,7 +118,7 @@ void Game::moveToRoom(int destinationRoomId) {
         }
     }
 
-    if (destination) {
+    if (destination != nullptr) {
         m_currentRoom = destination;
         m_visitedRoomIds.insert(destinationRoomId);
         std::cout << "Moving to room " << destinationRoomId << " (" << roomTypeToString(m_currentRoom->type) << ")" << '\n';
@@ -138,7 +138,7 @@ void Game::moveToRoom(int destinationRoomId) {
                     bool isBossRoom = (m_currentRoom->type == RoomType::Boss);
                     const MonsterData* newMonsterData = dataManager.getRandomMonsterByRank(monsterRank, isBossRoom);
 
-                    if (newMonsterData) {
+                    if (newMonsterData != nullptr) {
                         m_monster = Monster(*newMonsterData); // Construct new monster from loaded data
                     } else {
                         std::cerr << "Error: No monster found for Rank " << monsterRank 
@@ -264,7 +264,7 @@ void Game::handleInput(sf::Event event) {
             moveToRoom(action.destinationRoomId);
         } else if (action.type == UIActionType::CastSpell) {
             const Spell* spell = m_player.getSpells()[action.spellIndex];
-            if (!spell) { return; }
+            if (spell == nullptr) { return; }
 
             if (m_playMode == PlayMode::Targeting && m_pendingSpell == spell) {
                 cancelTargeting();
@@ -425,7 +425,7 @@ void Game::handleMatches(bool isPlayerMove) {
         // Instead of calling resolveMatches, process each gem in the match here
         for (const auto& pos : match) {
             BaseGem* gem = m_board.getGemAt(pos.x, pos.y);
-            if (gem) {
+            if (gem != nullptr) {
                 totalSkullDamageThisTurn += gem->onMatch(m_board, m_player, m_monster);
             }
         }
@@ -435,9 +435,9 @@ void Game::handleMatches(bool isPlayerMove) {
             // Handle transformations first
             for (const auto& transform : (*resolutionOpt)->gemsToTransform) {
                 BaseGem* gem = m_board.getGemAt(transform.first.x, transform.first.y);
-                if (gem) {
+                if (gem != nullptr) {
                     const GemCatalogEntry* newCatalogEntry = dataManager.getGemCatalogEntry(transform.second);
-                    if (newCatalogEntry && gemTextures.count(transform.second)) {
+                    if (newCatalogEntry != nullptr && gemTextures.count(transform.second) != 0u) {
                         gem->transform(newCatalogEntry, gemTextures.at(transform.second));
                     }
                 }
@@ -481,7 +481,7 @@ void Game::handleMatches(bool isPlayerMove) {
     std::map<sf::Vector2i, GemSubType, Vector2iCompare> destroyedGemTypes;
     for (const auto& pos : allRemovedGems) {
         BaseGem* gem = m_board.getGemAt(pos.x, pos.y);
-        if (gem) {
+        if (gem != nullptr) {
             destroyedGemTypes[pos] = gem->getSubType();
         }
     }
@@ -493,7 +493,7 @@ void Game::handleMatches(bool isPlayerMove) {
 
     std::cout << "[LOG] Game::handleMatches - Adding Destroy animations..." << std::endl;
     for (const auto& pos : allRemovedGems) {
-        GemSubType type = destroyedGemTypes.count(pos) ? destroyedGemTypes.at(pos) : GemSubType::None;
+        GemSubType type = destroyedGemTypes.count(pos) != 0u ? destroyedGemTypes.at(pos) : GemSubType::None;
         startBoardAnimation({BoardAnimationType::Destroy, sf::Clock(), sf::milliseconds(m_animationTimings.destroy_duration_ms), {}, {}, pos, type});
     }
 
@@ -590,7 +590,7 @@ void Game::update(sf::Time deltaTime) {
             for (int r = 0; r < BOARD_HEIGHT; ++r) {
                 for (int c = 0; c < BOARD_WIDTH; ++c) {
                     BaseGem* gem = m_board.getGemAt(r, c);
-                    if (gem) {
+                    if (gem != nullptr) {
                         switch (gem->getSubType()) {
                             case GemSubType::Coin: finalTreasureValue += 1; break;
                             case GemSubType::CoinPile: finalTreasureValue += 5; break;
@@ -676,7 +676,7 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                         sf::Vector2f p2_local((float)anim.endPos.x * TILE_SIZE, (float)anim.endPos.y * TILE_SIZE);
                         // During a swap, the gem is logically still at its start position.
                         BaseGem* gem = m_board.getGemAt(anim.startPos.y, anim.startPos.x);
-                        if (gem) {
+                        if (gem != nullptr) {
                             sf::Sprite sprite = gem->getSprite();
                             sprite.setPosition(p1_local + (p2_local - p1_local) * p + m_boardOrigin);
                             m_window.draw(sprite);
@@ -688,7 +688,7 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                         sf::Vector2f p2_local((float)anim.endPos.x * TILE_SIZE, (float)anim.endPos.y * TILE_SIZE);
                         // After gravity, the gem is logically at its end position.
                         BaseGem* gem = m_board.getGemAt(anim.endPos.y, anim.endPos.x);
-                        if (gem) {
+                        if (gem != nullptr) {
                             sf::Sprite sprite = gem->getSprite();
                             sprite.setPosition(p1_local + (p2_local - p1_local) * p + m_boardOrigin);
                             m_window.draw(sprite);
@@ -713,7 +713,7 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                     case BoardAnimationType::Transform: {
                         float scale = 1.0f + 0.5f * std::sin(p * 3.14159f);
                         BaseGem* gem = m_board.getGemAt(anim.position.x, anim.position.y);
-                        if (gem) {
+                        if (gem != nullptr) {
                              sf::Sprite sprite = gem->getSprite();
                             const sf::Texture* tex = &sprite.getTexture();
                             sf::Vector2u texSize = tex->getSize();
@@ -729,7 +729,7 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                     case BoardAnimationType::RotateRow: {
                         for (int c = 0; c < m_board.getWidth(); ++c) {
                             BaseGem* gem = m_board.getGemAt(anim.index, c);
-                            if (gem) {
+                            if (gem != nullptr) {
                                 sf::Sprite sprite = gem->getSprite();
                                 float newX = (c + anim.direction * p);
                                 if (newX < 0) { newX += m_board.getWidth(); }
@@ -743,7 +743,7 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
                     case BoardAnimationType::RotateColumn: {
                         for (int r = 0; r < m_board.getHeight(); ++r) {
                             BaseGem* gem = m_board.getGemAt(r, anim.index);
-                            if (gem) {
+                            if (gem != nullptr) {
                                 sf::Sprite sprite = gem->getSprite();
                                 float newY = (r + anim.direction * p);
                                 if (newY < 0) { newY += m_board.getHeight(); }
@@ -795,7 +795,7 @@ void Game::handleTimeEvent(const TimeEvent& event) {
     switch (event.type) {
         case TimeEventType::BurningTile_Activation: {
             BaseGem* gem = m_board.getGemAt(event.coordinates.x, event.coordinates.y);
-            if (gem && gem->getStatusEffect() == StatusEffect::Burning) {
+            if (gem != nullptr && gem->getStatusEffect() == StatusEffect::Burning) {
                 float damage = (m_player.getMaxMana() * 0.10f) * gem->getLevel();
                 m_monster.takeDamage(static_cast<int>(damage));
                 std::cout << "[EVENT] Burning tile dealt " << static_cast<int>(damage) << " damage. Monster HP: " << m_monster.getCurrentHp() << '\n';
@@ -804,7 +804,7 @@ void Game::handleTimeEvent(const TimeEvent& event) {
         }
         case TimeEventType::BurningTile_Expire: {
             BaseGem* gem = m_board.getGemAt(event.coordinates.x, event.coordinates.y);
-            if (gem && gem->getStatusEffect() == StatusEffect::Burning) {
+            if (gem != nullptr && gem->getStatusEffect() == StatusEffect::Burning) {
                 float damage = (m_player.getMaxMana() * 0.10f) * gem->getLevel();
                 m_monster.takeDamage(static_cast<int>(damage));
                 std::cout << "[EVENT] Burning tile dealt final " << static_cast<int>(damage) << " damage and expired. Monster HP: " << m_monster.getCurrentHp() << '\n';
@@ -827,7 +827,7 @@ void Game::startTargeting(const TargetingData& targetingData) {
 }
 
 void Game::resolveTargeting() {
-    if (!m_pendingSpell) {
+    if (m_pendingSpell == nullptr) {
         cancelTargeting();
         return;
     }

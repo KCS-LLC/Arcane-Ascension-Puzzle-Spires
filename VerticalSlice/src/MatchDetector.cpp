@@ -15,7 +15,7 @@ std::vector<std::vector<sf::Vector2i>> MatchDetector::findAllMatches(const Board
     for (int r = 0; r < board.getHeight(); ++r) {
         for (int c = 0; c < board.getWidth(); ) {
             const BaseGem* gem = board.getGemAt(r, c);
-            if (!gem) {
+            if (gem == nullptr) {
                 c++;
                 continue;
             }
@@ -29,7 +29,7 @@ std::vector<std::vector<sf::Vector2i>> MatchDetector::findAllMatches(const Board
             int runner = c;
             while (runner < board.getWidth()) {
                 const BaseGem* nextGem = board.getGemAt(r, runner);
-                if (nextGem && nextGem->getSubType() == type) {
+                if (nextGem != nullptr && nextGem->getSubType() == type) {
                     currentRun.push_back({r, runner});
                     runner++;
                 } else {
@@ -48,7 +48,7 @@ std::vector<std::vector<sf::Vector2i>> MatchDetector::findAllMatches(const Board
     for (int c = 0; c < board.getWidth(); ++c) {
         for (int r = 0; r < board.getHeight(); ) {
             const BaseGem* gem = board.getGemAt(r, c);
-            if (!gem) {
+            if (gem == nullptr) {
                 r++;
                 continue;
             }
@@ -62,7 +62,7 @@ std::vector<std::vector<sf::Vector2i>> MatchDetector::findAllMatches(const Board
             int runner = r;
             while (runner < board.getHeight()) {
                 const BaseGem* nextGem = board.getGemAt(runner, c);
-                if (nextGem && nextGem->getSubType() == type) {
+                if (nextGem != nullptr && nextGem->getSubType() == type) {
                     currentRun.push_back({runner, c});
                     runner++;
                 } else {

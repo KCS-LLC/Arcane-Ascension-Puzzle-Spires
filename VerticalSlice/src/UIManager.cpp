@@ -330,13 +330,13 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
 
     if (playMode == PlayMode::Targeting) {
         const Spell* spell = dataManager.getSpellById(targetingRequest.abilityId);
-        if (spell && spell->targeting.has_value()) {
+        if (spell != nullptr && spell->targeting.has_value()) {
             m_targetingPromptText.setString(wordWrap(spell->targeting->prompt, 50));
         }
     }
 
     if (currentState == GameState::Exploration) {
-        if (currentRoom) {
+        if (currentRoom != nullptr) {
             m_roomNameText.setString(currentRoom->name);
             m_roomDescriptionText.setString("Explore the room. Which way will you go?");
 
@@ -362,7 +362,7 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
                     }
                 }
 
-                if (destinationRoom) {
+                if (destinationRoom != nullptr) {
                     sf::RectangleShape button({buttonWidth, buttonHeight});
                     button.setPosition(sf::Vector2f((WINDOW_WIDTH - buttonWidth) / 2.f, startY + i * (buttonHeight + buttonSpacing)));
                     button.setFillColor(getSfColorForRoomType(destinationRoom->type));
@@ -371,7 +371,7 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
                     doorButtons.push_back(button);
 
                     std::string buttonTextStr;
-                    if (visitedRoomIds.count(destinationRoom->id)) {
+                    if (visitedRoomIds.count(destinationRoom->id) != 0u) {
                         buttonTextStr = destinationRoom->name;
                     } else {
                         buttonTextStr = roomTypeToString(destinationRoom->type) + " Door";

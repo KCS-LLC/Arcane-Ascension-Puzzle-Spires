@@ -54,7 +54,7 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
             std::vector<sf::Vector2i> coords = game.getBoard().getRandomGemCoords(amount, true);
             for (const auto& coord : coords) {
                 BaseGem* gem = game.getBoard().getGemAt(coord.x, coord.y);
-                if (gem) {
+                if (gem != nullptr) {
                     game.startBoardAnimation({BoardAnimationType::Transform, sf::Clock(), sf::seconds(0.3f), {}, {}, coord, gem->getSubType(), toType});
                 }
             }
