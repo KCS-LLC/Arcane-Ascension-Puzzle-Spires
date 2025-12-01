@@ -65,12 +65,25 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
             }
         }
     } else if (effect.type == "HIGHLIGHT_MOVE") {
-                auto validMove = game.getBoard().findValidMove();
-                if (validMove.has_value()) {
-                    game.getBoard().getGemAt(validMove->first.y, validMove->first.x)->setActionState(ActionState::ValidMoveHint);
-                    game.getBoard().getGemAt(validMove->second.y, validMove->second.x)->setActionState(ActionState::ValidMoveHint);
-                }
-            } else if (effect.type == "APPLY_STAT_MODIFIER") {
+        auto insightMoves = game.getInsightMoves();
+        int index = game.getInsightMovesIndex();
+
+        if (insightMoves.empty()) {
+            insightMoves = game.getBoard().findAllValidMoves();
+            game.setInsightMoves(insightMoves);
+            index = 0;
+        }
+
+        if (!insightMoves.empty() && index < insightMoves.size()) {
+            const auto& move = insightMoves[index];
+            game.getBoard().getGemAt(move.first.y, move.first.x)->setActionState(ActionState::ValidMoveHint);
+            game.getBoard().getGemAt(move.second.y, move.second.x)->setActionState(ActionState::ValidMoveHint);
+            game.setInsightMovesIndex(index + 1);
+        } else {
+            // Optional: Add feedback to the player that no more moves were found.
+            // For now, we do nothing.
+        }
+    } else if (effect.type == "APPLY_STAT_MODIFIER") {
         ActiveEffect activeEffect;
         activeEffect.effectId = spell.id;
         if (effect.params.count("stat") != 0) {

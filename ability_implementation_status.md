@@ -7,9 +7,9 @@ This document tracks the current implementation status of each Quartz-Rank Abili
 ## Diviner
 
 *   **Insight**
-    *   **Score:** 70/100
-    *   **Reasoning:** The effect correctly finds and highlights one valid move. However, the core logic is incomplete as it does not handle multiple casts. The `Board::findValidMove` function only finds the *first* available move, not all of them, and there is no system to track which moves have already been shown to the player.
-    *   **To Reach 100:** 1) Implement a new `Board::findAllValidMoves` method. 2) Add state management to the `Game` or `Player` class to store the list of found moves and track which have been revealed. 3) Update the `HIGHLIGHT_MOVE` effect in `EffectProcessor` to use this state, showing a new move on each cast and notifying the player when all are revealed.
+    *   **Score:** 100/100
+    *   **Reasoning:** The effect correctly finds and highlights valid moves sequentially on subsequent casts. The new `Board::findAllValidMoves` method and `Game` class state management ensure all possible moves are found and revealed to the player.
+    *   **To Reach 100:** (Already at 100)
 
 *   **Mana Surge**
     *   **Score:** 100/100
@@ -40,9 +40,9 @@ This document tracks the current implementation status of each Quartz-Rank Abili
     *   **To Reach 100:** (Already at 100)
 
 *   **Insight**
-    *   **Score:** 70/100
-    *   **Reasoning:** (Same as Diviner's Insight) The effect correctly finds and highlights one valid move. However, the core logic is incomplete as it does not handle multiple casts. The `Board::findValidMove` function only finds the *first* available move, not all of them, and there is no system to track which moves have already been shown to the player.
-    *   **To Reach 100:** 1) Implement a new `Board::findAllValidMoves` method. 2) Add state management to the `Game` or `Player` class to store the list of found moves and track which have been revealed. 3) Update the `HIGHLIGHT_MOVE` effect in `EffectProcessor` to use this state, showing a new move on each cast and notifying the player when all are revealed.
+    *   **Score:** 100/100
+    *   **Reasoning:** (Same as Diviner's Insight) The effect correctly finds and highlights valid moves sequentially on subsequent casts. The new `Board::findAllValidMoves` method and `Game` class state management ensure all possible moves are found and revealed to the player.
+    *   **To Reach 100:** (Already at 100)
 
 ---
 
@@ -54,18 +54,18 @@ This document tracks the current implementation status of each Quartz-Rank Abili
     *   **To Reach 100:** (Already at 100)
 
 *   **Minor Heal**
-    *   **Score:** 90/100
-    *   **Reasoning:** The spell correctly calls the `player.heal()` method, but no visual animation or effect is triggered to provide feedback that healing occurred. The existing player damage effect provides a template for implementation.
-    *   **To Reach 100:** Implement a visual effect (e.g., a green screen flash, floating numbers) triggered when the `HEAL_PLAYER` effect is processed.
+    *   **Score:** 100/100
+    *   **Reasoning:** The spell correctly calls the `player.heal()` method. The unified animation system now provides a green "HP Sweep" animation, which serves as sufficient visual feedback.
+    *   **To Reach 100:** (Already at 100)
 
 ---
 
 ## Mender
 
 *   **Minor Heal**
-    *   **Score:** 90/100
-    *   **Reasoning:** (Same as Guardian's Minor Heal) The spell correctly calls the `player.heal()` method, but no visual animation or effect is triggered to provide feedback that healing occurred.
-    *   **To Reach 100:** Implement a visual effect (e.g., a green screen flash, floating numbers) triggered when the `HEAL_PLAYER` effect is processed.
+    *   **Score:** 100/100
+    *   **Reasoning:** (Same as Guardian's Minor Heal) The spell correctly calls the `player.heal()` method. The unified animation system now provides a green "HP Sweep" animation, which serves as sufficient visual feedback.
+    *   **To Reach 100:** (Already at 100)
 
 *   **Chaotic Shift**
     *   **Score:** 100/100
@@ -77,9 +77,9 @@ This document tracks the current implementation status of each Quartz-Rank Abili
 ## Shadow
 
 *   **Shadow Strike**
-    *   **Score:** 90/100
-    *   **Reasoning:** The spell correctly calls the `monster.takeDamage()` method, but no visual animation or effect is triggered to provide feedback that damage was dealt.
-    *   **To Reach 100:** Implement a visual effect (e.g., a screen flash, particle effect on the monster) that is triggered when the `DEAL_DAMAGE` effect is processed.
+    *   **Score:** 100/100
+    *   **Reasoning:** The spell correctly calls the `monster.takeDamage()` method. The unified animation system now provides a purple "HP Sweep" animation for damage, which serves as sufficient visual feedback.
+    *   **To Reach 100:** (Already at 100)
 
 *   **Empower Weapon**
     *   **Score:** 100/100

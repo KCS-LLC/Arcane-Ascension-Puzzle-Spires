@@ -399,6 +399,8 @@ void Game::handleMatches(bool isPlayerMove) {
     }
 
     m_playerActionPerformedThisTurn = true;
+    m_insightMoves.clear();
+    m_insightMovesIndex = 0;
 
     if (isPlayerMove) {
         m_currentTurn++;
@@ -927,4 +929,21 @@ void Game::cancelTargeting() {
     m_targetingSelections.clear();
     m_board.clearActionStates();
     m_uiManager.m_activeTargetingSpellId = ""; // Clear active spell for UI highlight
+}
+
+// Insight spell state management
+const std::vector<std::pair<sf::Vector2i, sf::Vector2i>>& Game::getInsightMoves() const {
+    return m_insightMoves;
+}
+
+void Game::setInsightMoves(const std::vector<std::pair<sf::Vector2i, sf::Vector2i>>& moves) {
+    m_insightMoves = moves;
+}
+
+int Game::getInsightMovesIndex() const {
+    return m_insightMovesIndex;
+}
+
+void Game::setInsightMovesIndex(int index) {
+    m_insightMovesIndex = index;
 }

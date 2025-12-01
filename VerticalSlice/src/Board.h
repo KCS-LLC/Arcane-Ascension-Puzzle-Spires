@@ -42,6 +42,7 @@ public:
     void rotateColumn(int colIndex, int direction);
     std::vector<sf::Vector2i> getRandomGemCoords(int count, bool nonAttackGemsOnly = false, std::optional<GemSubType> specificType = std::nullopt);
     std::optional<std::pair<sf::Vector2i, sf::Vector2i>> findValidMove() const;
+    std::vector<std::pair<sf::Vector2i, sf::Vector2i>> findAllValidMoves() const;
     void clearActionStates();
     bool isAdjacent(sf::Vector2i pos1, sf::Vector2i pos2) const;
     std::vector<sf::Vector2i> convertRandomGems(int count, GemSubType toType, std::optional<GemSubType> excludeType = std::nullopt);

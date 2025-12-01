@@ -403,3 +403,32 @@ bool Board::isAdjacent(sf::Vector2i pos1, sf::Vector2i pos2) const {
     return (std::abs(pos1.x - pos2.x) == 1 && pos1.y == pos2.y) ||
            (std::abs(pos1.y - pos2.y) == 1 && pos1.x == pos2.x);
 }
+
+std::vector<std::pair<sf::Vector2i, sf::Vector2i>> Board::findAllValidMoves() const {
+    std::vector<std::pair<sf::Vector2i, sf::Vector2i>> validMoves;
+    Board* mutableThis = const_cast<Board*>(this);
+
+    // Check for horizontal swaps
+    for (int r = 0; r < m_height; ++r) {
+        for (int c = 0; c < m_width - 1; ++c) {
+            mutableThis->swapGems(r, c, r, c + 1);
+            if (mutableThis->findMatches().size() > 0) {
+                validMoves.push_back({sf::Vector2i(c, r), sf::Vector2i(c + 1, r)});
+            }
+            mutableThis->swapGems(r, c, r, c + 1); // Swap back
+        }
+    }
+
+    // Check for vertical swaps
+    for (int r = 0; r < m_height - 1; ++r) {
+        for (int c = 0; c < m_width; ++c) {
+            mutableThis->swapGems(r, c, r + 1, c);
+            if (mutableThis->findMatches().size() > 0) {
+                validMoves.push_back({sf::Vector2i(c, r), sf::Vector2i(c, r + 1)});
+            }
+            mutableThis->swapGems(r, c, r + 1, c); // Swap back
+        }
+    }
+
+    return validMoves;
+}

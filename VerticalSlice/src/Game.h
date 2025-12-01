@@ -36,12 +36,20 @@ public:
     TimeManager& getTimeManager();
     void startTargeting(const TargetingData& targetingData);
     void startTransformAnimation(const std::vector<sf::Vector2i>& gemsToTransform);
+
+    // Insight spell state management
+    const std::vector<std::pair<sf::Vector2i, sf::Vector2i>>& getInsightMoves() const;
+    void setInsightMoves(const std::vector<std::pair<sf::Vector2i, sf::Vector2i>>& moves);
+    int getInsightMovesIndex() const;
+    void setInsightMovesIndex(int index);
 private:
     PlayMode m_playMode = PlayMode::Normal;
     const Spell* m_pendingSpell = nullptr;
     TargetingRequest m_targetingRequest;
     std::vector<sf::Vector2i> m_targetingSelections;
     std::vector<Animation> m_activeAnimations;
+    std::vector<std::pair<sf::Vector2i, sf::Vector2i>> m_insightMoves;
+    int m_insightMovesIndex = 0;
 
 
     void resolveTargeting();
