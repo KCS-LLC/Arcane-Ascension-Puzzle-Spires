@@ -213,6 +213,10 @@ void Game::unloadBoard() {
     m_board.unloadBoard();
 }
 
+void Game::startAnimation(const Animation& animation) {
+    m_activeAnimations.push_back(animation);
+}
+
 void Game::run() {
     sf::Clock clock;
     while (m_window.isOpen()) {
@@ -441,8 +445,21 @@ void Game::handleMatches(bool isPlayerMove) {
 
     // Apply accumulated damage once
     if (totalSkullDamageThisTurn > 0.0f) {
+        float hpBefore = static_cast<float>(m_monster.getCurrentHp());
         int finalDamage = static_cast<int>(totalSkullDamageThisTurn);
         m_monster.takeDamage(finalDamage);
+        
+        startAnimation({
+            AnimationType::HpSweep,
+            AnimationTarget::MonsterHpBar,
+            sf::seconds(0.7f),
+            sf::Clock(),
+            sf::Color(180, 0, 0, 200), // A standard damage-red color
+            hpBefore,
+            static_cast<float>(m_monster.getCurrentHp()),
+            static_cast<float>(m_monster.getMaxHp())
+        });
+
         std::cout << "[COMBAT TURN] Total Damage Applied: " << finalDamage << ". Monster HP after: " << m_monster.getCurrentHp() << '\n';
     }
 
@@ -623,6 +640,18 @@ void Game::update(sf::Time deltaTime) {
         m_boardStateDirty = false;
         handleMatches(false);
     }
+
+    // Update and remove finished cosmetic animations
+    m_activeAnimations.erase(
+        std::remove_if(
+            m_activeAnimations.begin(),
+            m_activeAnimations.end(),
+            [](const Animation& anim) {
+                return anim.clock.getElapsedTime() >= anim.lifetime;
+            }
+        ),
+        m_activeAnimations.end()
+    );
 }
 
 void Game::setBoardStateDirty(bool isDirty) {
@@ -757,6 +786,9 @@ void Game::render(const sf::Font& font, sf::Clock& highlightClock) {
 
     // UI Rendering
     m_uiManager.render(m_window, m_boardOrigin, m_gameMode, m_gameState, m_playMode, m_targetingRequest, showPlayerDamageEffect, m_currentJudgementTrial, m_currentScore, m_currentTurn, std::nullopt, m_trialPerformance, gemTextures, m_effectIconTextures);
+
+    // Render cosmetic animations on top of everything else
+    m_uiManager.renderAnimations(m_window, m_activeAnimations);
 
     m_window.display();
 }

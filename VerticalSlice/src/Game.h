@@ -15,6 +15,7 @@
 #include "MatchProcessor.h"
 #include "EffectProcessor.h"
 #include "TimeManager.h"
+#include "Animation.h"
 
 // Forward-declaration of the global texture map
 extern std::map<GemSubType, sf::Texture> gemTextures;
@@ -25,6 +26,7 @@ public:
     void run();
     void handleTimeEvent(const TimeEvent& event);
     void setBoardStateDirty(bool isDirty);
+    void startAnimation(const Animation& animation);
 
     // Getters for game components
     Player& getPlayer();
@@ -39,6 +41,8 @@ private:
     const Spell* m_pendingSpell = nullptr;
     TargetingRequest m_targetingRequest;
     std::vector<sf::Vector2i> m_targetingSelections;
+    std::vector<Animation> m_activeAnimations;
+
 
     void resolveTargeting();
     void cancelTargeting();

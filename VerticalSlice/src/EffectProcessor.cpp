@@ -12,11 +12,33 @@
 std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, const Effect& effect, Game& game) {
     if (effect.type == "DEAL_DAMAGE") {
         if (effect.params.count("amount") != 0) {
+            float hpBefore = static_cast<float>(game.getMonster().getCurrentHp());
             game.getMonster().takeDamage(effect.params.at("amount").get<int>());
+            game.startAnimation({
+                AnimationType::HpSweep,
+                AnimationTarget::MonsterHpBar,
+                sf::seconds(0.7f),
+                sf::Clock(),
+                sf::Color(75, 0, 130, 200), // Dark purple
+                hpBefore,
+                static_cast<float>(game.getMonster().getCurrentHp()),
+                static_cast<float>(game.getMonster().getMaxHp())
+            });
         }
     } else if (effect.type == "HEAL_PLAYER") {
         if (effect.params.count("amount") != 0) {
+            float hpBefore = static_cast<float>(game.getPlayer().getHp());
             game.getPlayer().heal(effect.params.at("amount").get<int>());
+            game.startAnimation({
+                AnimationType::HpSweep,
+                AnimationTarget::PlayerHpBar,
+                sf::seconds(0.6f),
+                sf::Clock(),
+                sf::Color(100, 255, 100, 200), // Vibrant green
+                hpBefore,
+                static_cast<float>(game.getPlayer().getHp()),
+                static_cast<float>(game.getPlayer().getMaxHp())
+            });
         }
     } else if (effect.type == "REMOVE_RANDOM_GEMS") {
         if (effect.params.count("amount") != 0) {

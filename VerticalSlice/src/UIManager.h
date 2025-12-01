@@ -7,6 +7,7 @@
 #include "PrimaryGemType.h"
 #include "GemSubType.h"
 #include "Structs.h"
+#include "Animation.h"
 
 // Forward declarations
 class Player;
@@ -36,6 +37,7 @@ public:
     void setupTreasureRound();
     void update(const Player& player, const Monster& monster, const TimeManager& timeManager, GameMode gameMode, GameState currentState, PlayMode playMode, const TargetingRequest& targetingRequest, const Room* currentRoom, const Floor& currentFloor, const std::set<int>& visitedRoomIds, const DataManager& dataManager, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::vector<ActiveEffect>& activeEffects);
     void render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin, GameMode gameMode, GameState currentState, PlayMode playMode, const TargetingRequest& targetingRequest, bool showPlayerDamageEffect, const JudgementTrial& currentTrial, int currentScore, int currentTrialTurn, const std::optional<PrimaryGemType>& manaAffinityChoice, const TrialPerformance& performance, const std::map<GemSubType, sf::Texture>& gemTextures, const std::map<std::string, sf::Texture>& effectIconTextures);
+    void renderAnimations(sf::RenderWindow& window, const std::vector<Animation>& animations);
 
     const std::vector<sf::RectangleShape>& getSpellButtons() const;
 

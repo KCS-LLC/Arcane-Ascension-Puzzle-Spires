@@ -570,3 +570,43 @@ void UIManager::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin
 const std::vector<sf::RectangleShape>& UIManager::getSpellButtons() const {
     return spellButtons;
 }
+
+void UIManager::renderAnimations(sf::RenderWindow& window, const std::vector<Animation>& animations) {
+    for (const auto& animation : animations) {
+        if (animation.type == AnimationType::HpSweep) {
+            const sf::RectangleShape* baseBar = nullptr;
+            if (animation.target == AnimationTarget::PlayerHpBar) {
+                baseBar = &playerHpBarBack;
+            } else if (animation.target == AnimationTarget::MonsterHpBar) {
+                baseBar = &monsterHpBarBack;
+            }
+
+            if (baseBar == nullptr) continue;
+
+            float progress = animation.clock.getElapsedTime().asSeconds() / animation.lifetime.asSeconds();
+            std::uint8_t alpha = static_cast<std::uint8_t>(255.f * (1.f - progress));
+            
+            sf::RectangleShape sweep;
+            sweep.setSize({0, baseBar->getSize().y});
+            sweep.setFillColor({animation.color.r, animation.color.g, animation.color.b, alpha});
+            sweep.setPosition(baseBar->getPosition());
+
+            float startPercent = animation.startValue / animation.maxValue;
+            float endPercent = animation.endValue / animation.maxValue;
+
+            if (endPercent > startPercent) { // Healing
+                float sweepX = baseBar->getPosition().x + startPercent * baseBar->getSize().x;
+                float sweepWidth = (endPercent - startPercent) * baseBar->getSize().x;
+                sweep.setPosition({sweepX, baseBar->getPosition().y});
+                sweep.setSize({sweepWidth, baseBar->getSize().y});
+            } else { // Damage
+                float sweepX = baseBar->getPosition().x + endPercent * baseBar->getSize().x;
+                float sweepWidth = (startPercent - endPercent) * baseBar->getSize().x;
+                sweep.setPosition({sweepX, baseBar->getPosition().y});
+                sweep.setSize({sweepWidth, baseBar->getSize().y});
+            }
+
+            window.draw(sweep);
+        }
+    }
+}
