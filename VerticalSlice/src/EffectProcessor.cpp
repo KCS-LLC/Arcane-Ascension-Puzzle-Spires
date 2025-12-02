@@ -120,13 +120,16 @@ std::vector<sf::Vector2i> EffectProcessor::processEffect(const Spell& spell, con
                 long long currentTime = game.getTimeManager().getCurrentTime().totalTimeUnits;
                 const int tickInterval = 20; // Activates every 20 time units
                 
+                // Use the correct (row, col) format from the start
+                sf::Vector2i correctCoord(coord.x, coord.y);
+
                 // Schedule activation events
                 for (int i = 1; i <= (BURNING_TILE_DURATION / tickInterval) -1; ++i) {
-                     game.getTimeManager().addEvent({currentTime + static_cast<long long>(i) * tickInterval, TimeEventType::BurningTile_Activation, coord});
+                     game.getTimeManager().addEvent({currentTime + static_cast<long long>(i) * tickInterval, TimeEventType::BurningTile_Activation, correctCoord});
                 }
 
                 // Schedule expiration event
-                game.getTimeManager().addEvent({currentTime + BURNING_TILE_DURATION, TimeEventType::BurningTile_Expire, coord});
+                game.getTimeManager().addEvent({currentTime + BURNING_TILE_DURATION, TimeEventType::BurningTile_Expire, correctCoord});
             }
         }
     }

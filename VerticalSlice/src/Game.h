@@ -71,6 +71,7 @@ private:
     bool processTreasureMerges();
     void moveToRoom(int destinationRoomId);
     void unloadBoard();
+    void destroyAndRefillGems(const std::vector<sf::Vector2i>& coords);
 
     sf::RenderWindow m_window;
     DataManager dataManager; // Must be initialized before managers that use it.
@@ -122,4 +123,7 @@ private:
 
     // Quick Swap state
     sf::Vector2i m_quickSwapFirstSelectedGem = {-1, -1};
+
+    // FOR TESTING:
+    bool m_testSwordEquipped = false;
 };

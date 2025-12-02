@@ -8,6 +8,8 @@
 #include "GemSubType.h"
 #include "Structs.h"
 #include "Judgement.h"
+#include "ItemData.h"
+#include <memory>
 
 // Forward declarations
 class DataManager;
@@ -28,7 +30,14 @@ public:
     const std::vector<GemSubType>& getManaTypes() const;
     const std::string& getAttunementId() const;
     int getVigor() const;
+    int getSpeed() const;
+    int getWit() const;
     float getManaGainMultiplier() const;
+
+    void equipItem(std::unique_ptr<ItemInstance> item);
+    void unequipItem(EquipmentSlot slot);
+    bool addItemToInventory(std::unique_ptr<ItemInstance> item);
+    void useItem(int inventoryIndex);
 
     void setManaGainMultiplier(float multiplier);
 
@@ -43,11 +52,11 @@ public:
 
     void addEffect(const ActiveEffect& effect);
     void updateEffects(float speedCost);
-
-    void finalizeJudgement(const JudgementResults& results, const DataManager& dataManager);
 private:
     void setStartingStats(int tactical_score, int mana_affinity_score);
     std::string determineAttunement(const JudgementResults& results, const DataManager& dataManager) const;
+
+    static const int MAX_INVENTORY_SLOTS = 10;
 
     int m_hp;
     int m_maxHp;
@@ -58,6 +67,8 @@ private:
     std::map<GemSubType, int> mana;
     std::vector<Spell*> spells; // Changed to vector of pointers
     std::vector<ActiveEffect> m_activeEffects;
+    std::map<EquipmentSlot, std::unique_ptr<ItemInstance>> m_equipment;
+    std::vector<std::unique_ptr<ItemInstance>> m_inventory;
     std::string m_attunementId;
     int m_score = 0;
 };

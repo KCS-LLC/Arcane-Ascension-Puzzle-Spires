@@ -3,6 +3,66 @@
 #include "DataManager.h"
 #include "Structs.h"
 #include "StringUtils.h"
+#include "ItemData.h"
+
+// Method implementations...
+
+void Player::equipItem(std::unique_ptr<ItemInstance> item) {
+    if (item == nullptr) { return; }
+    EquipmentSlot slot = item->getBase()->slot;
+    m_equipment[slot] = std::move(item);
+    
+    // TODO: Add logic to handle passive/activated abilities
+}
+
+void Player::unequipItem(EquipmentSlot slot) {
+    auto it = m_equipment.find(slot);
+    if (it != m_equipment.end()) {
+        // TODO: Add logic to handle removal of passive/activated abilities
+        m_equipment.erase(it);
+    }
+}
+
+int Player::getVigor() const {
+    int totalVigor = m_vigor;
+    for (const auto& pair : m_equipment) {
+        for (const auto& modifier : pair.second->getStatModifiers()) {
+            if (modifier.stat == StatType::Vigor) {
+                totalVigor += modifier.value;
+            }
+        }
+    }
+    totalVigor += static_cast<int>(this->getStatModifier("vigor"));
+    return totalVigor;
+}
+
+int Player::getSpeed() const {
+    // TODO: Implement this
+    return 0;
+}
+
+int Player::getWit() const {
+    // TODO: Implement this
+    return 0;
+}
+
+bool Player::addItemToInventory(std::unique_ptr<ItemInstance> item) {
+    if (m_inventory.size() < MAX_INVENTORY_SLOTS) {
+        m_inventory.push_back(std::move(item));
+        return true;
+    }
+    return false;
+}
+
+void Player::useItem(int inventoryIndex) {
+    if (inventoryIndex >= 0 && inventoryIndex < m_inventory.size()) {
+        // Placeholder: just print and remove for now
+        std::cout << "Used item: " << m_inventory[inventoryIndex]->getBase()->name << std::endl;
+        m_inventory.erase(m_inventory.begin() + inventoryIndex);
+    }
+}
+
+
 
 Player::Player(int initialHp, const std::vector<Spell*>& initialSpells)
     : m_hp(initialHp), m_maxHp(initialHp), m_maxMana(100), spells(initialSpells) {
@@ -110,9 +170,7 @@ const std::string& Player::getAttunementId() const {
     return m_attunementId;
 }
 
-int Player::getVigor() const {
-    return m_vigor + static_cast<int>(getStatModifier("vigor"));
-}
+
 
 float Player::getManaGainMultiplier() const {
     return m_manaGainMultiplier;

@@ -1,0 +1,9 @@
+feat(abilities): Implement full Insight functionality
+
+Implements the complete, multi-cast functionality for the "Insight" spell.
+
+- Adds a `Board::findAllValidMoves` method to find all possible moves on the board, not just the first one.
+- Implements state management in the `Game` class to store the list of valid moves found by "Insight" and track the current reveal index.
+- The `HIGHLIGHT_MOVE` effect in `EffectProcessor` is updated to cycle through and display a new valid move on each subsequent cast.
+- The stored list of moves is cleared after any board action to prevent stale hints.
+- Updates ability documentation to mark "Insight," "Minor Heal," and "Shadow Strike" as 100% complete.

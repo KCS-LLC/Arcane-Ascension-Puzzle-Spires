@@ -1,0 +1,15 @@
+[
+    {
+        "id": "iron_sword",
+        "name": "Iron Sword",
+        "description": "A simple, sturdy sword.",
+        "slot": "Weapon",
+        "base_damage": 5
+    },
+    {
+        "id": "leather_armor",
+        "name": "Leather Armor",
+        "description": "Basic protection made from boiled leather.",
+        "slot": "Body"
+    }
+]

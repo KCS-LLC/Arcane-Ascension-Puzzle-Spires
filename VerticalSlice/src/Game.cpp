@@ -8,6 +8,7 @@
 #include "Constants.h"
 #include "Structs.h"
 #include "StringUtils.h"
+#include "ItemFactory.h"
 #include <numeric>
 #include <algorithm>
 #include <random>
@@ -300,6 +301,19 @@ void Game::handleInput(sf::Event event) {
                     playerDamageClock.restart();
                 }
             }
+        } else if (static_cast<int>(action.type) == 99) { // Test button action
+            if (m_testSwordEquipped) {
+                m_player.unequipItem(EquipmentSlot::Weapon);
+                std::cout << "Unequipped Iron Sword. Player Vigor: " << m_player.getVigor() << '\n';
+            } else {
+                const ItemBase* swordBase = dataManager.getItemBase("iron_sword");
+                if (swordBase != nullptr) {
+                    auto swordInstance = ItemFactory::createItemInstance(1, swordBase);
+                    m_player.equipItem(std::move(swordInstance));
+                    std::cout << "Equipped Iron Sword. Player Vigor: " << m_player.getVigor() << '\n';
+                }
+            }
+            m_testSwordEquipped = !m_testSwordEquipped;
         }
         return; // UI handled the event
     }
@@ -476,50 +490,8 @@ void Game::handleMatches(bool isPlayerMove) {
 
     m_currentScore += (static_cast<int>(allRemovedGems.size()) * 100);
 
-    // --- Create Destroy Animations ---
-    // First, record the subtypes of the gems about to be destroyed.
-    std::map<sf::Vector2i, GemSubType, Vector2iCompare> destroyedGemTypes;
-    for (const auto& pos : allRemovedGems) {
-        BaseGem* gem = m_board.getGemAt(pos.x, pos.y);
-        if (gem != nullptr) {
-            destroyedGemTypes[pos] = gem->getSubType();
-        }
-    }
-
-    // Now, actually remove the gems from the logical board.
-    for (const auto& pos : allRemovedGems) {
-        m_board.removeGem(pos.x, pos.y);
-    }
-
-    std::cout << "[LOG] Game::handleMatches - Adding Destroy animations..." << '\n';
-    for (const auto& pos : allRemovedGems) {
-        GemSubType type = destroyedGemTypes.count(pos) != 0u ? destroyedGemTypes.at(pos) : GemSubType::None;
-        startBoardAnimation({BoardAnimationType::Destroy, sf::Clock(), sf::milliseconds(m_animationTimings.destroy_duration_ms), {}, {}, pos, type});
-    }
-
-    // Refill logic
-    std::cout << "[LOG] Game::handleMatches - Adding Fall animations..." << '\n';
-    std::vector<Board::FallInfo> fallInfo;
-    if (m_gameState == GameState::Judgement_TreasureRound) {
-        fallInfo = m_board.applyGravityAndRefill(m_treasureRoundGems);
-    } else if (m_gameMode == GameMode::TOWER_CLIMB) {
-        fallInfo = m_board.applyGravityAndRefill(m_combatGemPool);
-    } else if (m_gameState == GameState::Trial) {
-        fallInfo = m_board.applyGravityAndRefill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air});
-    }
-
-    for (const auto& info : fallInfo) {
-        startBoardAnimation({BoardAnimationType::Fall, sf::Clock(), sf::milliseconds(m_animationTimings.fall_duration_ms), {info.col, info.startRow}, {info.col, info.fallToRow}});
-    }
-
-    // After adding all destroy and fall animations, find the last one and attach the recursive callback.
-    if (!m_activeBoardAnimations.empty()) {
-        m_activeBoardAnimations.back().onComplete = [this]() {
-            handleMatches(false);
-        };
-    }
-
-    m_animationClock.restart();
+    std::vector<sf::Vector2i> gemsToDestroy(allRemovedGems.begin(), allRemovedGems.end());
+    destroyAndRefillGems(gemsToDestroy);
 }
 
 void Game::update(sf::Time deltaTime) {
@@ -790,29 +762,30 @@ bool Game::processTreasureMerges() {
 
 void Game::handleTimeEvent(const TimeEvent& event) {
     switch (event.type) {
-        case TimeEventType::BurningTile_Activation: {
-            BaseGem* gem = m_board.getGemAt(event.coordinates.x, event.coordinates.y);
-            if (gem != nullptr && gem->getStatusEffect() == StatusEffect::Burning) {
-                float damage = (static_cast<float>(m_player.getMaxMana()) * 0.10f) * static_cast<float>(gem->getLevel());
-                m_monster.takeDamage(static_cast<int>(damage));
-                std::cout << "[EVENT] Burning tile dealt " << static_cast<int>(damage) << " damage. Monster HP: " << m_monster.getCurrentHp() << '\n';
-            }
-            break;
-        }
+            case TimeEventType::BurningTile_Activation: {
+                    BaseGem* gem = m_board.getGemAt(event.coordinates.y, event.coordinates.x);
+                    if (gem != nullptr && gem->getStatusEffect() == StatusEffect::Burning) {
+                        float damage = (static_cast<float>(m_player.getMaxMana()) * 0.10f) * static_cast<float>(gem->getLevel());
+                        m_monster.takeDamage(static_cast<int>(damage));
+                        std::cout << "[EVENT] Burning tile dealt " << static_cast<int>(damage) << " damage. Monster HP: " << m_monster.getCurrentHp() << '\n';
+                    }
+                    break;
+                }
         case TimeEventType::BurningTile_Expire: {
             BaseGem* gem = m_board.getGemAt(event.coordinates.x, event.coordinates.y);
-            if (gem != nullptr && gem->getStatusEffect() == StatusEffect::Burning) {
+            // The tile effect expires, so we damage and destroy whatever is here.
+            if (gem != nullptr) {
                 float damage = (static_cast<float>(m_player.getMaxMana()) * 0.10f) * static_cast<float>(gem->getLevel());
                 m_monster.takeDamage(static_cast<int>(damage));
                 std::cout << "[EVENT] Burning tile dealt final " << static_cast<int>(damage) << " damage and expired. Monster HP: " << m_monster.getCurrentHp() << '\n';
                 
-                // Add the gem to be destroyed
-                m_isAnimating = true;
-                m_animationClock.restart();
+                // We must clear the status from the current gem before destroying it,
+                // in case it's a different gem from the one that was originally burning.
+                gem->setStatusEffect(StatusEffect::None);
+                destroyAndRefillGems({event.coordinates});
             }
             break;
-        }
-    }
+        }    }
 }
 
 void Game::startTargeting(const TargetingData& targetingData) {
@@ -911,3 +884,54 @@ int Game::getInsightMovesIndex() const {
 void Game::setInsightMovesIndex(int index) {
     m_insightMovesIndex = index;
 }
+
+void Game::destroyAndRefillGems(const std::vector<sf::Vector2i>& coords) {
+    if (coords.empty()) {
+        return;
+    }
+
+    // --- Create Destroy Animations ---
+    std::map<sf::Vector2i, GemSubType, Vector2iCompare> destroyedGemTypes;
+    for (const auto& pos : coords) {
+        BaseGem* gem = m_board.getGemAt(pos.x, pos.y);
+        if (gem != nullptr) {
+            destroyedGemTypes[pos] = gem->getSubType();
+        }
+    }
+
+    // Now, actually remove the gems from the logical board.
+    for (const auto& pos : coords) {
+        m_board.removeGem(pos.x, pos.y);
+    }
+
+    std::cout << "[LOG] Game::destroyAndRefillGems - Adding Destroy animations..." << '\n';
+    for (const auto& pos : coords) {
+        GemSubType type = destroyedGemTypes.count(pos) != 0u ? destroyedGemTypes.at(pos) : GemSubType::None;
+        startBoardAnimation({BoardAnimationType::Destroy, sf::Clock(), sf::milliseconds(m_animationTimings.destroy_duration_ms), {}, {}, pos, type});
+    }
+
+    // Refill logic
+    std::cout << "[LOG] Game::destroyAndRefillGems - Adding Fall animations..." << '\n';
+    std::vector<Board::FallInfo> fallInfo;
+    if (m_gameState == GameState::Judgement_TreasureRound) {
+        fallInfo = m_board.applyGravityAndRefill(m_treasureRoundGems);
+    } else if (m_gameMode == GameMode::TOWER_CLIMB) {
+        fallInfo = m_board.applyGravityAndRefill(m_combatGemPool);
+    } else if (m_gameState == GameState::Trial) {
+        fallInfo = m_board.applyGravityAndRefill({GemSubType::Fire, GemSubType::Water, GemSubType::Earth, GemSubType::Air});
+    }
+
+    for (const auto& info : fallInfo) {
+        startBoardAnimation({BoardAnimationType::Fall, sf::Clock(), sf::milliseconds(m_animationTimings.fall_duration_ms), {info.col, info.startRow}, {info.col, info.fallToRow}});
+    }
+
+    // After adding all destroy and fall animations, find the last one and attach the recursive callback.
+    if (!m_activeBoardAnimations.empty()) {
+        m_activeBoardAnimations.back().onComplete = [this]() {
+            handleMatches(false); // Check for new matches after refill
+        };
+    }
+
+    m_animationClock.restart();
+}
+

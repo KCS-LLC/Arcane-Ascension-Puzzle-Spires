@@ -21,12 +21,12 @@ This file tracks the known bugs and design discrepancies in the current build.
 ## Medium Priority (as of 2025-11-26)
 
 ### UI/UX & Visual Feedback Bugs
-*   **`Minor Heal` Lacks Feedback (Bug #V.Guardian):** The Guardian's `Minor Heal` does not provide obvious visual feedback (e.g., an animation or floating green number), making it difficult to tell if it worked, especially if it coincides with a monster attack.
-*   **`Empower Self`/`Empower Weapon` Need Status Indicators (Bug #V.Guardian, #V.Shadow):** Abilities that grant temporary buffs are untestable and unusable without UI indicators showing that the buff is active and when it expires.
+*   **`Minor Heal` Lacks Feedback (Bug #V.Guardian):** FIXED. The `HEAL_PLAYER` effect now correctly triggers an `HpSweep` animation, providing visual feedback.
+*   **`Empower Self`/`Empower Weapon` Need Status Indicators (Bug #V.Guardian, #V.Shadow):** FIXED. The `APPLY_STAT_MODIFIER` effect correctly adds `ActiveEffect` objects to the player, and the UI rendering logic already displays these active effects along with their durations.
 
 ### Ability-Specific Bugs
-*   **`Gust of Wind` Incorrect Functionality (Bug #V.Elementalist, #V.Summoner):** The ability currently only rotates the top row. It needs to be refactored to allow the player to select a row/column and direction.
-*   **`Gust of Wind` Lacks Animation (Bug #V.Elementalist, #V.Summoner):** The rotation is instant and jarring. It needs a smooth animation.
+*   **`Gust of Wind` Incorrect Functionality (Bug #V.Elementalist, #V.Summoner):** FIXED. The ability has been refactored to allow player selection of a row/column and direction, and animations have been integrated.
+*   **`Gust of Wind` Lacks Animation (Bug #V.Elementalist, #V.Summoner):** FIXED. The ability now includes a smooth animation for row/column rotations.
 
 ---
 ## Resolved (as of 2025-11-25)

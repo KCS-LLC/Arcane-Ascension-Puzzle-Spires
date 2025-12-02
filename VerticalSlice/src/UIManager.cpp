@@ -42,7 +42,9 @@ UIManager::UIManager(const sf::Font& font)
       m_quickSwapInstructionText(font, "", 18),
       m_targetingPromptText(font, "", 18),
       m_dateText(font, "", 16),
-      m_timeText(font, "", 16)
+      m_timeText(font, "", 16),
+      m_testEquipButtonText(font, "", 18),
+      m_playerStatsText(font, "", 16)
 {
     // Positions and colors can be set here
     trialTypeText.setFillColor(sf::Color::White);
@@ -87,6 +89,20 @@ UIManager::UIManager(const sf::Font& font)
     sf::FloatRect timeRect = m_timeText.getLocalBounds();
     m_timeText.setOrigin(sf::Vector2f(timeRect.position.x + timeRect.size.x / 2.0f, timeRect.position.y + timeRect.size.y / 2.0f));
     m_timeText.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f, 40));
+
+    // Test button
+    m_testEquipButton.setSize(sf::Vector2f(150, 40));
+    m_testEquipButton.setPosition(sf::Vector2f(WINDOW_WIDTH / 2.0f - 75, WINDOW_HEIGHT - 100));
+    m_testEquipButton.setFillColor(sf::Color(100, 100, 180));
+    m_testEquipButtonText.setFont(font);
+    m_testEquipButtonText.setCharacterSize(18);
+    m_testEquipButtonText.setFillColor(sf::Color::White);
+
+    // Player stats display
+    m_playerStatsText.setFont(font);
+    m_playerStatsText.setCharacterSize(16);
+    m_playerStatsText.setFillColor(sf::Color::White);
+    m_playerStatsText.setPosition(sf::Vector2f(20, 250));
 }
       
 bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState currentState, const Room* currentRoom, const std::vector<Attunement>& attunements, UIAction& outAction) {
@@ -99,6 +115,12 @@ bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState
                         outAction.destinationRoomId = m_currentConnections[i].destinationRoomId;
                         return true;
                     }
+                }
+                if (m_testEquipButton.getGlobalBounds().contains(sf::Vector2f(mb->position))) {
+                    // This is a placeholder for a real UI action type
+                    // We'll use a special value for now to signal this test action
+                    outAction.type = static_cast<UIActionType>(99); // Test button action
+                    return true;
                 }
             }
         }
@@ -125,6 +147,8 @@ bool UIManager::handleEvent(const sf::Event& event, GameMode gameMode, GameState
                         return true;
                     }
                 }
+                // If no button was clicked, still consume the event to prevent fall-through
+                return true;
             }
         }
     }
@@ -340,6 +364,19 @@ void UIManager::update(const Player& player, const Monster& monster, const TimeM
             m_roomNameText.setString(currentRoom->name);
             m_roomDescriptionText.setString("Explore the room. Which way will you go?");
 
+            // Update stats text
+            std::string stats = "Vigor: " + std::to_string(player.getVigor()) + "\n" +
+                                "Speed: " + std::to_string(player.getSpeed()) + "\n" +
+                                "Wit: " + std::to_string(player.getWit());
+            m_playerStatsText.setString(stats);
+
+            // Update test button text
+            m_testEquipButtonText.setString("Equip Sword"); // Simplified for now
+            sf::FloatRect textBounds = m_testEquipButtonText.getLocalBounds();
+            m_testEquipButtonText.setOrigin(sf::Vector2f(textBounds.position.x + textBounds.size.x / 2.0f, textBounds.position.y + textBounds.size.y / 2.0f));
+            m_testEquipButtonText.setPosition(m_testEquipButton.getPosition() + sf::Vector2f(m_testEquipButton.getSize().x / 2.0f, m_testEquipButton.getSize().y / 2.0f));
+
+
             // --- Dynamic Door Button Generation ---
             doorButtons.clear();
             doorButtonTexts.clear();
@@ -476,6 +513,9 @@ void UIManager::render(sf::RenderWindow& window, const sf::Vector2f& boardOrigin
                 window.draw(doorButtons[i]);
                 window.draw(doorButtonTexts[i]);
             }
+            window.draw(m_testEquipButton);
+            window.draw(m_testEquipButtonText);
+            window.draw(m_playerStatsText);
             break;
         case GameState::Playing:
             window.draw(leftPanel);

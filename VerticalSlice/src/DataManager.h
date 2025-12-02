@@ -8,6 +8,7 @@
 #include <SFML/Graphics/Font.hpp>
 #include "Structs.h"
 #include "Judgement.h"
+#include "ItemData.h"
 
 struct AnimationTimings {
     int swap_duration_ms = 200;
@@ -29,6 +30,7 @@ public:
     bool loadAllMonsters(const std::string& path);
     bool loadFloor(const std::string& path);
     bool loadConfig(const std::string& path);
+    bool loadItemBases(const std::string& path);
 
     // Getters
     const GemCatalogEntry* getGemCatalogEntry(GemSubType subType) const;
@@ -45,6 +47,7 @@ public:
     const std::vector<JudgementTrial>& getJudgementTrials() const;
     const sf::Font& getFont() const;
     const AnimationTimings& getAnimationTimings() const;
+    const ItemBase* getItemBase(const std::string& id) const;
 
 private:
     bool loadJudgementTrials();
@@ -53,6 +56,7 @@ private:
     std::map<PrimaryGemType, std::string> m_primaryGemTypes;
     std::map<int, SecondaryGemTypeData> m_secondaryGemTypes;
     std::map<GemSubType, GemCatalogEntry> m_gemCatalog;
+    std::map<std::string, ItemBase> m_itemBases;
 
     // Other Data Members
     std::vector<Attunement> attunements;

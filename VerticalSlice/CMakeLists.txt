@@ -64,6 +64,9 @@ set(SOURCE_FILES
     src/EffectProcessor.cpp
     src/TimeManager.cpp
     src/TimeManager.h
+    src/ItemData.h
+    src/ItemFactory.cpp
+    src/ItemFactory.h
 )
 target_sources(game PRIVATE ${SOURCE_FILES})
 

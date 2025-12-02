@@ -144,6 +144,29 @@ void from_json(const json& j, Floor& f) {
     j.at("rooms").get_to(f.rooms);
 }
 
+void from_json(const json& j, ItemBase& ib) {
+    j.at("id").get_to(ib.id);
+    j.at("name").get_to(ib.name);
+    j.at("description").get_to(ib.description);
+    // TODO: Need a stringToEquipmentSlot function
+    // For now, manual mapping:
+    std::string slotStr = j.at("slot").get<std::string>();
+    if (slotStr == "Weapon") { ib.slot = EquipmentSlot::Weapon; }
+    else if (slotStr == "OffHand") { ib.slot = EquipmentSlot::OffHand; }
+    else if (slotStr == "Head") { ib.slot = EquipmentSlot::Head; }
+    else if (slotStr == "Body") { ib.slot = EquipmentSlot::Body; }
+    else if (slotStr == "Legs") { ib.slot = EquipmentSlot::Legs; }
+    else if (slotStr == "Feet") { ib.slot = EquipmentSlot::Feet; }
+    else if (slotStr == "Hands") { ib.slot = EquipmentSlot::Hands; }
+    else if (slotStr == "Ring1") { ib.slot = EquipmentSlot::Ring1; }
+    else if (slotStr == "Ring2") { ib.slot = EquipmentSlot::Ring2; }
+
+    if (j.contains("base_damage")) {
+        j.at("base_damage").get_to(ib.baseDamage);
+    }
+}
+
+
 // =================================================================================
 // DataManager Implementation
 // =================================================================================
@@ -178,6 +201,9 @@ DataManager::DataManager() {
     }
     if (!loadConfig("data/config.json")) {
         std::cerr << "Failed to load config." << '\n';
+    }
+    if (!loadItemBases("data/item_bases.json")) {
+        std::cerr << "Failed to load item bases." << '\n';
     }
 }
 
@@ -317,6 +343,31 @@ bool DataManager::loadJudgementTrials() {
     }
     return true;
 }
+
+bool DataManager::loadItemBases(const std::string& path) {
+    std::ifstream f(path);
+    if (!f.is_open()) { return false; }
+    try {
+        json data = json::parse(f);
+        for (const auto& item : data) {
+            ItemBase base = item.get<ItemBase>();
+            m_itemBases[base.id] = base;
+        }
+    } catch (const json::exception& e) {
+        std::cerr << "JSON error in item bases: " << e.what() << '\n';
+        return false;
+    }
+    return true;
+}
+
+const ItemBase* DataManager::getItemBase(const std::string& id) const {
+    auto it = m_itemBases.find(id);
+    if (it != m_itemBases.end()) {
+        return &it->second;
+    }
+    return nullptr;
+}
+
 
 const GemCatalogEntry* DataManager::getGemCatalogEntry(GemSubType subType) const {
     auto it = m_gemCatalog.find(subType);

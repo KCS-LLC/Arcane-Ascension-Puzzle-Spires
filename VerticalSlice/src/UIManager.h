@@ -118,6 +118,15 @@ private:
     sf::Text m_targetingPromptText;
     sf::Text m_dateText;
     sf::Text m_timeText;
+
+    // FOR TESTING:
+    sf::RectangleShape m_testEquipButton;
+    sf::Text m_testEquipButtonText;
+    sf::Text m_playerStatsText;
+
+    // Inventory UI
+    std::vector<sf::RectangleShape> m_inventorySlots;
+    std::vector<sf::Sprite> m_inventoryItemIcons;
 };
 
 #endif // UIMANAGER_H
